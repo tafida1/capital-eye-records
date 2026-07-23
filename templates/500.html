@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Server Error | CAPITAL EYE HOSPITAL RECORDS SYSTEM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/app.css' %}" rel="stylesheet">
+</head>
+<body class="error-page-body">
+
+<div class="error-page-card">
+    <div class="error-icon">⚠️</div>
+    <h1>500</h1>
+    <h3>System Error</h3>
+    <p>
+        The system encountered an unexpected error.
+        Please contact the administrator or technical support.
+    </p>
+
+    <a href="{% url 'dashboard' %}" class="btn btn-primary">
+        Return to Dashboard
+    </a>
+
+    <div class="error-footer">
+        CAPITAL EYE HOSPITAL RECORDS SYSTEM<br>
+        Developed by Mutafs Global Technology<br>
+        © {% now "Y" %} All Rights Reserved.
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Appointment Calendar{% endblock %}
+
+{% block content %}
+
+<div class="calendar-hero">
+    <div class="calendar-icon">📅</div>
+
+    <div class="calendar-main">
+        <span class="calendar-label">Clinic Appointment Calendar</span>
+        <h2>Appointments for {{ calendar_date }}</h2>
+        <p>View scheduled consultation, follow-up, surgery, procedure, and eye test appointments.</p>
+    </div>
+
+    <div class="calendar-actions">
+        <a href="{% url 'appointment_create' %}" class="btn btn-light btn-sm">+ New Appointment</a>
+        <a href="{% url 'clinic_queue' %}" class="btn btn-outline-light btn-sm">Clinic Queue</a>
+    </div>
+</div>
+
+<div class="panel-card mt-4 mb-4">
+    <form method="get" class="row g-2">
+        <div class="col-md-10">
+            <input type="date" name="date" value="{{ calendar_date|date:'Y-m-d' }}" class="form-control">
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary">View Date</button>
+        </div>
+    </form>
+</div>
+
+<div class="row g-4">
+    {% for appointment in appointments %}
+        <div class="col-lg-4 col-md-6">
+            <div class="appointment-card-pro">
+                <div class="appointment-card-top">
+                    <span>{{ appointment.appointment_time|time:"h:i A" }}</span>
+
+                    {% if appointment.status == "COMPLETED" %}
+                        <strong class="badge bg-success">{{ appointment.get_status_display }}</strong>
+                    {% elif appointment.status == "ARRIVED" %}
+                        <strong class="badge bg-info">{{ appointment.get_status_display }}</strong>
+                    {% elif appointment.status == "CANCELLED" %}
+                        <strong class="badge bg-danger">{{ appointment.get_status_display }}</strong>
+                    {% elif appointment.status == "MISSED" %}
+                        <strong class="badge bg-dark">{{ appointment.get_status_display }}</strong>
+                    {% else %}
+                        <strong class="badge bg-secondary">{{ appointment.get_status_display }}</strong>
+                    {% endif %}
+                </div>
+
+                <h5>{{ appointment.patient.full_name }}</h5>
+                <p>File No: {{ appointment.patient.file_number }}</p>
+                <p>Type: {{ appointment.get_appointment_type_display }}</p>
+                <p>Assigned To: {{ appointment.assigned_to|default:"-" }}</p>
+
+                <div class="appointment-card-actions">
+                    <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                    <a href="{% url 'patient_detail' appointment.patient.pk %}" class="btn btn-sm btn-outline-dark">Patient</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="professional-empty-state">
+                <div class="empty-icon">📅</div>
+                <h5>No Appointments for This Date</h5>
+                <p>Create an appointment or select another date.</p>
+                <a href="{% url 'appointment_create' %}" class="btn btn-primary btn-sm">Create Appointment</a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

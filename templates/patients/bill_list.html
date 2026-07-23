@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Billing | CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Billing / Payments</h2>
+        <p>Create bills, record payments, track outstanding balances, and print receipts.</p>
+    </div>
+
+    <a href="{% url 'bill_create' %}" class="btn btn-primary">
+        + Create Bill
+    </a>
+</div>
+
+<div class="billing-summary-grid mb-4">
+    <div class="billing-summary-card">
+        <span>🧾</span>
+        <strong>Total Bills</strong>
+        <h3>{{ total_bills }}</h3>
+    </div>
+
+    <div class="billing-summary-card warning">
+        <span>⏳</span>
+        <strong>Unpaid / Part Paid</strong>
+        <h3>{{ unpaid_bills }}</h3>
+    </div>
+</div>
+
+<div class="enterprise-filter-card">
+    <form method="get" class="row g-2">
+        <div class="col-md-8">
+            <input type="text" name="q" value="{{ query }}" class="form-control"
+                   placeholder="Search by bill number, patient name, file number, phone, bill title...">
+        </div>
+
+        <div class="col-md-2">
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary">Search</button>
+        </div>
+    </form>
+</div>
+
+<div class="enterprise-table-card">
+    <div class="enterprise-table-header">
+        <div>
+            <h5>Billing Records</h5>
+            <small>Bills, payments, outstanding balances, and receipts.</small>
+        </div>
+
+        <a href="{% url 'bill_create' %}" class="btn btn-primary btn-sm">
+            + Create Bill
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table enterprise-table">
+            <thead>
+                <tr>
+                    <th>Bill No.</th>
+                    <th>Patient</th>
+                    <th>File No.</th>
+                    <th>Title</th>
+                    <th>Net Amount</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for bill in bills %}
+                    <tr>
+                        <td data-label="Bill No.">
+                            <span class="table-primary-text">{{ bill.bill_number }}</span>
+                        </td>
+
+                        <td data-label="Patient">
+                            <strong>{{ bill.patient.full_name }}</strong>
+                        </td>
+
+                        <td data-label="File No.">{{ bill.patient.file_number }}</td>
+
+                        <td data-label="Title">{{ bill.bill_title }}</td>
+
+                        <td data-label="Net Amount">₦{{ bill.net_amount }}</td>
+
+                        <td data-label="Paid">₦{{ bill.amount_paid }}</td>
+
+                        <td data-label="Balance">
+                            {% if bill.balance > 0 %}
+                                <strong class="text-danger">₦{{ bill.balance }}</strong>
+                            {% else %}
+                                <strong class="text-success">₦0.00</strong>
+                            {% endif %}
+                        </td>
+
+                        <td data-label="Status">
+                            {% if bill.status == "PAID" %}
+                                <span class="enterprise-badge success">{{ bill.get_status_display }}</span>
+                            {% elif bill.status == "PART_PAID" %}
+                                <span class="enterprise-badge warning">{{ bill.get_status_display }}</span>
+                            {% elif bill.status == "CANCELLED" %}
+                                <span class="enterprise-badge danger">{{ bill.get_status_display }}</span>
+                            {% else %}
+                                <span class="enterprise-badge dark">{{ bill.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+
+                        <td data-label="Actions">
+                            <div class="enterprise-actions">
+                                <a href="{% url 'bill_detail' bill.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="9">
+                            <div class="enterprise-empty-state">
+                                <div class="enterprise-empty-icon">💰</div>
+                                <h5>No Billing Records Found</h5>
+                                <p>Create a bill for patient consultation, surgery, procedure, or service.</p>
+                                <a href="{% url 'bill_create' %}" class="btn btn-primary btn-sm">
+                                    Create First Bill
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/pagination.html" %}
+</div>
+
+{% endblock %}

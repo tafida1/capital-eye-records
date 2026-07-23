@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Surgery Theatre Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="theatre-hero">
+    <div class="theatre-icon">🏥</div>
+
+    <div class="theatre-main">
+        <span class="theatre-label">Surgery / Procedure Theatre</span>
+        <h2>Theatre Dashboard</h2>
+        <p>{{ theatre_date }} — planned, active, completed, postponed, and cancelled theatre cases.</p>
+    </div>
+
+    <div class="theatre-actions">
+        <a href="{% url 'surgery_create' %}" class="btn btn-light btn-sm">+ New Procedure</a>
+        <a href="{% url 'surgery_list' %}" class="btn btn-outline-light btn-sm">All Surgery Records</a>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-xl-3 col-md-6">
+        <div class="theatre-stat-card">
+            <span>📋</span>
+            <h3>{{ planned_count }}</h3>
+            <p>Planned</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="theatre-stat-card active">
+            <span>⚕️</span>
+            <h3>{{ in_progress_count }}</h3>
+            <p>In Progress</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="theatre-stat-card success">
+            <span>✅</span>
+            <h3>{{ completed_count }}</h3>
+            <p>Completed</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="theatre-stat-card warning">
+            <span>⏳</span>
+            <h3>{{ postponed_count }}</h3>
+            <p>Postponed</p>
+        </div>
+    </div>
+
+</div>
+
+<div class="panel-card mt-4 mb-4">
+    <form method="get" class="row g-2">
+        <div class="col-md-10">
+            <input type="date" name="date" value="{{ theatre_date|date:'Y-m-d' }}" class="form-control">
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary">View Theatre Date</button>
+        </div>
+    </form>
+</div>
+
+<div class="panel-card">
+    <div class="panel-header">
+        <h5>Theatre Schedule</h5>
+    </div>
+
+    {% for surgery in surgeries %}
+        <div class="theatre-case-card">
+            <div class="theatre-case-time">
+                {% if surgery.scheduled_date %}
+                    {{ surgery.scheduled_date|time:"h:i A" }}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+
+            <div class="theatre-case-main">
+                <h5>{{ surgery.procedure_name }}</h5>
+                <p>
+                    {{ surgery.procedure_number }} |
+                    Patient:
+                    <a href="{% url 'patient_detail' surgery.patient.pk %}">
+                        {{ surgery.patient.full_name }}
+                    </a>
+                    |
+                    File No: {{ surgery.patient.file_number }}
+                </p>
+
+                <div class="theatre-case-tags">
+                    <span>{{ surgery.get_eye_side_display }}</span>
+                    <span>{{ surgery.procedure_type|default:"Procedure" }}</span>
+
+                    {% if surgery.status == "COMPLETED" %}
+                        <span class="tag-success">{{ surgery.get_status_display }}</span>
+                    {% elif surgery.status == "IN_PROGRESS" %}
+                        <span class="tag-active">{{ surgery.get_status_display }}</span>
+                    {% elif surgery.status == "POSTPONED" %}
+                        <span class="tag-warning">{{ surgery.get_status_display }}</span>
+                    {% elif surgery.status == "CANCELLED" %}
+                        <span class="tag-danger">{{ surgery.get_status_display }}</span>
+                    {% else %}
+                        <span>{{ surgery.get_status_display }}</span>
+                    {% endif %}
+                </div>
+
+                <small>
+                    Surgeon: {{ surgery.surgeon|default:"-" }} |
+                    Assistant: {{ surgery.assistant|default:"-" }}
+                </small>
+            </div>
+
+            <div class="theatre-case-actions">
+                <a href="{% url 'surgery_detail' surgery.pk %}" class="btn btn-sm btn-outline-primary">
+                    Open
+                </a>
+
+                {% if surgery.status != "IN_PROGRESS" and surgery.status != "COMPLETED" and surgery.status != "CANCELLED" %}
+                    <a href="{% url 'surgery_mark_in_progress' surgery.pk %}" class="btn btn-sm btn-outline-info">
+                        Start
+                    </a>
+                {% endif %}
+
+                {% if surgery.status != "COMPLETED" and surgery.status != "CANCELLED" %}
+                    <a href="{% url 'surgery_mark_completed' surgery.pk %}" class="btn btn-sm btn-outline-success">
+                        Complete
+                    </a>
+                {% endif %}
+
+                {% if surgery.status != "POSTPONED" and surgery.status != "COMPLETED" and surgery.status != "CANCELLED" %}
+                    <a href="{% url 'surgery_mark_postponed' surgery.pk %}" class="btn btn-sm btn-outline-warning">
+                        Postpone
+                    </a>
+                {% endif %}
+
+                {% if surgery.status != "CANCELLED" and surgery.status != "COMPLETED" %}
+                    <a href="{% url 'surgery_mark_cancelled' surgery.pk %}" class="btn btn-sm btn-outline-danger">
+                        Cancel
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="professional-empty-state">
+            <div class="empty-icon">🏥</div>
+            <h5>No Theatre Cases for This Date</h5>
+            <p>Create or schedule surgery/procedure records for this day.</p>
+            <a href="{% url 'surgery_create' %}" class="btn btn-primary btn-sm">
+                Create Surgery / Procedure
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

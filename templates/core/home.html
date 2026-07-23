@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CAPITAL EYE HOSPITAL RECORDS SYSTEM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  :root{
+    --navy:#0b2c47;
+    --navy-deep:#071c30;
+    --iris:#1f7a8c;
+    --iris-light:#5fb3c4;
+    --paper:#fbfcfe;
+    --coral:#ff6b5b;
+    --ink:#33414f;
+  }
+
+  *{ box-sizing:border-box; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow-x:hidden;
+  }
+
+  /* ---------- Ambient backdrop: slow drifting clinical scenes ---------- */
+  .backdrop{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    background: linear-gradient(160deg, var(--navy-deep), var(--navy) 55%, #0e3a5c 100%);
+  }
+
+  .backdrop .scene{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    animation: cycle 18s infinite;
+  }
+  .backdrop .scene:nth-child(1){ animation-delay:0s; }
+  .backdrop .scene:nth-child(2){ animation-delay:6s; }
+  .backdrop .scene:nth-child(3){ animation-delay:12s; }
+
+  @keyframes cycle{
+    0%   { opacity:0; }
+    8%   { opacity:1; }
+    25%  { opacity:1; }
+    33%  { opacity:0; }
+    100% { opacity:0; }
+  }
+
+  /* Scene 1: eye-chart rows, receding */
+  .scene-chart{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    font-weight:700;
+    letter-spacing:.18em;
+    color:rgba(255,255,255,0.22);
+  }
+  .scene-chart span{ display:block; }
+  .scene-chart span:nth-child(1){ font-size:72px; }
+  .scene-chart span:nth-child(2){ font-size:54px; letter-spacing:.3em; }
+  .scene-chart span:nth-child(3){ font-size:38px; letter-spacing:.4em; }
+  .scene-chart span:nth-child(4){ font-size:26px; letter-spacing:.5em; }
+
+  /* Scene 2: radiating iris rings */
+  .scene-rings{
+    display:flex; align-items:center; justify-content:center;
+  }
+  .scene-rings .ring{
+    position:absolute;
+    border-radius:50%;
+    border:1.5px solid rgba(95,179,196,0.45);
+  }
+  .scene-rings .ring:nth-child(1){ width:240px; height:240px; border-color:rgba(255,107,91,0.4); }
+  .scene-rings .ring:nth-child(2){ width:420px; height:420px; }
+  .scene-rings .ring:nth-child(3){ width:620px; height:620px; }
+  .scene-rings .ring:nth-child(4){ width:840px; height:840px; }
+
+  /* Scene 3: soft cross-hatch / scanner lines (suggests retinal scan) */
+  .scene-scan{
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(95,179,196,0.20) 0px,
+      rgba(95,179,196,0.20) 1px,
+      transparent 1px,
+      transparent 26px
+    );
+  }
+  .scene-scan::after{
+    content:"";
+    position:absolute; left:0; right:0; height:160px;
+    background: linear-gradient(to bottom, transparent, rgba(95,179,196,0.5), transparent);
+    animation: sweep 4.5s ease-in-out infinite;
+  }
+  @keyframes sweep{
+    0%   { top:-10%; }
+    100% { top:110%; }
+  }
+
+  /* ---------- Card ---------- */
+  .stage{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:28px;
+    padding:48px 24px;
+    width:100%;
+    max-width:560px;
+  }
+
+  /* Signature element: the iris */
+  .iris{
+    position:relative;
+    width:118px;
+    height:118px;
+    flex-shrink:0;
+  }
+  .iris svg{ width:100%; height:100%; display:block; }
+  .iris .pupil{
+    transform-origin:60px 60px;
+    animation: blink 6s ease-in-out infinite;
+  }
+  @keyframes blink{
+    0%, 88%, 100% { transform: scaleY(1); }
+    92% { transform: scaleY(0.08); }
+    96% { transform: scaleY(1); }
+  }
+
+  .box{
+    background: var(--paper);
+    padding:46px 44px 40px;
+    width:100%;
+    text-align:center;
+    border-radius:22px;
+    box-shadow: 0 24px 60px rgba(7,28,48,0.35);
+  }
+
+  .eyebrow{
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color: var(--iris);
+    margin:0 0 10px;
+  }
+
+  h1{
+    font-size:25px;
+    line-height:1.25;
+    letter-spacing:-0.01em;
+    color: var(--navy);
+    margin:0 0 14px;
+    font-weight:800;
+  }
+
+  p.lead{
+    color:#5b6b7a;
+    font-size:15px;
+    line-height:1.6;
+    margin:0 auto 28px;
+    max-width:420px;
+  }
+
+  .divider{
+    width:46px;
+    height:3px;
+    border-radius:3px;
+    background: var(--coral);
+    margin:0 auto 28px;
+  }
+
+  a.cta{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background: var(--navy);
+    color:white;
+    padding:14px 30px;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:.01em;
+    transition: background .2s ease, transform .15s ease;
+  }
+  a.cta:hover{ background:#0e3a5c; transform:translateY(-1px); }
+  a.cta:focus-visible{ outline:3px solid var(--iris-light); outline-offset:3px; }
+  a.cta svg{ width:16px; height:16px; }
+
+  .footnote{
+    margin-top:22px;
+    font-size:12px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing:.04em;
+  }
+
+  @media (max-width:480px){
+    .box{ padding:38px 26px 32px; }
+    h1{ font-size:21px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="backdrop" aria-hidden="true">
+  <div class="scene scene-chart">
+    <span>E F P</span>
+    <span>T O Z</span>
+    <span>L P E D</span>
+    <span>P E C F D</span>
+  </div>
+  <div class="scene scene-rings">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+  </div>
+  <div class="scene scene-scan"></div>
+</div>
+
+<div class="stage">
+  <div class="iris" aria-hidden="true">
+    <svg viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="58" fill="none" stroke="var(--iris-light)" stroke-width="2" opacity="0.5"/>
+      <circle cx="60" cy="60" r="46" fill="none" stroke="var(--iris)" stroke-width="2" opacity="0.7"/>
+      <circle cx="60" cy="60" r="34" fill="var(--iris)" opacity="0.15"/>
+      <g class="pupil">
+        <circle cx="60" cy="60" r="20" fill="var(--navy)"/>
+        <circle cx="53" cy="53" r="5" fill="white" opacity="0.85"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="box">
+    <p class="eyebrow">Clinic Management &middot; LAN Edition</p>
+    <h1>Capital Eye Hospital<br>Records System</h1>
+    <div class="divider"></div>
+    <p class="lead">
+      Offline, LAN-based records for patient charts, consultations, billing,
+      appointments, and reporting — built for the clinic floor, not the cloud.
+    </p>
+    <a class="cta" href="/admin/">
+      Open admin login
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="13 6 19 12 13 18"></polyline>
+      </svg>
+    </a>
+  </div>
+
+  <p class="footnote">Runs entirely on your local network &mdash; no internet required.</p>
+</div>
+
+</body>
+</html>

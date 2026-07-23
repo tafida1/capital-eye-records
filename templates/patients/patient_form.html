@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | Patient Record{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>{{ title }}</h2>
+        <p>Capture patient demographic, contact, family, and medical background information.</p>
+    </div>
+
+    <a href="{% url 'patient_list' %}" class="btn btn-secondary">
+        Back to Patients
+    </a>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="enterprise-non-field-errors">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <div class="enterprise-form-note">
+        Fields marked with <strong>*</strong> are required. Ensure the phone number and file number are correct to avoid duplicate records.
+    </div>
+
+    <div class="enterprise-form-card">
+        <div class="enterprise-form-header">
+            <h5>Patient Identity</h5>
+            <p>Basic patient identification and file number information.</p>
+        </div>
+
+        <div class="enterprise-form-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    {% include "partials/enterprise_field.html" with field=form.file_number %}
+                </div>
+
+                <div class="col-md-8">
+                    {% include "partials/enterprise_field.html" with field=form.full_name %}
+                </div>
+
+                <div class="col-md-4">
+                    {% include "partials/enterprise_field.html" with field=form.gender %}
+                </div>
+
+                <div class="col-md-4">
+                    {% include "partials/enterprise_field.html" with field=form.date_of_birth %}
+                </div>
+
+                <div class="col-md-4">
+                    {% include "partials/enterprise_field.html" with field=form.age %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="enterprise-form-card">
+        <div class="enterprise-form-header">
+            <h5>Contact Information</h5>
+            <p>Patient phone number, address, occupation, and next of kin details.</p>
+        </div>
+
+        <div class="enterprise-form-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.phone_number %}
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.occupation %}
+                </div>
+
+                <div class="col-md-12">
+                    {% include "partials/enterprise_field.html" with field=form.address %}
+                </div>
+
+                <div class="col-md-4">
+                    {% include "partials/enterprise_field.html" with field=form.next_of_kin_name %}
+                </div>
+
+                <div class="col-md-4">
+                    {% include "partials/enterprise_field.html" with field=form.next_of_kin_phone %}
+                </div>
+
+                <div class="col-md-4">
+                    {% include "partials/enterprise_field.html" with field=form.next_of_kin_relationship %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="enterprise-form-card">
+        <div class="enterprise-form-header">
+            <h5>Family / Group Record</h5>
+            <p>Link this patient to an existing family or group record.</p>
+        </div>
+
+        <div class="enterprise-form-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.family_group %}
+                    <div class="form-text">
+                        Select a registered family/group if this patient belongs to one.
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.family_group_name %}
+                    <div class="form-text">
+                        This can be filled manually or copied from the selected family group.
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.family_relationship %}
+                    <div class="form-text">
+                        Example: Father, Mother, Child, Wife, Husband, Brother, Sister.
+                    </div>
+                </div>
+
+                <div class="col-md-6 d-flex align-items-end">
+                    <a href="{% url 'family_group_create' %}" class="btn btn-outline-primary w-100">
+                        + Create New Family Group
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="enterprise-form-card">
+        <div class="enterprise-form-header">
+            <h5>Medical Background</h5>
+            <p>Medical history, allergy history, diagnosis notes, and treatment information.</p>
+        </div>
+
+        <div class="enterprise-form-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.medical_history %}
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.allergy_history %}
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.eye_complaint %}
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.diagnosis %}
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.treatment %}
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.surgery_procedure_details %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="enterprise-form-card">
+        <div class="enterprise-form-header">
+            <h5>Payment and Notes</h5>
+            <p>Payment status and any additional clinical or administrative notes.</p>
+        </div>
+
+        <div class="enterprise-form-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    {% include "partials/enterprise_field.html" with field=form.payment_status %}
+                </div>
+
+                <div class="col-md-8">
+                    {% include "partials/enterprise_field.html" with field=form.notes %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "partials/form_actions.html" with button_text=button_text cancel_url=request.META.HTTP_REFERER %}
+
+</form>
+
+{% endblock %}

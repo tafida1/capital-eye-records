@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>System Settings</h2>
+        <p>Manage hospital identity, report footers, currency, and system behavior.</p>
+    </div>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Hospital Identity</h5>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Hospital Name</label>
+                {{ form.hospital_name }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">System Name</label>
+                {{ form.system_name }}
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Hospital Address</label>
+                {{ form.hospital_address }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Hospital Phone</label>
+                {{ form.hospital_phone }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Hospital Email</label>
+                {{ form.hospital_email }}
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Reports and Receipts</h5>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Receipt Footer</label>
+                {{ form.receipt_footer }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Report Footer</label>
+                {{ form.report_footer }}
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Default Currency</label>
+                {{ form.default_currency }}
+            </div>
+
+            <div class="col-md-8">
+                <label class="form-label">Backup Reminder Text</label>
+                {{ form.backup_reminder_text }}
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>System Behavior</h5>
+        </div>
+
+        <div class="form-check mb-3">
+            {{ form.allow_duplicate_warning }}
+            <label class="form-check-label">
+                Enable duplicate patient warning
+            </label>
+        </div>
+
+        <div class="form-check">
+            {{ form.enable_audit_logs }}
+            <label class="form-check-label">
+                Enable audit logs
+            </label>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-lg">
+            Save Settings
+        </button>
+    </div>
+</form>
+
+{% endblock %}

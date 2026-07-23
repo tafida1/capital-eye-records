@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | Staff Account{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>{{ title }}</h2>
+        <p>Create or update staff login, role, department, and permission status.</p>
+    </div>
+
+    <a href="{% url 'staff_dashboard' %}" class="btn btn-secondary">Back to Staff</a>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="enterprise-non-field-errors">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <div class="enterprise-form-note">
+        Fields marked with <strong>*</strong> are required. Ensure the username is unique and the role is correctly assigned.
+    </div>
+
+    <div class="enterprise-form-card">
+        <div class="enterprise-form-header">
+            <h5>Staff Account Information</h5>
+            <p>Login credentials, role assignment, department, and account status.</p>
+        </div>
+
+        <div class="enterprise-form-body">
+            <div class="row g-3">
+                {% for field in form %}
+                    <div class="col-md-6">
+                        {% if field.field.widget.input_type == "checkbox" %}
+                            <div class="enterprise-form-check mt-4">
+                                {{ field }}
+                                <label class="form-check-label" for="{{ field.id_for_label }}">
+                                    {{ field.label }}
+                                </label>
+                            </div>
+                        {% else %}
+                            <div class="enterprise-field-group">
+                                <label class="enterprise-field-label" for="{{ field.id_for_label }}">
+                                    {{ field.label }}
+                                    {% if field.field.required %}<span class="required-star">*</span>{% endif %}
+                                </label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="enterprise-field-error">{{ field.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% include "partials/form_actions.html" with button_text=button_text cancel_url=request.META.HTTP_REFERER %}
+
+</form>
+
+{% endblock %}

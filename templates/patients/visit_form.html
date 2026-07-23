@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>{{ title }}</h2>
+        <p>Create or update a patient encounter record.</p>
+    </div>
+
+    <a href="{% url 'visit_list' %}" class="btn btn-secondary">
+        Back to Visits
+    </a>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Visit Information</h5>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Patient</label>
+                {{ form.patient }}
+                <div class="text-danger small">{{ form.patient.errors }}</div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Visit Type</label>
+                {{ form.visit_type }}
+                <div class="text-danger small">{{ form.visit_type.errors }}</div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                {{ form.status }}
+                <div class="text-danger small">{{ form.status.errors }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Complaint and Brief History</h5>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Chief Complaint</label>
+                {{ form.chief_complaint }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Brief History</label>
+                {{ form.brief_history }}
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Vital Signs</h5>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Temperature</label>
+                {{ form.temperature }}
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Blood Pressure</label>
+                {{ form.blood_pressure }}
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Pulse</label>
+                {{ form.pulse }}
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Weight</label>
+                {{ form.weight }}
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Notes</label>
+                {{ form.notes }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-lg">
+            {{ button_text }}
+        </button>
+
+        <a href="{% url 'visit_list' %}" class="btn btn-secondary btn-lg">
+            Cancel
+        </a>
+    </div>
+</form>
+
+{% endblock %}

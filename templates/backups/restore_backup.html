@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Restore Backup{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Restore Backup</h2>
+        <p>Restore system data from a previous backup file.</p>
+    </div>
+
+    <a href="{% url 'backup_dashboard' %}" class="btn btn-secondary">
+        Back to Backups
+    </a>
+</div>
+
+<div class="alert alert-danger">
+    Warning: Restore should only be done by an authorized admin.
+    It may overwrite or duplicate records if used carelessly.
+</div>
+
+<div class="panel-card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">Backup File (.zip)</label>
+            {{ form.backup_file }}
+        </div>
+
+        <div class="form-check mb-3">
+            {{ form.confirm_restore }}
+            <label class="form-check-label">
+                I understand this will restore data into the system.
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-danger btn-lg">
+            Restore Backup
+        </button>
+    </form>
+</div>
+
+{% endblock %}

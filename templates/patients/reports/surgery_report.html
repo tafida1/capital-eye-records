@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Surgery Report{% endblock %}
+
+{% block content %}
+
+<div class="report-page-header no-print">
+    <div>
+        <h2>Surgery / Procedure Report</h2>
+        <p>Planned, active, completed, postponed, and cancelled theatre records.</p>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button onclick="window.print()" class="btn btn-primary">Print Report</button>
+
+        <a href="{% url 'surgery_report_pdf' %}?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}&status={{ status }}" class="btn btn-outline-danger no-loader">
+            PDF
+        </a>
+
+        <a href="{% url 'surgery_report_excel' %}?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}&status={{ status }}" class="btn btn-outline-success no-loader">
+            Excel
+        </a>
+    </div>
+</div>
+
+<div class="panel-card mb-4 no-print">
+    <form method="get" class="row g-2">
+        <div class="col-md-3">
+            <label class="form-label">Start Date</label>
+            <input type="date" name="start_date" value="{{ start_date|date:'Y-m-d' }}" class="form-control">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">End Date</label>
+            <input type="date" name="end_date" value="{{ end_date|date:'Y-m-d' }}" class="form-control">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <label class="form-label">&nbsp;</label>
+            <button class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="print-report-sheet">
+
+    <div class="print-report-title">
+        <h2>{{ system_settings.hospital_name|default:"CAPITAL EYE HOSPITAL" }}</h2>
+        <p>Surgery / Procedure Report</p>
+        <small>{{ start_date }} to {{ end_date }}</small>
+    </div>
+
+    <div class="report-summary-row">
+        <div><span>Total Procedures</span><strong>{{ surgeries.count }}</strong></div>
+    </div>
+
+    <h5>Status Summary</h5>
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Count</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in status_summary %}
+                <tr>
+                    <td>{{ item.status }}</td>
+                    <td>{{ item.count }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="2">No status summary found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h5>Surgery / Procedure Records</h5>
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Scheduled</th>
+                <th>Procedure No.</th>
+                <th>Patient</th>
+                <th>File No.</th>
+                <th>Procedure</th>
+                <th>Eye</th>
+                <th>Status</th>
+                <th>Surgeon</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for surgery in surgeries %}
+                <tr>
+                    <td>{{ surgery.scheduled_date|date:"d M Y, h:i A"|default:"-" }}</td>
+                    <td>{{ surgery.procedure_number }}</td>
+                    <td>{{ surgery.patient.full_name }}</td>
+                    <td>{{ surgery.patient.file_number }}</td>
+                    <td>{{ surgery.procedure_name }}</td>
+                    <td>{{ surgery.get_eye_side_display }}</td>
+                    <td>{{ surgery.get_status_display }}</td>
+                    <td>{{ surgery.surgeon|default:"-" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="8">No surgery/procedure records found for this period.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

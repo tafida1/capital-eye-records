@@ -1,0 +1,61 @@
+{% extends "patients/reports/pdf/report_pdf_base.html" %}
+
+{% block content %}
+
+<h2>Surgery / Procedure Report</h2>
+<p><strong>Period:</strong> {{ start_date }} to {{ end_date }}</p>
+
+<table class="summary-table">
+    <tr>
+        <th>Total Procedures</th>
+    </tr>
+    <tr>
+        <td>{{ surgeries.count }}</td>
+    </tr>
+</table>
+
+<h3>Status Summary</h3>
+<table>
+    <tr>
+        <th>Status</th>
+        <th>Count</th>
+    </tr>
+    {% for item in status_summary %}
+    <tr>
+        <td>{{ item.status }}</td>
+        <td>{{ item.count }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="2">No status summary found.</td></tr>
+    {% endfor %}
+</table>
+
+<h3>Surgery / Procedure Records</h3>
+<table>
+    <tr>
+        <th>Scheduled</th>
+        <th>No</th>
+        <th>Patient</th>
+        <th>File No</th>
+        <th>Procedure</th>
+        <th>Eye</th>
+        <th>Status</th>
+        <th>Surgeon</th>
+    </tr>
+    {% for surgery in surgeries %}
+    <tr>
+        <td>{{ surgery.scheduled_date|date:"d M Y, h:i A"|default:"-" }}</td>
+        <td>{{ surgery.procedure_number }}</td>
+        <td>{{ surgery.patient.full_name }}</td>
+        <td>{{ surgery.patient.file_number }}</td>
+        <td>{{ surgery.procedure_name }}</td>
+        <td>{{ surgery.get_eye_side_display }}</td>
+        <td>{{ surgery.get_status_display }}</td>
+        <td>{{ surgery.surgeon|default:"-" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="8">No surgery records found.</td></tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

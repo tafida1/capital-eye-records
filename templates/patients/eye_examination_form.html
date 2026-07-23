@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | Eye Examination{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>{{ title }}</h2>
+        <p>
+            Patient: <strong>{{ visit.patient.full_name }}</strong> |
+            File No: <strong>{{ visit.patient.file_number }}</strong> |
+            Visit: <strong>{{ visit.visit_number }}</strong>
+        </p>
+    </div>
+
+    <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-secondary">
+        Back to Visit
+    </a>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Visual Acuity</h5>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Right Visual Acuity</label>
+                {{ form.right_visual_acuity }}
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Left Visual Acuity</label>
+                {{ form.left_visual_acuity }}
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Right Pinhole</label>
+                {{ form.right_pinhole }}
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Left Pinhole</label>
+                {{ form.left_pinhole }}
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Right Near Vision</label>
+                {{ form.right_near_vision }}
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Left Near Vision</label>
+                {{ form.left_near_vision }}
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Refraction</h5>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead>
+                    <tr>
+                        <th>Eye</th>
+                        <th>Sphere</th>
+                        <th>Cylinder</th>
+                        <th>Axis</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td><strong>Right Eye</strong></td>
+                        <td>{{ form.right_sphere }}</td>
+                        <td>{{ form.right_cylinder }}</td>
+                        <td>{{ form.right_axis }}</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Left Eye</strong></td>
+                        <td>{{ form.left_sphere }}</td>
+                        <td>{{ form.left_cylinder }}</td>
+                        <td>{{ form.left_axis }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Intraocular Pressure</h5>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Right IOP</label>
+                {{ form.right_iop }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Left IOP</label>
+                {{ form.left_iop }}
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Eye Examination Findings</h5>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">External Examination</label>
+                {{ form.external_exam }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Anterior Segment</label>
+                {{ form.anterior_segment }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Posterior Segment</label>
+                {{ form.posterior_segment }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Fundus Examination</label>
+                {{ form.fundus_exam }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Slit Lamp Examination</label>
+                {{ form.slit_lamp_exam }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Right Eye Findings</label>
+                {{ form.right_eye_findings }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Left Eye Findings</label>
+                {{ form.left_eye_findings }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Impression</label>
+                {{ form.impression }}
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Recommendation</label>
+                {{ form.recommendation }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-lg">
+            {{ button_text }}
+        </button>
+
+        <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-secondary btn-lg">
+            Cancel
+        </a>
+    </div>
+</form>
+
+{% endblock %}

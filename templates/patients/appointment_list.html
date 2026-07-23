@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Appointments | CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Appointments</h2>
+        <p>Schedule, track, confirm, and manage patient appointments.</p>
+    </div>
+
+    <a href="{% url 'appointment_create' %}" class="btn btn-primary">
+        + Create Appointment
+    </a>
+</div>
+
+<div class="enterprise-filter-card">
+    <form method="get" class="row g-2">
+        <div class="col-md-5">
+            <input type="text" name="q" value="{{ query }}" class="form-control"
+                   placeholder="Search by appointment no, patient name, file no, phone, reason...">
+        </div>
+
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <input type="date" name="date" value="{{ date }}" class="form-control">
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="enterprise-table-card">
+    <div class="enterprise-table-header">
+        <div>
+            <h5>Appointment Records</h5>
+            <small>Schedule, track, confirm, and manage patient appointments.</small>
+        </div>
+
+        <a href="{% url 'appointment_create' %}" class="btn btn-primary btn-sm">
+            + Create Appointment
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table enterprise-table">
+            <thead>
+                <tr>
+                    <th>Appointment No.</th>
+                    <th>Patient</th>
+                    <th>File No.</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Assigned To</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for appointment in appointments %}
+                    <tr>
+                        <td data-label="Appointment No.">
+                            <span class="table-primary-text">{{ appointment.appointment_number }}</span>
+                        </td>
+
+                        <td data-label="Patient">
+                            <strong>{{ appointment.patient.full_name }}</strong>
+                        </td>
+
+                        <td data-label="File No.">{{ appointment.patient.file_number }}</td>
+
+                        <td data-label="Type">{{ appointment.get_appointment_type_display }}</td>
+
+                        <td data-label="Status">
+                            <span class="enterprise-badge dark">{{ appointment.get_status_display }}</span>
+                        </td>
+
+                        <td data-label="Date">{{ appointment.appointment_date|date:"d M Y" }}</td>
+
+                        <td data-label="Time">{{ appointment.appointment_time|time:"h:i A" }}</td>
+
+                        <td data-label="Assigned To">{{ appointment.assigned_to|default:"-" }}</td>
+
+                        <td data-label="Actions">
+                            <div class="enterprise-actions">
+                                <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="9">
+                            <div class="enterprise-empty-state">
+                                <div class="enterprise-empty-icon">📅</div>
+                                <h5>No Appointments Found</h5>
+                                <p>Schedule a new appointment for a patient consultation or follow-up.</p>
+                                <a href="{% url 'appointment_create' %}" class="btn btn-primary btn-sm">
+                                    Create First Appointment
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/pagination.html" %}
+</div>
+
+{% endblock %}

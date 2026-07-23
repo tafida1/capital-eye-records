@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Visit History | {{ patient.full_name }}{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Visit History</h2>
+        <p>
+            {{ patient.full_name }} |
+            File No: <strong>{{ patient.file_number }}</strong>
+        </p>
+    </div>
+
+    <div>
+        <a href="{% url 'patient_visit_create' patient.pk %}" class="btn btn-primary">
+            + New Visit
+        </a>
+
+        <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-secondary">
+            Back to Patient
+        </a>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Visit No.</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Complaint</th>
+                    <th>Created By</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for visit in visits %}
+                    <tr>
+                        <td><strong>{{ visit.visit_number }}</strong></td>
+                        <td>{{ visit.visit_date|date:"d M Y, h:i A" }}</td>
+                        <td>{{ visit.get_visit_type_display }}</td>
+                        <td>{{ visit.get_status_display }}</td>
+                        <td>{{ visit.chief_complaint|truncatechars:55|default:"-" }}</td>
+                        <td>{{ visit.created_by|default:"-" }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No visit history found for this patient.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

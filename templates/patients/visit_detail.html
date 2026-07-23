@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+
+{% block title %}{{ visit.visit_number }} | Visit Detail{% endblock %}
+
+{% block content %}
+
+<div class="visit-hero">
+    <div class="visit-icon">🩺</div>
+
+    <div class="visit-main">
+        <span class="visit-label">Patient Encounter</span>
+        <h2>{{ visit.visit_number }}</h2>
+        <p>
+            Patient:
+            <a href="{% url 'patient_detail' visit.patient.pk %}">
+                <strong>{{ visit.patient.full_name }}</strong>
+            </a>
+            |
+            File No: <strong>{{ visit.patient.file_number }}</strong>
+        </p>
+
+        <div class="visit-badges">
+            <span>{{ visit.get_visit_type_display }}</span>
+            <span>{{ visit.get_status_display }}</span>
+            <span>{{ visit.visit_date|date:"d M Y, h:i A" }}</span>
+            <span>Created by: {{ visit.created_by|default:"-" }}</span>
+        </div>
+    </div>
+
+    <div class="visit-actions">
+        <a href="{% url 'visit_update' visit.pk %}" class="btn btn-light btn-sm">Edit Visit</a>
+        <a href="{% url 'visit_report_pdf' visit.pk %}" class="btn btn-outline-light btn-sm no-loader">Visit PDF</a>
+        <a href="{% url 'patient_visit_history' visit.patient.pk %}" class="btn btn-outline-light btn-sm">Visit History</a>
+        <button onclick="window.print()" class="btn btn-warning btn-sm no-print">Print</button>
+    </div>
+</div>
+
+<div class="visit-action-strip mt-4">
+
+    {% if visit.consultation %}
+        <a href="{% url 'consultation_update' visit.consultation.pk %}" class="btn btn-success">
+            Edit Consultation
+        </a>
+    {% else %}
+        <a href="{% url 'consultation_create' visit.pk %}" class="btn btn-success">
+            + Consultation
+        </a>
+    {% endif %}
+
+    {% if visit.eye_examination %}
+        <a href="{% url 'eye_examination_update' visit.eye_examination.pk %}" class="btn btn-info">
+            Edit Eye Exam
+        </a>
+    {% else %}
+        <a href="{% url 'eye_examination_create' visit.pk %}" class="btn btn-info">
+            + Eye Exam
+        </a>
+    {% endif %}
+
+    {% if visit.diagnosis_treatment %}
+        <a href="{% url 'diagnosis_treatment_update' visit.diagnosis_treatment.pk %}" class="btn btn-warning">
+            Edit Diagnosis
+        </a>
+    {% else %}
+        <a href="{% url 'diagnosis_treatment_create' visit.pk %}" class="btn btn-warning">
+            + Diagnosis
+        </a>
+    {% endif %}
+
+    <a href="{% url 'prescription_create' visit.pk %}" class="btn btn-dark">
+        + Prescription
+    </a>
+
+    <a href="{% url 'visit_surgery_create' visit.pk %}" class="btn btn-outline-warning">
+        + Surgery / Procedure
+    </a>
+
+    <a href="{% url 'patient_detail' visit.patient.pk %}" class="btn btn-outline-primary">
+        Patient Profile
+    </a>
+
+</div>
+
+
+<div class="row g-4 mt-2">
+
+    <div class="col-xl-3 col-md-6">
+        <div class="clinical-stat-card">
+            <span>🌡️</span>
+            <h5>{{ visit.temperature|default:"-" }}</h5>
+            <p>Temperature</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="clinical-stat-card">
+            <span>🩸</span>
+            <h5>{{ visit.blood_pressure|default:"-" }}</h5>
+            <p>Blood Pressure</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="clinical-stat-card">
+            <span>❤️</span>
+            <h5>{{ visit.pulse|default:"-" }}</h5>
+            <p>Pulse</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="clinical-stat-card">
+            <span>⚖️</span>
+            <h5>{{ visit.weight|default:"-" }}</h5>
+            <p>Weight</p>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-lg-4">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Visit Information</h5>
+            </div>
+
+            <div class="profile-info-list">
+                <p><strong>Visit Number:</strong> {{ visit.visit_number }}</p>
+                <p><strong>Visit Date:</strong> {{ visit.visit_date|date:"d M Y, h:i A" }}</p>
+                <p><strong>Visit Type:</strong> {{ visit.get_visit_type_display }}</p>
+                <p><strong>Status:</strong> {{ visit.get_status_display }}</p>
+                <p><strong>Created By:</strong> {{ visit.created_by|default:"-" }}</p>
+            </div>
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header">
+                <h5>Patient Snapshot</h5>
+            </div>
+
+            <div class="visit-patient-card">
+                <div class="visit-patient-avatar">
+                    {{ visit.patient.full_name|slice:":1"|upper }}
+                </div>
+
+                <div>
+                    <strong>{{ visit.patient.full_name }}</strong>
+                    <small>{{ visit.patient.file_number }}</small>
+                    <small>{{ visit.patient.phone_number|default:"No phone" }}</small>
+                </div>
+            </div>
+
+            <a href="{% url 'patient_detail' visit.patient.pk %}" class="btn btn-outline-primary w-100 mt-3">
+                Open Patient Profile
+            </a>
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header">
+                <h5>Visit Notes</h5>
+            </div>
+
+            <p>{{ visit.notes|linebreaksbr|default:"No notes recorded." }}</p>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+
+        <div class="panel-card clinical-summary-panel">
+            <div class="panel-header">
+                <h5>Chief Complaint and History</h5>
+            </div>
+
+            <div class="clinical-text-block">
+                <strong>Chief Complaint</strong>
+                <p>{{ visit.chief_complaint|linebreaksbr|default:"No chief complaint recorded." }}</p>
+            </div>
+
+            <div class="clinical-text-block">
+                <strong>Brief History</strong>
+                <p>{{ visit.brief_history|linebreaksbr|default:"No brief history recorded." }}</p>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-1">
+
+            <div class="col-lg-6">
+                <div class="panel-card">
+                    <div class="panel-header d-flex justify-content-between align-items-center">
+                        <h5>Consultation</h5>
+
+                        {% if visit.consultation %}
+                            <a href="{% url 'consultation_update' visit.consultation.pk %}" class="btn btn-sm btn-outline-primary">
+                                Edit
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {% if visit.consultation %}
+                        <div class="clinical-text-block">
+                            <strong>Presenting Complaint</strong>
+                            <p>{{ visit.consultation.presenting_complaint|linebreaksbr|default:"-" }}</p>
+                        </div>
+
+                        <div class="clinical-text-block">
+                            <strong>Final Diagnosis</strong>
+                            <p>{{ visit.consultation.final_diagnosis|linebreaksbr|default:"-" }}</p>
+                        </div>
+
+                        <div class="clinical-text-block">
+                            <strong>Treatment Plan</strong>
+                            <p>{{ visit.consultation.treatment_plan|linebreaksbr|default:"-" }}</p>
+                        </div>
+
+                        <small>Doctor: {{ visit.consultation.doctor|default:"-" }}</small>
+                    {% else %}
+                        <div class="empty-state">No consultation record added.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="panel-card">
+                    <div class="panel-header d-flex justify-content-between align-items-center">
+                        <h5>Eye Examination</h5>
+
+                        {% if visit.eye_examination %}
+                            <a href="{% url 'eye_examination_update' visit.eye_examination.pk %}" class="btn btn-sm btn-outline-primary">
+                                Edit
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {% if visit.eye_examination %}
+                        <div class="eye-exam-grid">
+                            <div>
+                                <strong>Right VA</strong>
+                                <span>{{ visit.eye_examination.right_visual_acuity|default:"-" }}</span>
+                            </div>
+                            <div>
+                                <strong>Left VA</strong>
+                                <span>{{ visit.eye_examination.left_visual_acuity|default:"-" }}</span>
+                            </div>
+                            <div>
+                                <strong>Right IOP</strong>
+                                <span>{{ visit.eye_examination.right_iop|default:"-" }}</span>
+                            </div>
+                            <div>
+                                <strong>Left IOP</strong>
+                                <span>{{ visit.eye_examination.left_iop|default:"-" }}</span>
+                            </div>
+                        </div>
+
+                        <div class="clinical-text-block mt-3">
+                            <strong>Impression</strong>
+                            <p>{{ visit.eye_examination.impression|linebreaksbr|default:"-" }}</p>
+                        </div>
+
+                        <div class="clinical-text-block">
+                            <strong>Recommendation</strong>
+                            <p>{{ visit.eye_examination.recommendation|linebreaksbr|default:"-" }}</p>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">No eye examination record added.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header d-flex justify-content-between align-items-center">
+                <h5>Diagnosis and Treatment</h5>
+
+                {% if visit.diagnosis_treatment %}
+                    <a href="{% url 'diagnosis_treatment_update' visit.diagnosis_treatment.pk %}" class="btn btn-sm btn-outline-primary">
+                        Edit
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if visit.diagnosis_treatment %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="diagnosis-box">
+                            <strong>Primary Diagnosis</strong>
+                            <p>{{ visit.diagnosis_treatment.primary_diagnosis|linebreaksbr }}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="diagnosis-box soft">
+                            <strong>Secondary Diagnosis</strong>
+                            <p>{{ visit.diagnosis_treatment.secondary_diagnosis|linebreaksbr|default:"-" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="diagnosis-box">
+                            <strong>Treatment Plan</strong>
+                            <p>{{ visit.diagnosis_treatment.treatment_plan|linebreaksbr|default:"-" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="diagnosis-box soft">
+                            <strong>Follow-up Instruction</strong>
+                            <p>{{ visit.diagnosis_treatment.follow_up_instruction|linebreaksbr|default:"-" }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty-state">No diagnosis/treatment record added.</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header d-flex justify-content-between align-items-center">
+                <h5>Prescriptions</h5>
+                <a href="{% url 'prescription_create' visit.pk %}" class="btn btn-sm btn-outline-primary">
+                    + Add
+                </a>
+            </div>
+
+            {% if prescriptions %}
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead>
+                            <tr>
+                                <th>Drug</th>
+                                <th>Dosage</th>
+                                <th>Frequency</th>
+                                <th>Duration</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for prescription in prescriptions %}
+                                <tr>
+                                    <td>{{ prescription.drug_name }}</td>
+                                    <td>{{ prescription.dosage|default:"-" }}</td>
+                                    <td>{{ prescription.frequency|default:"-" }}</td>
+                                    <td>{{ prescription.duration|default:"-" }}</td>
+                                    <td>
+                                        <a href="{% url 'prescription_update' prescription.pk %}" class="btn btn-sm btn-outline-primary">
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                {% if prescription.instructions %}
+                                    <tr>
+                                        <td colspan="5">
+                                            <strong>Instructions:</strong>
+                                            {{ prescription.instructions|linebreaksbr }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">No prescription has been added for this visit.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header d-flex justify-content-between align-items-center">
+                <h5>Surgery / Procedures</h5>
+                <a href="{% url 'visit_surgery_create' visit.pk %}" class="btn btn-sm btn-outline-primary">
+                    + Add
+                </a>
+            </div>
+
+            {% if surgeries %}
+                {% for surgery in surgeries %}
+                    <div class="mini-list-item">
+                        <strong>{{ surgery.procedure_name }}</strong>
+                        <small>{{ surgery.procedure_number }} | {{ surgery.get_status_display }}</small>
+                        <a href="{% url 'surgery_detail' surgery.pk %}">Open</a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">No surgery/procedure record has been attached to this visit.</div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Billing Records for This Visit</h5>
+            </div>
+
+            {% if bills %}
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead>
+                            <tr>
+                                <th>Bill No.</th>
+                                <th>Title</th>
+                                <th>Net Amount</th>
+                                <th>Paid</th>
+                                <th>Balance</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for bill in bills %}
+                                <tr>
+                                    <td>{{ bill.bill_number }}</td>
+                                    <td>{{ bill.bill_title }}</td>
+                                    <td>₦{{ bill.net_amount }}</td>
+                                    <td>₦{{ bill.amount_paid }}</td>
+                                    <td>₦{{ bill.balance }}</td>
+                                    <td>{{ bill.get_status_display }}</td>
+                                    <td>
+                                        <a href="{% url 'bill_detail' bill.pk %}" class="btn btn-sm btn-outline-primary">
+                                            Open
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">No bill has been attached to this visit.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

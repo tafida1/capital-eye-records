@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Reports Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="reports-hero">
+    <div class="reports-icon">📊</div>
+
+    <div class="reports-main">
+        <span class="reports-label">Hospital Reports Center</span>
+        <h2>Reports Dashboard</h2>
+        <p>Financial, clinical, appointment, surgery, and operational summaries.</p>
+    </div>
+
+    <div class="reports-actions">
+        <button onclick="window.print()" class="btn btn-light btn-sm no-print">Print Summary</button>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-xl-3 col-md-6">
+        <div class="report-stat-card">
+            <span>👤</span>
+            <h3>{{ total_patients }}</h3>
+            <p>Total Patients</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="report-stat-card">
+            <span>🩺</span>
+            <h3>{{ total_visits }}</h3>
+            <p>Total Visits</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="report-stat-card">
+            <span>📅</span>
+            <h3>{{ total_appointments }}</h3>
+            <p>Total Appointments</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="report-stat-card">
+            <span>🏥</span>
+            <h3>{{ total_surgeries }}</h3>
+            <p>Total Surgeries</p>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-xl-4 col-md-6">
+        <div class="report-money-card">
+            <span>💰</span>
+            <h3>₦{{ total_revenue }}</h3>
+            <p>Total Revenue Collected</p>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="report-money-card success">
+            <span>📈</span>
+            <h3>₦{{ today_revenue }}</h3>
+            <p>Today Revenue</p>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="report-money-card warning">
+            <span>⚠️</span>
+            <h3>₦{{ outstanding_balance }}</h3>
+            <p>Outstanding Balance</p>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-lg-3 col-md-6">
+        <a href="{% url 'financial_report' %}" class="report-link-card">
+            <span>💰</span>
+            <strong>Financial Report</strong>
+            <small>Payments, bills, balances, payment methods.</small>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <a href="{% url 'clinical_report' %}" class="report-link-card">
+            <span>🩺</span>
+            <strong>Clinical Report</strong>
+            <small>Visits, consultations, prescriptions, diagnosis.</small>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <a href="{% url 'appointment_report' %}" class="report-link-card">
+            <span>📅</span>
+            <strong>Appointment Report</strong>
+            <small>Scheduled, arrived, completed, missed appointments.</small>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <a href="{% url 'surgery_report' %}" class="report-link-card">
+            <span>🏥</span>
+            <strong>Surgery Report</strong>
+            <small>Planned, completed, postponed, cancelled procedures.</small>
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}{{ staff.username }} | Staff Detail{% endblock %}
+
+{% block content %}
+
+<div class="staff-profile-hero">
+    <div class="staff-avatar">
+        {{ staff.get_full_name|default:staff.username|slice:":1"|upper }}
+    </div>
+
+    <div class="staff-profile-main">
+        <span class="staff-label">Staff Profile</span>
+        <h2>{{ staff.get_full_name|default:staff.username }}</h2>
+        <p>
+            Username: <strong>{{ staff.username }}</strong> |
+            Role: <strong>{{ staff.get_role_display }}</strong>
+        </p>
+
+        <div class="staff-badges">
+            <span>{{ staff.department|default:"No Department" }}</span>
+            <span>{{ staff.email|default:"No Email" }}</span>
+            <span>{{ staff.phone_number|default:"No Phone" }}</span>
+            {% if staff.is_active %}
+                <span>Active</span>
+            {% else %}
+                <span>Inactive</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="staff-profile-actions">
+        <a href="{% url 'staff_update' staff.pk %}" class="btn btn-light btn-sm">Edit</a>
+        {% if staff != request.user %}
+            <a href="{% url 'staff_toggle_active' staff.pk %}" class="btn btn-outline-light btn-sm">
+                {% if staff.is_active %}Deactivate{% else %}Activate{% endif %}
+            </a>
+        {% endif %}
+        <a href="{% url 'staff_dashboard' %}" class="btn btn-outline-light btn-sm">Back</a>
+
+        <a href="{% url 'staff_password_reset' staff.pk %}" class="btn btn-warning btn-sm">
+            Reset Password
+        </a>
+
+        <a href="{% url 'staff_force_password_change' staff.pk %}" class="btn btn-outline-light btn-sm">
+            Force Password Change
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-lg-4">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Account Information</h5>
+            </div>
+
+            <div class="profile-info-list">
+                <p><strong>Username:</strong> {{ staff.username }}</p>
+                <p><strong>Full Name:</strong> {{ staff.get_full_name|default:"-" }}</p>
+                <p><strong>Email:</strong> {{ staff.email|default:"-" }}</p>
+                <p><strong>Phone:</strong> {{ staff.phone_number|default:"-" }}</p>
+                <p><strong>Staff ID:</strong> {{ staff.staff_id|default:"-" }}</p>
+                <p><strong>Department:</strong> {{ staff.department|default:"-" }}</p>
+            </div>
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header">
+                <h5>Access Status</h5>
+            </div>
+
+            <p><strong>Role:</strong> {{ staff.get_role_display }}</p>
+            <p><strong>Active:</strong> {{ staff.is_active }}</p>
+            <p><strong>Staff/Admin:</strong> {{ staff.is_staff }}</p>
+            <p><strong>Superuser:</strong> {{ staff.is_superuser }}</p>
+            <p><strong>Last Login:</strong> {{ staff.last_login|date:"d M Y, h:i A"|default:"Never" }}</p>
+            <p><strong>Date Joined:</strong> {{ staff.date_joined|date:"d M Y, h:i A" }}</p>
+            <p><strong>Must Change Password:</strong> {{ staff.must_change_password }}</p>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Recent Activity</h5>
+            </div>
+
+            {% for log in recent_logs %}
+                <div class="activity-item">
+                    <strong>{{ log.get_action_display }} - {{ log.module }}</strong>
+                    <p>{{ log.description }}</p>
+                    <small>{{ log.created_at|date:"d M Y, h:i A" }} | IP: {{ log.ip_address|default:"-" }}</small>
+                </div>
+            {% empty %}
+                <div class="empty-state">No activity recorded for this staff member.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

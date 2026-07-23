@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Patients | CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Patients</h2>
+        <p>Register, search, and manage patient records.</p>
+    </div>
+
+    <div>
+        <a href="{% url 'patient_excel_import' %}" class="btn btn-outline-primary">
+            Import Excel
+        </a>
+
+        <a href="{% url 'patient_excel_export' %}" class="btn btn-outline-success no-loader">
+            Export Excel
+        </a>
+
+        <a href="{% url 'patient_create' %}" class="btn btn-primary">
+            + Register Patient
+        </a>
+    </div>
+</div>
+
+<div class="enterprise-filter-card">
+    <form method="get" class="row g-2">
+        <div class="col-md-10">
+            <input type="text" name="q" value="{{ query }}" class="form-control"
+                   placeholder="Search by file number, patient name, phone number, diagnosis...">
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary">Search</button>
+        </div>
+    </form>
+</div>
+
+<div class="enterprise-table-card">
+    <div class="enterprise-table-header">
+        <div>
+            <h5>Patient Records</h5>
+            <small>Registered patient files and medical records.</small>
+        </div>
+
+        <a href="{% url 'patient_create' %}" class="btn btn-primary btn-sm">
+            + Register Patient
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table enterprise-table">
+            <thead>
+                <tr>
+                    <th>File No.</th>
+                    <th>Patient</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                    <th>Phone</th>
+                    <th>Payment</th>
+                    <th>Registered</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for patient in patients %}
+                    <tr>
+                        <td data-label="File No.">
+                            <span class="table-primary-text">{{ patient.file_number }}</span>
+                        </td>
+
+                        <td data-label="Patient">
+                            <strong>{{ patient.full_name }}</strong><br>
+                            <span class="table-muted-text">{{ patient.address|default:"No address" }}</span>
+                        </td>
+
+                        <td data-label="Gender">{{ patient.get_gender_display }}</td>
+
+                        <td data-label="Age">{{ patient.display_age|default:"-" }}</td>
+
+                        <td data-label="Phone">{{ patient.phone_number|default:"-" }}</td>
+
+                        <td data-label="Payment">
+                            {% if patient.payment_status == "PAID" %}
+                                <span class="enterprise-badge success">{{ patient.get_payment_status_display }}</span>
+                            {% elif patient.payment_status == "PART_PAID" %}
+                                <span class="enterprise-badge warning">{{ patient.get_payment_status_display }}</span>
+                            {% else %}
+                                <span class="enterprise-badge dark">{{ patient.get_payment_status_display }}</span>
+                            {% endif %}
+                        </td>
+
+                        <td data-label="Registered">
+                            {{ patient.registration_date|date:"d M Y" }}
+                        </td>
+
+                        <td data-label="Actions">
+                            <div class="enterprise-actions">
+                                <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                                <a href="{% url 'patient_update' patient.pk %}" class="btn btn-sm btn-outline-dark">Edit</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8">
+                            <div class="enterprise-empty-state">
+                                <div class="enterprise-empty-icon">👤</div>
+                                <h5>No Patient Records Found</h5>
+                                <p>Register a new patient or import existing clinic records from Excel.</p>
+                                <a href="{% url 'patient_create' %}" class="btn btn-primary btn-sm">
+                                    Register First Patient
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/pagination.html" %}
+</div>
+
+{% endblock %}

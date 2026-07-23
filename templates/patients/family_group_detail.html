@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{{ family_group.family_name }} | Family Group{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>{{ family_group.family_name }}</h2>
+        <p>Family Code: <strong>{{ family_group.family_code }}</strong></p>
+    </div>
+
+    <div>
+        <a href="{% url 'family_group_update' family_group.pk %}" class="btn btn-primary">
+            Edit Family Group
+        </a>
+
+        <a href="{% url 'patient_create' %}" class="btn btn-outline-primary">
+            + Add Patient
+        </a>
+
+        <a href="{% url 'family_group_list' %}" class="btn btn-secondary">
+            Back
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+
+    <div class="col-lg-4">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Family Information</h5>
+            </div>
+
+            <p><strong>Family Code:</strong> {{ family_group.family_code }}</p>
+            <p><strong>Family Name:</strong> {{ family_group.family_name }}</p>
+            <p><strong>Head of Family:</strong> {{ family_group.head_of_family|default:"-" }}</p>
+            <p><strong>Primary Phone:</strong> {{ family_group.primary_phone|default:"-" }}</p>
+            <p><strong>Address:</strong><br>{{ family_group.address|linebreaksbr|default:"-" }}</p>
+            <p><strong>Notes:</strong><br>{{ family_group.notes|linebreaksbr|default:"-" }}</p>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Family Members</h5>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>File No.</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Age</th>
+                            <th>Relationship</th>
+                            <th>Phone</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for patient in members %}
+                            <tr>
+                                <td><strong>{{ patient.file_number }}</strong></td>
+                                <td>{{ patient.full_name }}</td>
+                                <td>{{ patient.get_gender_display }}</td>
+                                <td>{{ patient.display_age|default:"-" }}</td>
+                                <td>{{ patient.family_relationship|default:"-" }}</td>
+                                <td>{{ patient.phone_number|default:"-" }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    No patients have been attached to this family/group yet.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

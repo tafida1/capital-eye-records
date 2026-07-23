@@ -1,0 +1,90 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | CAPITAL EYE HOSPITAL RECORDS SYSTEM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/app.css' %}" rel="stylesheet">
+</head>
+<body class="login-body-pro">
+
+<div class="login-shell">
+
+    <div class="login-visual">
+        <div class="visual-overlay">
+            <div class="eye-icon-large">👁️</div>
+            <h1>CAPITAL EYE HOSPITAL</h1>
+            <p>Secure offline LAN-based patient records, consultation, billing, appointment, and reporting system.</p>
+
+            <div class="login-feature-grid">
+                <div>👤 Patient Registration</div>
+                <div>👁️ Eye Examination</div>
+                <div>🩺 Consultation Records</div>
+                <div>💊 Prescriptions</div>
+                <div>📅 Appointments</div>
+                <div>💰 Billing & Receipts</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="login-panel">
+        <div class="login-card-pro">
+            <div class="text-center mb-4">
+                <div class="hospital-logo-pro">CEH</div>
+                <h3 class="fw-bold mt-3 mb-1">
+                    {{ system_settings.hospital_name|default:"CAPITAL EYE HOSPITAL" }}
+                </h3>
+                <p class="text-muted mb-0">
+                    {{ system_settings.system_name|default:"Records Management System" }}
+                </p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="text-danger small">{{ form.password.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 login-btn">
+                    Login Securely
+                </button>
+            </form>
+
+            <div class="login-footer-note">
+                Offline LAN Clinic System<br>
+                Access restricted to authorized hospital staff only.
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

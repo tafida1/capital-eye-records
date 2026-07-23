@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}System Information{% endblock %}
+
+{% block content %}
+
+<div class="system-info-hero">
+    <div class="system-info-icon">ℹ️</div>
+
+    <div>
+        <span class="system-info-label">Enterprise Product Information</span>
+        <h2>CAPITAL EYE HOSPITAL RECORDS SYSTEM</h2>
+        <p>Complete clinic management and electronic medical records system.</p>
+    </div>
+</div>
+
+<div class="row g-4 mt-3">
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Software Information</h5>
+            </div>
+
+            <p><strong>System Name:</strong> CAPITAL EYE HOSPITAL RECORDS SYSTEM</p>
+            <p><strong>Version:</strong> {{ system_version }}</p>
+            <p><strong>Edition:</strong> {{ edition }}</p>
+            <p><strong>License:</strong> {{ license_type }}</p>
+            <p><strong>Deployment:</strong> LAN / Offline</p>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Developer Information</h5>
+            </div>
+
+            <p><strong>Developed By:</strong> {{ developer }}</p>
+            <p><strong>Specialization:</strong> Software Development, ICT Solutions, Database Systems, Hospital Systems</p>
+            <p><strong>Country:</strong> Nigeria</p>
+            <p><strong>Copyright:</strong> © {% now "Y" %} Mutafs Global Technology. All Rights Reserved.</p>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Technology Stack</h5>
+            </div>
+
+            <p><strong>Python:</strong> {{ python_version }}</p>
+            <p><strong>Django:</strong> {{ django_version }}</p>
+            <p><strong>Database:</strong> PostgreSQL</p>
+            <p><strong>Server:</strong> Waitress / LAN Server</p>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Current Session</h5>
+            </div>
+
+            <p><strong>User:</strong> {{ request.user.get_full_name|default:request.user.username }}</p>
+            <p><strong>Role:</strong> {{ request.user.get_role_display }}</p>
+            <p><strong>Date/Time:</strong> {% now "d M Y, h:i A" %}</p>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | Payment{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>{{ title }}</h2>
+        <p>
+            Bill: <strong>{{ bill.bill_number }}</strong> |
+            Patient: <strong>{{ bill.patient.full_name }}</strong>
+        </p>
+    </div>
+
+    <a href="{% url 'bill_detail' bill.pk %}" class="btn btn-secondary">Back to Bill</a>
+</div>
+
+<div class="payment-overview mb-4">
+    <div>
+        <span>Net Amount</span>
+        <strong>₦{{ bill.net_amount }}</strong>
+    </div>
+
+    <div>
+        <span>Amount Paid</span>
+        <strong>₦{{ bill.amount_paid }}</strong>
+    </div>
+
+    <div class="danger">
+        <span>Outstanding Balance</span>
+        <strong>₦{{ bill.balance }}</strong>
+    </div>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="enterprise-non-field-errors">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <div class="enterprise-form-note">
+        Fields marked with <strong>*</strong> are required. Payment amount cannot exceed the outstanding balance of <strong>₦{{ bill.balance }}</strong>.
+    </div>
+
+    <div class="enterprise-form-card">
+        <div class="enterprise-form-header">
+            <h5>Payment Information</h5>
+            <p>Enter payment amount, method, date, and reference details.</p>
+        </div>
+
+        <div class="enterprise-form-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    {% include "partials/enterprise_field.html" with field=form.amount %}
+                </div>
+
+                <div class="col-md-4">
+                    {% include "partials/enterprise_field.html" with field=form.payment_method %}
+                </div>
+
+                <div class="col-md-4">
+                    {% include "partials/enterprise_field.html" with field=form.payment_date %}
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.reference_number %}
+                    <div class="form-text">For transfer, POS, cheque, or external reference.</div>
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.notes %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "partials/form_actions.html" with button_text=button_text cancel_url=request.META.HTTP_REFERER %}
+
+</form>
+
+{% endblock %}

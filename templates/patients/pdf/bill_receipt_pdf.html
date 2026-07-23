@@ -1,0 +1,51 @@
+{% extends "patients/pdf/pdf_base.html" %}
+
+{% block content %}
+
+<h2>Payment Receipt</h2>
+
+<table>
+    <tr><th>Bill Number</th><td>{{ bill.bill_number }}</td></tr>
+    <tr><th>Patient</th><td>{{ bill.patient.full_name }}</td></tr>
+    <tr><th>File Number</th><td>{{ bill.patient.file_number }}</td></tr>
+    <tr><th>Phone</th><td>{{ bill.patient.phone_number|default:"-" }}</td></tr>
+    <tr><th>Bill Title</th><td>{{ bill.bill_title }}</td></tr>
+    <tr><th>Status</th><td>{{ bill.get_status_display }}</td></tr>
+</table>
+
+<h3>Bill Summary</h3>
+<table>
+    <tr><th>Total Amount</th><td class="amount">₦{{ bill.total_amount }}</td></tr>
+    <tr><th>Discount</th><td>₦{{ bill.discount }}</td></tr>
+    <tr><th>Net Amount</th><td class="amount">₦{{ bill.net_amount }}</td></tr>
+    <tr><th>Amount Paid</th><td class="amount">₦{{ bill.amount_paid }}</td></tr>
+    <tr><th>Balance</th><td class="amount">₦{{ bill.balance }}</td></tr>
+</table>
+
+<h3>Payment History</h3>
+<table>
+    <tr>
+        <th>Receipt No.</th>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Date</th>
+        <th>Received By</th>
+    </tr>
+    {% for payment in payments %}
+    <tr>
+        <td>{{ payment.receipt_number }}</td>
+        <td>₦{{ payment.amount }}</td>
+        <td>{{ payment.get_payment_method_display }}</td>
+        <td>{{ payment.payment_date|date:"d M Y, h:i A" }}</td>
+        <td>{{ payment.received_by|default:"-" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No payments recorded.</td></tr>
+    {% endfor %}
+</table>
+
+<p>
+    <strong>Cashier:</strong> {{ bill.created_by|default:"-" }}
+</p>
+
+{% endblock %}

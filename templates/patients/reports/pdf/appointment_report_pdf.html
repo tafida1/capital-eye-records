@@ -1,0 +1,61 @@
+{% extends "patients/reports/pdf/report_pdf_base.html" %}
+
+{% block content %}
+
+<h2>Appointment Report</h2>
+<p><strong>Period:</strong> {{ start_date }} to {{ end_date }}</p>
+
+<table class="summary-table">
+    <tr>
+        <th>Total Appointments</th>
+    </tr>
+    <tr>
+        <td>{{ appointments.count }}</td>
+    </tr>
+</table>
+
+<h3>Status Summary</h3>
+<table>
+    <tr>
+        <th>Status</th>
+        <th>Count</th>
+    </tr>
+    {% for item in status_summary %}
+    <tr>
+        <td>{{ item.status }}</td>
+        <td>{{ item.count }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="2">No status summary found.</td></tr>
+    {% endfor %}
+</table>
+
+<h3>Appointments</h3>
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>No</th>
+        <th>Patient</th>
+        <th>File No</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Assigned</th>
+    </tr>
+    {% for appointment in appointments %}
+    <tr>
+        <td>{{ appointment.appointment_date|date:"d M Y" }}</td>
+        <td>{{ appointment.appointment_time|time:"h:i A" }}</td>
+        <td>{{ appointment.appointment_number }}</td>
+        <td>{{ appointment.patient.full_name }}</td>
+        <td>{{ appointment.patient.file_number }}</td>
+        <td>{{ appointment.get_appointment_type_display }}</td>
+        <td>{{ appointment.get_status_display }}</td>
+        <td>{{ appointment.assigned_to|default:"-" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="8">No appointments found.</td></tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+
+<div class="notification-hero">
+    <div class="notification-icon">🔔</div>
+
+    <div class="notification-main">
+        <span class="notification-label">Notification Center</span>
+        <h2>Notifications</h2>
+        <p>Backup reminders, appointment alerts, system announcements, and important updates.</p>
+    </div>
+
+    <div class="notification-actions">
+        <a href="{% url 'notification_mark_all_read' %}" class="btn btn-light btn-sm">
+            Mark All Read
+        </a>
+    </div>
+</div>
+
+<div class="enterprise-filter-card mt-4">
+    <form method="get" class="row g-2">
+        <div class="col-md-8">
+            <input type="text" name="q" value="{{ query }}" class="form-control"
+                   placeholder="Search notifications...">
+        </div>
+
+        <div class="col-md-2">
+            <select name="status" class="form-select">
+                <option value="">All</option>
+                <option value="unread" {% if status == "unread" %}selected{% endif %}>Unread</option>
+                <option value="read" {% if status == "read" %}selected{% endif %}>Read</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="enterprise-table-card">
+    <div class="enterprise-table-header">
+        <div>
+            <h5>Notification Center</h5>
+            <small>Backup reminders, appointment alerts, system announcements, and updates.</small>
+        </div>
+
+        <a href="{% url 'notification_mark_all_read' %}" class="btn btn-outline-secondary btn-sm">
+            Mark All Read
+        </a>
+    </div>
+
+    {% for notification in notifications %}
+        <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
+            <div class="notification-type-icon">
+                {% if notification.notification_type == "BACKUP" %}
+                    💾
+                {% elif notification.notification_type == "APPOINTMENT" %}
+                    📅
+                {% elif notification.notification_type == "DANGER" %}
+                    ⚠️
+                {% elif notification.notification_type == "SUCCESS" %}
+                    ✅
+                {% else %}
+                    🔔
+                {% endif %}
+            </div>
+
+            <div class="notification-content">
+                <strong>{{ notification.title }}</strong>
+                <p>{{ notification.message }}</p>
+                <small>{{ notification.created_at|date:"d M Y, h:i A" }}</small>
+            </div>
+
+            <div class="notification-buttons">
+                {% if notification.link %}
+                    <a href="{% url 'notification_mark_read' notification.pk %}" class="btn btn-sm btn-outline-primary">
+                        Open
+                    </a>
+                {% else %}
+                    <a href="{% url 'notification_mark_read' notification.pk %}" class="btn btn-sm btn-outline-secondary">
+                        Mark Read
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="enterprise-empty-state">
+            <div class="enterprise-empty-icon">🔔</div>
+            <h5>No Notifications</h5>
+            <p>You currently have no system notifications.</p>
+        </div>
+    {% endfor %}
+
+    {% include "partials/pagination.html" %}
+</div>
+
+{% endblock %}

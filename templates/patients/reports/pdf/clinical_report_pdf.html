@@ -1,0 +1,65 @@
+{% extends "patients/reports/pdf/report_pdf_base.html" %}
+
+{% block content %}
+
+<h2>Clinical Activity Report</h2>
+<p><strong>Period:</strong> {{ start_date }} to {{ end_date }}</p>
+
+<table class="summary-table">
+    <tr>
+        <th>Visits</th>
+        <th>Consultations</th>
+        <th>Prescriptions</th>
+        <th>Diagnosis Records</th>
+    </tr>
+    <tr>
+        <td>{{ visits.count }}</td>
+        <td>{{ consultations.count }}</td>
+        <td>{{ prescriptions.count }}</td>
+        <td>{{ diagnosis_records.count }}</td>
+    </tr>
+</table>
+
+<h3>Visit Type Summary</h3>
+<table>
+    <tr>
+        <th>Visit Type</th>
+        <th>Count</th>
+    </tr>
+    {% for item in visit_type_summary %}
+    <tr>
+        <td>{{ item.visit_type }}</td>
+        <td>{{ item.count }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="2">No visit summary found.</td></tr>
+    {% endfor %}
+</table>
+
+<h3>Visits</h3>
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Visit No</th>
+        <th>Patient</th>
+        <th>File No</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Complaint</th>
+    </tr>
+    {% for visit in visits %}
+    <tr>
+        <td>{{ visit.visit_date|date:"d M Y, h:i A" }}</td>
+        <td>{{ visit.visit_number }}</td>
+        <td>{{ visit.patient.full_name }}</td>
+        <td>{{ visit.patient.file_number }}</td>
+        <td>{{ visit.get_visit_type_display }}</td>
+        <td>{{ visit.get_status_display }}</td>
+        <td>{{ visit.chief_complaint|default:"-" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7">No visits found.</td></tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

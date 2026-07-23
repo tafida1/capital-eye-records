@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Surgery History | {{ patient.full_name }}{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Surgery / Procedure History</h2>
+        <p>
+            {{ patient.full_name }} |
+            File No: <strong>{{ patient.file_number }}</strong>
+        </p>
+    </div>
+
+    <div>
+        <a href="{% url 'patient_surgery_create' patient.pk %}" class="btn btn-primary">
+            + New Surgery / Procedure
+        </a>
+
+        <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-secondary">
+            Back to Patient
+        </a>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Procedure No.</th>
+                    <th>Procedure</th>
+                    <th>Type</th>
+                    <th>Eye</th>
+                    <th>Status</th>
+                    <th>Scheduled</th>
+                    <th>Surgeon</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for surgery in surgeries %}
+                    <tr>
+                        <td><strong>{{ surgery.procedure_number }}</strong></td>
+                        <td>{{ surgery.procedure_name }}</td>
+                        <td>{{ surgery.procedure_type|default:"-" }}</td>
+                        <td>{{ surgery.get_eye_side_display }}</td>
+                        <td>{{ surgery.get_status_display }}</td>
+                        <td>{{ surgery.scheduled_date|date:"d M Y, h:i A"|default:"-" }}</td>
+                        <td>{{ surgery.surgeon|default:"-" }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'surgery_detail' surgery.pk %}" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            No surgery/procedure record found for this patient.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

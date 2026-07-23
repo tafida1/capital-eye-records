@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header dashboard-header-pro">
+    <div>
+        <span class="dashboard-label">Clinic Operations Dashboard</span>
+        <h2>{{ system_settings.hospital_name|default:"CAPITAL EYE HOSPITAL" }}</h2>
+        <p>
+            Welcome back, {{ request.user.get_full_name|default:request.user.username }}.
+            You are logged in as <strong>{{ request.user.get_role_display }}</strong>.
+        </p>
+    </div>
+
+    <div class="dashboard-hero-card">
+        <span>💾</span>
+        <strong>Backup Reminder</strong>
+        <small>{{ system_settings.backup_reminder_text|default:"Backup clinic records regularly." }}</small>
+    </div>
+</div>
+
+<div class="row g-4 mt-1 kpi-row">
+
+    <div class="col-xl-3 col-md-6">
+        <div class="premium-kpi-card kpi-blue">
+            <div class="kpi-top">
+                <div class="kpi-icon">👤</div>
+                <span class="kpi-badge">Patients</span>
+            </div>
+
+            <h3 class="counter-number" data-target="{{ total_patients }}">0</h3>
+            <p>Total Registered Patients</p>
+
+            <div class="kpi-footer">
+                <span>EMR Database</span>
+                <strong>Active</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="premium-kpi-card kpi-green">
+            <div class="kpi-top">
+                <div class="kpi-icon">🩺</div>
+                <span class="kpi-badge">Visits</span>
+            </div>
+
+            <h3 class="counter-number" data-target="{{ visits_today }}">0</h3>
+            <p>Patient Visits Today</p>
+
+            <div class="kpi-footer">
+                <span>Clinical Flow</span>
+                <strong>Today</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="premium-kpi-card kpi-purple">
+            <div class="kpi-top">
+                <div class="kpi-icon">📅</div>
+                <span class="kpi-badge">Appointments</span>
+            </div>
+
+            <h3 class="counter-number" data-target="{{ appointments_today }}">0</h3>
+            <p>Appointments Today</p>
+
+            <div class="kpi-footer">
+                <span>Clinic Schedule</span>
+                <strong>Live</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="premium-kpi-card kpi-orange">
+            <div class="kpi-top">
+                <div class="kpi-icon">💰</div>
+                <span class="kpi-badge">Revenue</span>
+            </div>
+
+            <h3>
+                ₦<span class="counter-number" data-target="{{ today_payments }}">0</span>
+            </h3>
+            <p>Payments Received Today</p>
+
+            <div class="kpi-footer">
+                <span>Finance</span>
+                <strong>Daily</strong>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-xl-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Quick Actions</h5>
+            </div>
+
+            <div class="premium-quick-actions">
+
+                <a href="{% url 'patient_create' %}" class="premium-action-card">
+                    <div class="action-icon">➕</div>
+                    <div>
+                        <strong>Register Patient</strong>
+                        <small>Create a new patient file</small>
+                    </div>
+                </a>
+
+                <a href="{% url 'global_search' %}" class="premium-action-card">
+                    <div class="action-icon">🔍</div>
+                    <div>
+                        <strong>Search Records</strong>
+                        <small>Find patients, visits, bills</small>
+                    </div>
+                </a>
+
+                <a href="{% url 'visit_create' %}" class="premium-action-card">
+                    <div class="action-icon">🩺</div>
+                    <div>
+                        <strong>New Visit</strong>
+                        <small>Open today's encounter</small>
+                    </div>
+                </a>
+
+                <a href="{% url 'clinic_queue' %}" class="premium-action-card">
+                    <div class="action-icon">🏥</div>
+                    <div>
+                        <strong>Clinic Queue</strong>
+                        <small>Manage waiting patients</small>
+                    </div>
+                </a>
+
+                <a href="{% url 'appointment_calendar' %}" class="premium-action-card">
+                    <div class="action-icon">📆</div>
+                    <div>
+                        <strong>Calendar</strong>
+                        <small>View appointments</small>
+                    </div>
+                </a>
+
+                <a href="{% url 'doctor_worklist' %}" class="premium-action-card">
+                    <div class="action-icon">🩺</div>
+                    <div>
+                        <strong>Doctor Worklist</strong>
+                        <small>Clinical review queue</small>
+                    </div>
+                </a>
+
+                <a href="{% url 'bill_list' %}" class="premium-action-card">
+                    <div class="action-icon">💰</div>
+                    <div>
+                        <strong>Billing</strong>
+                        <small>Bills, payments, receipts</small>
+                    </div>
+                </a>
+
+                <a href="{% url 'reports_dashboard' %}" class="premium-action-card">
+                    <div class="action-icon">📊</div>
+                    <div>
+                        <strong>Reports</strong>
+                        <small>Financial and clinical reports</small>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="panel-card enterprise-side-card">
+            <div class="panel-header">
+                <h5>System Overview</h5>
+            </div>
+
+            <div class="health-grid">
+                <div class="health-item success">
+                    <span>🗄️</span>
+                    <div>
+                        <strong>Database</strong>
+                        <small>{{ system_health.database }}</small>
+                    </div>
+                </div>
+
+                <div class="health-item success">
+                    <span>🌐</span>
+                    <div>
+                        <strong>LAN Mode</strong>
+                        <small>{{ system_health.lan_mode }}</small>
+                    </div>
+                </div>
+
+                <div class="health-item {% if latest_backup %}success{% else %}warning{% endif %}">
+                    <span>💾</span>
+                    <div>
+                        <strong>Backup</strong>
+                        {% if latest_backup %}
+                            <small>{{ latest_backup.name }}</small>
+                        {% else %}
+                            <small>No backup created yet</small>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="health-item success">
+                    <span>💽</span>
+                    <div>
+                        <strong>Storage</strong>
+                        <small>{{ system_health.storage }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="system-mini-info mt-3">
+                <p><strong>Pending Bills:</strong> {{ pending_bills }}</p>
+                <p><strong>Upcoming Surgeries:</strong> {{ upcoming_surgeries }}</p>
+                <p><strong>Logged In As:</strong> {{ request.user.get_role_display }}</p>
+            </div>
+
+            <div class="side-card-actions">
+                <a href="{% url 'backup_dashboard' %}" class="btn btn-sm btn-outline-primary">
+                    Backup Center
+                </a>
+                <a href="{% url 'about_system' %}" class="btn btn-sm btn-outline-dark">
+                    System Info
+                </a>
+            </div>
+        </div>
+
+        <div class="panel-card backup-reminder-card mt-4">
+            <div class="backup-reminder-icon">💾</div>
+
+            <div>
+                <h5>Daily Backup Reminder</h5>
+                <p>
+                    {{ system_settings.backup_reminder_text|default:"Create a backup before closing the clinic today." }}
+                </p>
+
+                {% if latest_backup %}
+                    <small>Latest backup: {{ latest_backup.name }}</small>
+                {% else %}
+                    <small>No backup found. Please create one today.</small>
+                {% endif %}
+
+                <div class="mt-3">
+                    <a href="{% url 'backup_dashboard' %}" class="btn btn-primary btn-sm">
+                        Create Backup
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-lg-4">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Recent Patients</h5>
+            </div>
+
+            {% for patient in recent_patients %}
+                <div class="mini-list-item">
+                    <strong>{{ patient.full_name }}</strong>
+                    <small>{{ patient.file_number }} | {{ patient.registration_date|date:"d M Y" }}</small>
+                    <a href="{% url 'patient_detail' patient.pk %}">Open</a>
+                </div>
+            {% empty %}
+                <div class="empty-state">No patients yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Recent Visits</h5>
+            </div>
+
+            {% for visit in recent_visits %}
+                <div class="mini-list-item">
+                    <strong>{{ visit.patient.full_name }}</strong>
+                    <small>{{ visit.visit_number }} | {{ visit.visit_date|date:"d M Y, h:i A" }}</small>
+                    <a href="{% url 'visit_detail' visit.pk %}">Open</a>
+                </div>
+            {% empty %}
+                <div class="empty-state">No visits yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Upcoming Appointments</h5>
+            </div>
+
+            {% for appointment in upcoming_appointments %}
+                <div class="mini-list-item">
+                    <strong>{{ appointment.patient.full_name }}</strong>
+                    <small>{{ appointment.appointment_date|date:"d M Y" }} | {{ appointment.appointment_time|time:"h:i A" }}</small>
+                    <a href="{% url 'appointment_detail' appointment.pk %}">Open</a>
+                </div>
+            {% empty %}
+                <div class="empty-state">No upcoming appointments.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Recent Activity</h5>
+            </div>
+
+            {% for log in recent_logs %}
+                <div class="activity-item activity-item-pro">
+                    <div class="activity-icon-pro">
+                        {% if log.action == "LOGIN" %}
+                            🔐
+                        {% elif log.action == "LOGOUT" %}
+                            🚪
+                        {% elif log.action == "CREATE" %}
+                            ➕
+                        {% elif log.action == "UPDATE" %}
+                            ✏️
+                        {% elif log.action == "DELETE" %}
+                            🗑️
+                        {% elif log.action == "EXPORT" %}
+                            📤
+                        {% elif log.action == "IMPORT" %}
+                            📥
+                        {% elif log.action == "BACKUP" %}
+                            💾
+                        {% elif log.action == "PRINT" %}
+                            🖨️
+                        {% else %}
+                            📌
+                        {% endif %}
+                    </div>
+
+                    <div class="activity-text-pro">
+                        <strong>{{ log.get_action_display }} - {{ log.module }}</strong>
+                        <p>{{ log.description }}</p>
+                        <small>
+                            {{ log.created_at|date:"d M Y, h:i A" }}
+                            by {{ log.user|default:"System" }}
+                        </small>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">No recent activity yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

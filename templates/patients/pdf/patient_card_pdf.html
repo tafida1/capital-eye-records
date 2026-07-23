@@ -1,0 +1,42 @@
+{% extends "patients/pdf/pdf_base.html" %}
+
+{% block content %}
+
+<h2>Patient Card</h2>
+
+<table>
+    <tr>
+        <th>File Number</th>
+        <td>{{ patient.file_number }}</td>
+    </tr>
+    <tr>
+        <th>Full Name</th>
+        <td>{{ patient.full_name }}</td>
+    </tr>
+    <tr>
+        <th>Gender</th>
+        <td>{{ patient.get_gender_display }}</td>
+    </tr>
+    <tr>
+        <th>Age</th>
+        <td>{{ patient.display_age|default:"-" }}</td>
+    </tr>
+    <tr>
+        <th>Phone Number</th>
+        <td>{{ patient.phone_number|default:"-" }}</td>
+    </tr>
+    <tr>
+        <th>Address</th>
+        <td>{{ patient.address|default:"-" }}</td>
+    </tr>
+    <tr>
+        <th>Registration Date</th>
+        <td>{{ patient.registration_date|date:"d M Y, h:i A" }}</td>
+    </tr>
+</table>
+
+<p class="small">
+    Patient should present this card whenever visiting the hospital.
+</p>
+
+{% endblock %}

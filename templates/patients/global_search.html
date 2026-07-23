@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Global Search | CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Global Search</h2>
+        <p>Search across patients, visits, appointments, surgery, billing, diagnosis, consultations, and prescriptions.</p>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <form method="get" class="row g-2">
+        <div class="col-md-10">
+            <input
+                type="text"
+                name="q"
+                value="{{ query }}"
+                class="form-control form-control-lg"
+                placeholder="Search by patient name, file number, phone, diagnosis, surgery, bill, drug..."
+                autofocus
+            >
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary btn-lg">Search</button>
+        </div>
+    </form>
+</div>
+
+{% if query %}
+
+<div class="row g-4">
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Patients</h5>
+            </div>
+
+            {% for patient in patients %}
+                <div class="search-result-item">
+                    <strong>{{ patient.full_name }}</strong>
+                    <p>
+                        File No: {{ patient.file_number }} |
+                        Phone: {{ patient.phone_number|default:"-" }}
+                    </p>
+                    <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                </div>
+            {% empty %}
+                <div class="empty-state">No patient result.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Visits / Encounters</h5>
+            </div>
+
+            {% for visit in visits %}
+                <div class="search-result-item">
+                    <strong>{{ visit.visit_number }}</strong>
+                    <p>{{ visit.patient.full_name }} | {{ visit.chief_complaint|truncatechars:80|default:"-" }}</p>
+                    <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                </div>
+            {% empty %}
+                <div class="empty-state">No visit result.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Appointments</h5>
+            </div>
+
+            {% for appointment in appointments %}
+                <div class="search-result-item">
+                    <strong>{{ appointment.appointment_number }}</strong>
+                    <p>
+                        {{ appointment.patient.full_name }} |
+                        {{ appointment.appointment_date|date:"d M Y" }} {{ appointment.appointment_time|time:"h:i A" }}
+                    </p>
+                    <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                </div>
+            {% empty %}
+                <div class="empty-state">No appointment result.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Surgery / Procedures</h5>
+            </div>
+
+            {% for surgery in surgeries %}
+                <div class="search-result-item">
+                    <strong>{{ surgery.procedure_number }}</strong>
+                    <p>{{ surgery.patient.full_name }} | {{ surgery.procedure_name }}</p>
+                    <a href="{% url 'surgery_detail' surgery.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                </div>
+            {% empty %}
+                <div class="empty-state">No surgery/procedure result.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Billing</h5>
+            </div>
+
+            {% for bill in bills %}
+                <div class="search-result-item">
+                    <strong>{{ bill.bill_number }}</strong>
+                    <p>{{ bill.patient.full_name }} | {{ bill.bill_title }} | Balance: ₦{{ bill.balance }}</p>
+                    <a href="{% url 'bill_detail' bill.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                </div>
+            {% empty %}
+                <div class="empty-state">No billing result.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Prescriptions</h5>
+            </div>
+
+            {% for prescription in prescriptions %}
+                <div class="search-result-item">
+                    <strong>{{ prescription.drug_name }}</strong>
+                    <p>
+                        {{ prescription.visit.patient.full_name }} |
+                        {{ prescription.dosage|default:"-" }} |
+                        {{ prescription.frequency|default:"-" }}
+                    </p>
+                    <a href="{% url 'visit_detail' prescription.visit.pk %}" class="btn btn-sm btn-outline-primary">Open Visit</a>
+                </div>
+            {% empty %}
+                <div class="empty-state">No prescription result.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Diagnosis / Treatment</h5>
+            </div>
+
+            {% for diagnosis in diagnoses %}
+                <div class="search-result-item">
+                    <strong>{{ diagnosis.visit.patient.full_name }}</strong>
+                    <p>{{ diagnosis.primary_diagnosis|truncatechars:100 }}</p>
+                    <a href="{% url 'visit_detail' diagnosis.visit.pk %}" class="btn btn-sm btn-outline-primary">Open Visit</a>
+                </div>
+            {% empty %}
+                <div class="empty-state">No diagnosis result.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Consultations</h5>
+            </div>
+
+            {% for consultation in consultations %}
+                <div class="search-result-item">
+                    <strong>{{ consultation.visit.patient.full_name }}</strong>
+                    <p>{{ consultation.final_diagnosis|truncatechars:100|default:consultation.presenting_complaint }}</p>
+                    <a href="{% url 'visit_detail' consultation.visit.pk %}" class="btn btn-sm btn-outline-primary">Open Visit</a>
+                </div>
+            {% empty %}
+                <div class="empty-state">No consultation result.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+{% else %}
+<div class="search-landing-state">
+    <div class="search-landing-icon">🔍</div>
+    <h4>Search All Hospital Records</h4>
+    <p>
+        Search by patient name, file number, phone number, diagnosis,
+        surgery type, bill number, drug name, or appointment details.
+    </p>
+</div>
+{% endif %}
+
+{% endblock %}

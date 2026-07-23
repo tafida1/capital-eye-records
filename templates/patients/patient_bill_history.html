@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Billing History | {{ patient.full_name }}{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Billing History</h2>
+        <p>{{ patient.full_name }} | File No: <strong>{{ patient.file_number }}</strong></p>
+    </div>
+
+    <div>
+        <a href="{% url 'patient_bill_create' patient.pk %}" class="btn btn-primary">+ New Bill</a>
+        <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-secondary">Back to Patient</a>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Bill No.</th>
+                    <th>Title</th>
+                    <th>Total</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for bill in bills %}
+                    <tr>
+                        <td><strong>{{ bill.bill_number }}</strong></td>
+                        <td>{{ bill.bill_title }}</td>
+                        <td>₦{{ bill.net_amount }}</td>
+                        <td>₦{{ bill.amount_paid }}</td>
+                        <td>₦{{ bill.balance }}</td>
+                        <td>{{ bill.get_status_display }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'bill_detail' bill.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No billing history found for this patient.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

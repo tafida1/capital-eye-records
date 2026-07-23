@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Clinic Queue{% endblock %}
+
+{% block content %}
+
+<div class="queue-hero">
+    <div class="queue-icon">🏥</div>
+
+    <div class="queue-main">
+        <span class="queue-label">Daily Clinic Queue</span>
+        <h2>Today’s Clinic Queue</h2>
+        <p>{{ today|date:"d M Y" }} — patients expected, arrived, and currently in consultation.</p>
+    </div>
+
+    <div class="queue-actions">
+        <a href="{% url 'visit_create' %}" class="btn btn-light btn-sm">+ New Visit</a>
+        <a href="{% url 'appointment_calendar' %}" class="btn btn-outline-light btn-sm">Calendar</a>
+        <a href="{% url 'doctor_worklist' %}" class="btn btn-outline-light btn-sm">Doctor Worklist</a>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Today’s Appointments</h5>
+            </div>
+
+            {% for appointment in appointments %}
+                <div class="queue-item">
+                    <div class="queue-time">{{ appointment.appointment_time|time:"h:i A" }}</div>
+
+                    <div class="queue-info">
+                        <strong>{{ appointment.patient.full_name }}</strong>
+                        <small>{{ appointment.patient.file_number }} | {{ appointment.get_appointment_type_display }}</small>
+                        <small>Status: {{ appointment.get_status_display }}</small>
+                    </div>
+
+                    <div class="queue-buttons">
+                        {% if appointment.status != "ARRIVED" and appointment.status != "COMPLETED" %}
+                            <a href="{% url 'appointment_mark_arrived' appointment.pk %}" class="btn btn-sm btn-outline-success">
+                                Arrived
+                            </a>
+                        {% endif %}
+
+                        {% if appointment.status != "COMPLETED" %}
+                            <a href="{% url 'appointment_mark_completed' appointment.pk %}" class="btn btn-sm btn-outline-primary">
+                                Complete
+                            </a>
+                        {% endif %}
+
+                        <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-sm btn-outline-dark">
+                            Open
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">No appointments scheduled today.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Today’s Visits / Encounters</h5>
+            </div>
+
+            {% for visit in visits %}
+                <div class="queue-item">
+                    <div class="queue-time">{{ visit.visit_date|time:"h:i A" }}</div>
+
+                    <div class="queue-info">
+                        <strong>{{ visit.patient.full_name }}</strong>
+                        <small>{{ visit.patient.file_number }} | {{ visit.get_visit_type_display }}</small>
+                        <small>Status: {{ visit.get_status_display }}</small>
+                    </div>
+
+                    <div class="queue-buttons">
+                        <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-sm btn-outline-primary">
+                            Open
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">No visits created today.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

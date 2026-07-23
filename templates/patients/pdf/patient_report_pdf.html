@@ -1,0 +1,111 @@
+{% extends "patients/pdf/pdf_base.html" %}
+
+{% block content %}
+
+<h2>Full Patient Report</h2>
+
+<h3>Patient Information</h3>
+<table>
+    <tr><th>File Number</th><td>{{ patient.file_number }}</td></tr>
+    <tr><th>Full Name</th><td>{{ patient.full_name }}</td></tr>
+    <tr><th>Gender</th><td>{{ patient.get_gender_display }}</td></tr>
+    <tr><th>Age</th><td>{{ patient.display_age|default:"-" }}</td></tr>
+    <tr><th>Phone</th><td>{{ patient.phone_number|default:"-" }}</td></tr>
+    <tr><th>Address</th><td>{{ patient.address|default:"-" }}</td></tr>
+    <tr><th>Occupation</th><td>{{ patient.occupation|default:"-" }}</td></tr>
+</table>
+
+<h3>Medical Summary</h3>
+<table>
+    <tr><th>Medical History</th><td>{{ patient.medical_history|linebreaksbr|default:"-" }}</td></tr>
+    <tr><th>Allergy History</th><td>{{ patient.allergy_history|linebreaksbr|default:"-" }}</td></tr>
+    <tr><th>Eye Complaint</th><td>{{ patient.eye_complaint|linebreaksbr|default:"-" }}</td></tr>
+    <tr><th>Diagnosis</th><td>{{ patient.diagnosis|linebreaksbr|default:"-" }}</td></tr>
+    <tr><th>Treatment</th><td>{{ patient.treatment|linebreaksbr|default:"-" }}</td></tr>
+</table>
+
+<h3>Visits</h3>
+<table>
+    <tr>
+        <th>Visit No.</th>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Complaint</th>
+    </tr>
+    {% for visit in visits %}
+    <tr>
+        <td>{{ visit.visit_number }}</td>
+        <td>{{ visit.visit_date|date:"d M Y" }}</td>
+        <td>{{ visit.get_visit_type_display }}</td>
+        <td>{{ visit.get_status_display }}</td>
+        <td>{{ visit.chief_complaint|default:"-" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No visits found.</td></tr>
+    {% endfor %}
+</table>
+
+<h3>Appointments</h3>
+<table>
+    <tr>
+        <th>No.</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Status</th>
+    </tr>
+    {% for appointment in appointments %}
+    <tr>
+        <td>{{ appointment.appointment_number }}</td>
+        <td>{{ appointment.appointment_date|date:"d M Y" }}</td>
+        <td>{{ appointment.appointment_time|time:"h:i A" }}</td>
+        <td>{{ appointment.get_status_display }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No appointments found.</td></tr>
+    {% endfor %}
+</table>
+
+<h3>Surgery / Procedures</h3>
+<table>
+    <tr>
+        <th>No.</th>
+        <th>Procedure</th>
+        <th>Eye</th>
+        <th>Status</th>
+    </tr>
+    {% for surgery in surgeries %}
+    <tr>
+        <td>{{ surgery.procedure_number }}</td>
+        <td>{{ surgery.procedure_name }}</td>
+        <td>{{ surgery.get_eye_side_display }}</td>
+        <td>{{ surgery.get_status_display }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No surgery/procedure records found.</td></tr>
+    {% endfor %}
+</table>
+
+<h3>Billing Summary</h3>
+<table>
+    <tr>
+        <th>Bill No.</th>
+        <th>Title</th>
+        <th>Net Amount</th>
+        <th>Paid</th>
+        <th>Balance</th>
+    </tr>
+    {% for bill in bills %}
+    <tr>
+        <td>{{ bill.bill_number }}</td>
+        <td>{{ bill.bill_title }}</td>
+        <td>₦{{ bill.net_amount }}</td>
+        <td>₦{{ bill.amount_paid }}</td>
+        <td>₦{{ bill.balance }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No billing records found.</td></tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

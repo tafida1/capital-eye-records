@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Family Groups | CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Family / Group Records</h2>
+        <p>Manage patients who belong to the same family or group.</p>
+    </div>
+
+    <a href="{% url 'family_group_create' %}" class="btn btn-primary">
+        + Create Family Group
+    </a>
+</div>
+
+<div class="panel-card mb-4">
+    <form method="get" class="row g-2">
+        <div class="col-md-10">
+            <input
+                type="text"
+                name="q"
+                value="{{ query }}"
+                class="form-control"
+                placeholder="Search by family code, family name, head of family, phone..."
+            >
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary">Search</button>
+        </div>
+    </form>
+</div>
+
+<div class="panel-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Family Code</th>
+                    <th>Family Name</th>
+                    <th>Head of Family</th>
+                    <th>Phone</th>
+                    <th>Members</th>
+                    <th>Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for family in family_groups %}
+                    <tr>
+                        <td><strong>{{ family.family_code }}</strong></td>
+                        <td>{{ family.family_name }}</td>
+                        <td>{{ family.head_of_family|default:"-" }}</td>
+                        <td>{{ family.primary_phone|default:"-" }}</td>
+                        <td>{{ family.members.count }}</td>
+                        <td>{{ family.created_at|date:"d M Y" }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'family_group_detail' family.pk %}" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No family/group records found.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

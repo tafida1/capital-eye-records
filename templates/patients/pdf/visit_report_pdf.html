@@ -1,0 +1,98 @@
+{% extends "patients/pdf/pdf_base.html" %}
+
+{% block content %}
+
+<h2>Visit / Encounter Report</h2>
+
+<table>
+    <tr><th>Visit Number</th><td>{{ visit.visit_number }}</td></tr>
+    <tr><th>Patient</th><td>{{ visit.patient.full_name }}</td></tr>
+    <tr><th>File Number</th><td>{{ visit.patient.file_number }}</td></tr>
+    <tr><th>Visit Date</th><td>{{ visit.visit_date|date:"d M Y, h:i A" }}</td></tr>
+    <tr><th>Visit Type</th><td>{{ visit.get_visit_type_display }}</td></tr>
+    <tr><th>Status</th><td>{{ visit.get_status_display }}</td></tr>
+</table>
+
+<h3>Complaint and History</h3>
+<table>
+    <tr><th>Chief Complaint</th><td>{{ visit.chief_complaint|linebreaksbr|default:"-" }}</td></tr>
+    <tr><th>Brief History</th><td>{{ visit.brief_history|linebreaksbr|default:"-" }}</td></tr>
+</table>
+
+<h3>Vital Signs</h3>
+<table>
+    <tr>
+        <th>Temperature</th>
+        <th>Blood Pressure</th>
+        <th>Pulse</th>
+        <th>Weight</th>
+    </tr>
+    <tr>
+        <td>{{ visit.temperature|default:"-" }}</td>
+        <td>{{ visit.blood_pressure|default:"-" }}</td>
+        <td>{{ visit.pulse|default:"-" }}</td>
+        <td>{{ visit.weight|default:"-" }}</td>
+    </tr>
+</table>
+
+{% if visit.consultation %}
+<h3>Consultation</h3>
+<table>
+    <tr><th>Presenting Complaint</th><td>{{ visit.consultation.presenting_complaint|linebreaksbr|default:"-" }}</td></tr>
+    <tr><th>Final Diagnosis</th><td>{{ visit.consultation.final_diagnosis|linebreaksbr|default:"-" }}</td></tr>
+    <tr><th>Treatment Plan</th><td>{{ visit.consultation.treatment_plan|linebreaksbr|default:"-" }}</td></tr>
+</table>
+{% endif %}
+
+{% if visit.eye_examination %}
+<h3>Eye Examination</h3>
+<table>
+    <tr>
+        <th>Right VA</th>
+        <td>{{ visit.eye_examination.right_visual_acuity|default:"-" }}</td>
+        <th>Left VA</th>
+        <td>{{ visit.eye_examination.left_visual_acuity|default:"-" }}</td>
+    </tr>
+    <tr>
+        <th>Right IOP</th>
+        <td>{{ visit.eye_examination.right_iop|default:"-" }}</td>
+        <th>Left IOP</th>
+        <td>{{ visit.eye_examination.left_iop|default:"-" }}</td>
+    </tr>
+    <tr>
+        <th>Impression</th>
+        <td colspan="3">{{ visit.eye_examination.impression|linebreaksbr|default:"-" }}</td>
+    </tr>
+</table>
+{% endif %}
+
+{% if visit.diagnosis_treatment %}
+<h3>Diagnosis and Treatment</h3>
+<table>
+    <tr><th>Primary Diagnosis</th><td>{{ visit.diagnosis_treatment.primary_diagnosis|linebreaksbr }}</td></tr>
+    <tr><th>Treatment Plan</th><td>{{ visit.diagnosis_treatment.treatment_plan|linebreaksbr|default:"-" }}</td></tr>
+    <tr><th>Follow-up</th><td>{{ visit.diagnosis_treatment.follow_up_instruction|linebreaksbr|default:"-" }}</td></tr>
+</table>
+{% endif %}
+
+<h3>Prescriptions</h3>
+<table>
+    <tr>
+        <th>Drug</th>
+        <th>Dosage</th>
+        <th>Frequency</th>
+        <th>Duration</th>
+    </tr>
+    {% for prescription in visit.prescriptions.all %}
+    <tr>
+        <td>{{ prescription.drug_name }}</td>
+        <td>{{ prescription.dosage|default:"-" }}</td>
+        <td>{{ prescription.frequency|default:"-" }}</td>
+        <td>{{ prescription.duration|default:"-" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No prescriptions found.</td></tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

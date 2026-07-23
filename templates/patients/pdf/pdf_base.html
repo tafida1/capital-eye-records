@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 22mm 15mm 18mm 15mm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #222;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #0b4f8a;
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+        }
+
+        .header h1 {
+            color: #0b4f8a;
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .header p {
+            margin: 3px 0;
+            font-size: 11px;
+        }
+
+        h2 {
+            color: #0b4f8a;
+            font-size: 16px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 4px;
+        }
+
+        h3 {
+            color: #0b4f8a;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 14px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            vertical-align: top;
+        }
+
+        th {
+            background: #eef5ff;
+            text-align: left;
+        }
+
+        .no-border td {
+            border: none;
+            padding: 4px;
+        }
+
+        .small {
+            font-size: 10px;
+            color: #555;
+        }
+
+        .footer {
+            margin-top: 25px;
+            border-top: 1px solid #ccc;
+            padding-top: 8px;
+            font-size: 10px;
+            text-align: center;
+            color: #555;
+        }
+
+        .amount {
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>{{ system_settings.hospital_name|default:"CAPITAL EYE HOSPITAL" }}</h1>
+    <p>{{ system_settings.system_name|default:"CAPITAL EYE HOSPITAL RECORDS SYSTEM" }}</p>
+    <p>{{ system_settings.hospital_address|default:"Offline LAN-Based Clinic Management System" }}</p>
+    <p>{{ system_settings.hospital_phone }} {% if system_settings.hospital_email %}| {{ system_settings.hospital_email }}{% endif %}</p>
+</div>
+
+{% block content %}{% endblock %}
+
+<div class="footer">
+    {{ system_settings.report_footer|default:"Generated from CAPITAL EYE HOSPITAL RECORDS SYSTEM." }}
+    <br>
+    Developed by Mutafs Global Technology.
+    <br>
+    © {% now "Y" %} Mutafs Global Technology. All Rights Reserved.
+</div>
+
+</body>
+</html>

@@ -1,0 +1,121 @@
+RAM: 8GB minimum
+Storage: 256GB SSD minimum
+OS: Windows 10/11
+Database: PostgreSQL
+Network: Stable Wi-Fi router or LAN cable
+
+
+
+5. Open on Other Devices
+
+On phones, tablets, laptops, or desktops connected to the same Wi-Fi:
+
+http://192.168.1.100:8000
+
+If it does not open, allow Python through Windows Firewall.
+
+6. Windows Firewall Fix
+
+Open:
+
+Windows Security > Firewall & network protection > Allow an app through firewall
+
+Allow:
+
+python.exe
+
+Or create inbound port rule:
+
+Port: 8000
+Protocol: TCP
+Action: Allow
+7. Optional Stable Server IP
+
+Set the server PC to a fixed/static IP from the router, for example:
+
+192.168.1.100
+
+This prevents the address from changing.
+
+8. Daily Startup Command
+
+Create a file on Desktop:
+
+start_capital_eye.bat
+
+Paste:
+
+@echo off
+cd /d C:\Users\BMBABW\capital_eye_records
+call venv\Scripts\activate
+python manage.py runserver 0.0.0.0:8000
+pause
+
+Double-click it every morning.
+
+9. Staff Access Guide
+
+Staff should open:
+
+http://SERVER-IP:8000/accounts/login/
+
+Example:
+
+http://192.168.1.100:8000/accounts/login/
+
+Use separate accounts for:
+
+Receptionist
+Doctor
+Nurse
+Cashier
+Records Officer
+Admin
+Viewer
+10. Backup Routine
+
+At closing time:
+
+Backups > Create Backup > Download
+
+Copy backup ZIP to:
+
+External flash drive
+External hard drive
+Google Drive when internet is available
+LAN Deployment Checklist
+[ ] PostgreSQL installed
+[ ] DATABASE_ENGINE=postgres
+[ ] Server IP added to ALLOWED_HOSTS
+[ ] Migrations applied
+[ ] Superuser created
+[ ] Server runs with 0.0.0.0:8000
+[ ] Other devices open the system
+[ ] Firewall allows port 8000
+[ ] Staff accounts created
+[ ] Daily backup routine confirmed
+
+Next
+
+
+6. PostgreSQL Optimization
+
+Open PostgreSQL postgresql.conf later and adjust only if needed:
+
+max_connections = 100
+shared_buffers = 256MB
+effective_cache_size = 1GB
+work_mem = 4MB
+maintenance_work_mem = 64MB
+
+For a small/medium clinic, the default PostgreSQL settings are usually okay at first.
+
+7. Create Daily Backup Rule
+
+Clinic daily closing routine:
+
+1. Go to Backup / Restore
+2. Click Create Backup
+3. Download backup ZIP
+4. Copy to external flash drive
+5. Copy to Google Drive when internet is available

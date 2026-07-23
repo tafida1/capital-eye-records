@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Visits / Encounters | CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Patient Visits / Encounters</h2>
+        <p>Track each patient visit, complaint, vital signs, and encounter status.</p>
+    </div>
+
+    <a href="{% url 'visit_create' %}" class="btn btn-primary">
+        + Create Visit
+    </a>
+</div>
+
+<div class="enterprise-filter-card">
+    <form method="get" class="row g-2">
+        <div class="col-md-7">
+            <input type="text" name="q" value="{{ query }}" class="form-control"
+                   placeholder="Search by visit number, file number, patient name, phone, complaint...">
+        </div>
+
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary">Search</button>
+        </div>
+    </form>
+</div>
+
+<div class="enterprise-table-card">
+    <div class="enterprise-table-header">
+        <div>
+            <h5>Visit / Encounter Records</h5>
+            <small>Track each patient visit, complaint, vital signs, and encounter status.</small>
+        </div>
+
+        <a href="{% url 'visit_create' %}" class="btn btn-primary btn-sm">
+            + Create Visit
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table enterprise-table">
+            <thead>
+                <tr>
+                    <th>Visit No.</th>
+                    <th>Patient</th>
+                    <th>File No.</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Complaint</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for visit in visits %}
+                    <tr>
+                        <td data-label="Visit No.">
+                            <span class="table-primary-text">{{ visit.visit_number }}</span>
+                        </td>
+
+                        <td data-label="Patient">
+                            <strong>{{ visit.patient.full_name }}</strong>
+                        </td>
+
+                        <td data-label="File No.">{{ visit.patient.file_number }}</td>
+
+                        <td data-label="Type">{{ visit.get_visit_type_display }}</td>
+
+                        <td data-label="Status">
+                            <span class="enterprise-badge dark">{{ visit.get_status_display }}</span>
+                        </td>
+
+                        <td data-label="Date">{{ visit.visit_date|date:"d M Y, h:i A" }}</td>
+
+                        <td data-label="Complaint">{{ visit.chief_complaint|truncatechars:45|default:"-" }}</td>
+
+                        <td data-label="Actions">
+                            <div class="enterprise-actions">
+                                <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8">
+                            <div class="enterprise-empty-state">
+                                <div class="enterprise-empty-icon">🩺</div>
+                                <h5>No Visit Records Found</h5>
+                                <p>Create a new visit to begin tracking patient encounters.</p>
+                                <a href="{% url 'visit_create' %}" class="btn btn-primary btn-sm">
+                                    Create First Visit
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/pagination.html" %}
+</div>
+
+{% endblock %}

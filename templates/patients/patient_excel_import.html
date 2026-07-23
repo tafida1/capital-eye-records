@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Excel Import{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Excel Import</h2>
+        <p>Import old clinic patient records from Excel into the database.</p>
+    </div>
+
+    <div>
+        <a href="{% url 'patient_excel_template' %}" class="btn btn-outline-primary no-loader">
+            Download Template
+        </a>
+
+        <a href="{% url 'patient_list' %}" class="btn btn-secondary">
+            Back to Patients
+        </a>
+    </div>
+</div>
+
+<div class="panel-card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">Select Excel File (.xlsx)</label>
+            <input type="file" name="excel_file" class="form-control" accept=".xlsx" required>
+        </div>
+
+        <div class="alert alert-info">
+            The Excel file must follow the system template columns exactly.
+            Download the template first before importing old records.
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg">
+            Import Excel Records
+        </button>
+    </form>
+</div>
+
+{% endblock %}

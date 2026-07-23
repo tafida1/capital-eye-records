@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>{{ title }}</h2>
+        <p>
+            Patient: <strong>{{ visit.patient.full_name }}</strong> |
+            File No: <strong>{{ visit.patient.file_number }}</strong> |
+            Visit: <strong>{{ visit.visit_number }}</strong>
+        </p>
+    </div>
+
+    <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-secondary">
+        Back to Visit
+    </a>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Diagnosis</h5>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-12">
+                <label class="form-label">Primary Diagnosis</label>
+                {{ form.primary_diagnosis }}
+                <div class="text-danger small">{{ form.primary_diagnosis.errors }}</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Secondary Diagnosis</label>
+                {{ form.secondary_diagnosis }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Differential Diagnosis</label>
+                {{ form.differential_diagnosis }}
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Treatment and Advice</h5>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Treatment Plan</label>
+                {{ form.treatment_plan }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Advice Given</label>
+                {{ form.advice_given }}
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Follow-up Instruction</label>
+                {{ form.follow_up_instruction }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-lg">
+            {{ button_text }}
+        </button>
+
+        <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-secondary btn-lg">
+            Cancel
+        </a>
+    </div>
+</form>
+
+{% endblock %}

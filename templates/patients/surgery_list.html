@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Surgery / Procedures | CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Surgery / Procedure Records</h2>
+        <p>Manage surgery, theatre, procedure, and post-operative records.</p>
+    </div>
+
+    <a href="{% url 'surgery_create' %}" class="btn btn-primary">
+        + Create Surgery / Procedure
+    </a>
+</div>
+
+<div class="enterprise-filter-card">
+    <form method="get" class="row g-2">
+        <div class="col-md-7">
+            <input type="text" name="q" value="{{ query }}" class="form-control"
+                   placeholder="Search by procedure number, patient, file number, phone, surgery type, diagnosis...">
+        </div>
+
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary">Search</button>
+        </div>
+    </form>
+</div>
+
+<div class="enterprise-table-card">
+    <div class="enterprise-table-header">
+        <div>
+            <h5>Surgery / Procedure Records</h5>
+            <small>Theatre, procedure, and post-operative records.</small>
+        </div>
+
+        <a href="{% url 'surgery_create' %}" class="btn btn-primary btn-sm">
+            + Create Surgery / Procedure
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table enterprise-table">
+            <thead>
+                <tr>
+                    <th>Procedure No.</th>
+                    <th>Patient</th>
+                    <th>File No.</th>
+                    <th>Procedure</th>
+                    <th>Eye</th>
+                    <th>Status</th>
+                    <th>Scheduled</th>
+                    <th>Surgeon</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for surgery in surgeries %}
+                    <tr>
+                        <td data-label="Procedure No.">
+                            <span class="table-primary-text">{{ surgery.procedure_number }}</span>
+                        </td>
+
+                        <td data-label="Patient">
+                            <strong>{{ surgery.patient.full_name }}</strong>
+                        </td>
+
+                        <td data-label="File No.">{{ surgery.patient.file_number }}</td>
+
+                        <td data-label="Procedure">{{ surgery.procedure_name }}</td>
+
+                        <td data-label="Eye">{{ surgery.get_eye_side_display }}</td>
+
+                        <td data-label="Status">
+                            <span class="enterprise-badge dark">{{ surgery.get_status_display }}</span>
+                        </td>
+
+                        <td data-label="Scheduled">{{ surgery.scheduled_date|date:"d M Y, h:i A"|default:"-" }}</td>
+
+                        <td data-label="Surgeon">{{ surgery.surgeon|default:"-" }}</td>
+
+                        <td data-label="Actions">
+                            <div class="enterprise-actions">
+                                <a href="{% url 'surgery_detail' surgery.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="9">
+                            <div class="enterprise-empty-state">
+                                <div class="enterprise-empty-icon">🏥</div>
+                                <h5>No Surgery / Procedure Records Found</h5>
+                                <p>Create a new surgery or procedure record for a scheduled patient.</p>
+                                <a href="{% url 'surgery_create' %}" class="btn btn-primary btn-sm">
+                                    Create First Record
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/pagination.html" %}
+</div>
+
+{% endblock %}

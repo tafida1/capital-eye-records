@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Staff Management{% endblock %}
+
+{% block content %}
+
+<div class="staff-hero">
+    <div class="staff-icon">👥</div>
+
+    <div class="staff-main">
+        <span class="staff-label">User Management</span>
+        <h2>Staff Accounts & Roles</h2>
+        <p>Manage hospital users, role-based access, account status, and activity.</p>
+    </div>
+
+    <div class="staff-actions">
+        <a href="{% url 'staff_create' %}" class="btn btn-light btn-sm">+ Create Staff</a>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-xl-3 col-md-6">
+        <div class="staff-stat-card">
+            <span>👥</span>
+            <h3>{{ total_staff }}</h3>
+            <p>Total Staff</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="staff-stat-card success">
+            <span>✅</span>
+            <h3>{{ active_staff }}</h3>
+            <p>Active Staff</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="staff-stat-card danger">
+            <span>⛔</span>
+            <h3>{{ inactive_staff }}</h3>
+            <p>Inactive Staff</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="staff-stat-card admin">
+            <span>🔐</span>
+            <h3>{{ admin_staff }}</h3>
+            <p>Admin Access</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-lg-8">
+        <div class="enterprise-filter-card">
+            <form method="get" class="row g-2">
+                <div class="col-md-5">
+                    <input type="text" name="q" value="{{ query }}" class="form-control"
+                           placeholder="Search staff by name, username, phone, staff ID, department...">
+                </div>
+
+                <div class="col-md-3">
+                    <select name="role" class="form-select">
+                        <option value="">All Roles</option>
+                        {% for value, label in role_choices %}
+                            <option value="{{ value }}" {% if role == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="active" {% if status == "active" %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if status == "inactive" %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-grid">
+                    <button class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="enterprise-table-card">
+            <div class="enterprise-table-header">
+                <div>
+                    <h5>Staff List</h5>
+                    <small>Hospital users, roles, departments, and account status.</small>
+                </div>
+
+                <a href="{% url 'staff_create' %}" class="btn btn-primary btn-sm">
+                    + Create Staff
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table enterprise-table">
+                    <thead>
+                        <tr>
+                            <th>Staff</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for staff in users %}
+                            <tr>
+                                <td data-label="Staff">
+                                    <strong>{{ staff.get_full_name|default:staff.username }}</strong><br>
+                                    <span class="table-muted-text">{{ staff.email|default:"No email" }}</span>
+                                </td>
+
+                                <td data-label="Username">{{ staff.username }}</td>
+
+                                <td data-label="Role">{{ staff.get_role_display }}</td>
+
+                                <td data-label="Department">{{ staff.department|default:"-" }}</td>
+
+                                <td data-label="Status">
+                                    {% if staff.is_active %}
+                                        <span class="enterprise-badge success">Active</span>
+                                    {% else %}
+                                        <span class="enterprise-badge danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+
+                                <td data-label="Actions">
+                                    <div class="enterprise-actions">
+                                        <a href="{% url 'staff_detail' staff.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                                        <a href="{% url 'staff_update' staff.pk %}" class="btn btn-sm btn-outline-dark">Edit</a>
+                                        {% if staff != request.user %}
+                                            <a href="{% url 'staff_toggle_active' staff.pk %}" class="btn btn-sm btn-outline-warning">
+                                                {% if staff.is_active %}Deactivate{% else %}Activate{% endif %}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6">
+                                    <div class="enterprise-empty-state">
+                                        <div class="enterprise-empty-icon">👥</div>
+                                        <h5>No Staff Accounts Found</h5>
+                                        <p>Create staff accounts for receptionist, doctor, nurse, cashier, records officer, and admin.</p>
+                                        <a href="{% url 'staff_create' %}" class="btn btn-primary btn-sm">Create Staff</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% include "partials/pagination.html" %}
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Role Summary</h5>
+            </div>
+
+            {% for item in role_summary %}
+                <div class="role-summary-item">
+                    <span>{{ item.role }}</span>
+                    <strong>{{ item.count }}</strong>
+                </div>
+            {% empty %}
+                <div class="empty-state">No role summary available.</div>
+            {% endfor %}
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header">
+                <h5>Role Guide</h5>
+            </div>
+
+            <div class="role-guide">
+                <p><strong>Super/Admin:</strong> Full access.</p>
+                <p><strong>Reception/Records:</strong> Patients, visits, appointments.</p>
+                <p><strong>Clinical Staff:</strong> Consultation, examination, diagnosis, surgery.</p>
+                <p><strong>Cashier:</strong> Billing, payments, receipts.</p>
+                <p><strong>Viewer/Auditor:</strong> Read-only style access.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

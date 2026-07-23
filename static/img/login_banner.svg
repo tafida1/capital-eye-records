@@ -1,0 +1,83 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="login-banner-title">
+  <title id="login-banner-title">Capital Eye Hospital — Login</title>
+
+  <defs>
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F2A4D"/>
+      <stop offset="45%" stop-color="#1B4F8A"/>
+      <stop offset="100%" stop-color="#2E78C7"/>
+    </linearGradient>
+
+    <linearGradient id="irisGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#BFE2FF"/>
+      <stop offset="100%" stop-color="#5AA9E6"/>
+    </linearGradient>
+
+    <radialGradient id="pupilGlow" cx="35%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#1B3A56"/>
+      <stop offset="100%" stop-color="#06121F"/>
+    </radialGradient>
+
+    <radialGradient id="glow" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="vignette" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#06142A" stop-opacity="0.35"/>
+      <stop offset="18%" stop-color="#06142A" stop-opacity="0"/>
+      <stop offset="82%" stop-color="#06142A" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#06142A" stop-opacity="0.45"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1600" height="900" fill="url(#bgGradient)"/>
+
+  <!-- Soft glow behind the eye -->
+  <circle cx="800" cy="370" r="480" fill="url(#glow)"/>
+
+  <!-- Decorative concentric rings, faint -->
+  <circle cx="800" cy="370" r="300" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.06"/>
+  <circle cx="800" cy="370" r="380" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.05"/>
+
+  <!-- Floating soft dots -->
+  <circle cx="220" cy="160" r="6" fill="#FFFFFF" opacity="0.18"/>
+  <circle cx="1380" cy="200" r="8" fill="#FFFFFF" opacity="0.14"/>
+  <circle cx="1300" cy="650" r="5" fill="#FFFFFF" opacity="0.16"/>
+  <circle cx="180" cy="640" r="7" fill="#FFFFFF" opacity="0.14"/>
+  <circle cx="500" cy="120" r="4" fill="#FFFFFF" opacity="0.2"/>
+  <circle cx="1120" cy="110" r="4" fill="#FFFFFF" opacity="0.2"/>
+
+  <!-- Large eye mark, centered upper-mid -->
+  <g transform="translate(800,360)">
+    <path d="M-300 0
+             C -210 -168, -96 -238, 0 -238
+             C 96 -238, 210 -168, 300 0
+             C 210 168, 96 238, 0 238
+             C -96 238, -210 168, -300 0 Z"
+          fill="#FFFFFF"/>
+
+    <circle cx="0" cy="0" r="150" fill="url(#irisGradient)"/>
+    <circle cx="0" cy="0" r="150" fill="none" stroke="#1B4F8A" stroke-width="3" opacity="0.2"/>
+    <circle cx="0" cy="0" r="114" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.35"/>
+
+    <circle cx="0" cy="0" r="68" fill="url(#pupilGlow)"/>
+    <circle cx="-24" cy="-28" r="22" fill="#FFFFFF" opacity="0.95"/>
+    <circle cx="30" cy="22" r="10" fill="#FFFFFF" opacity="0.5"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="800" y="700" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="76" font-weight="700" fill="#FFFFFF">
+    CAPITAL EYE HOSPITAL
+  </text>
+
+  <rect x="650" y="730" width="300" height="3" rx="1.5" fill="#9FD4FF" opacity="0.8"/>
+
+  <text x="800" y="772" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" letter-spacing="3" fill="#CFE3F7">
+    SMART HOSPITAL RECORDS SYSTEM
+  </text>
+
+  <!-- Bottom vignette for legibility / depth -->
+  <rect x="0" y="0" width="1600" height="900" fill="url(#vignette)"/>
+</svg>

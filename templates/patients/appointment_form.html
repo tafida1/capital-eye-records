@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | Appointment{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>{{ title }}</h2>
+        <p>Create or update patient appointment schedule.</p>
+    </div>
+
+    <a href="{% url 'appointment_list' %}" class="btn btn-secondary">
+        Back to Appointments
+    </a>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="enterprise-non-field-errors">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <div class="enterprise-form-note">
+        Fields marked with <strong>*</strong> are required. Ensure the appointment date and time are correct before saving.
+    </div>
+
+    <div class="enterprise-form-card">
+        <div class="enterprise-form-header">
+            <h5>Appointment Information</h5>
+            <p>Patient, appointment type, schedule, and assignment details.</p>
+        </div>
+
+        <div class="enterprise-form-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.patient %}
+                </div>
+
+                <div class="col-md-3">
+                    {% include "partials/enterprise_field.html" with field=form.appointment_type %}
+                </div>
+
+                <div class="col-md-3">
+                    {% include "partials/enterprise_field.html" with field=form.status %}
+                </div>
+
+                <div class="col-md-3">
+                    {% include "partials/enterprise_field.html" with field=form.appointment_date %}
+                </div>
+
+                <div class="col-md-3">
+                    {% include "partials/enterprise_field.html" with field=form.appointment_time %}
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.assigned_to %}
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.reason %}
+                </div>
+
+                <div class="col-md-6">
+                    {% include "partials/enterprise_field.html" with field=form.notes %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "partials/form_actions.html" with button_text=button_text cancel_url=request.META.HTTP_REFERER %}
+
+</form>
+
+{% endblock %}

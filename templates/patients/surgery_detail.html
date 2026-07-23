@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}{{ surgery.procedure_number }} | Surgery Detail{% endblock %}
+
+{% block content %}
+
+<div class="surgery-hero">
+    <div class="surgery-icon">🏥</div>
+
+    <div class="surgery-main">
+        <span class="surgery-label">Surgery / Procedure Record</span>
+        <h2>{{ surgery.procedure_number }}</h2>
+        <p>
+            Patient:
+            <a href="{% url 'patient_detail' surgery.patient.pk %}">
+                <strong>{{ surgery.patient.full_name }}</strong>
+            </a>
+            |
+            File No: <strong>{{ surgery.patient.file_number }}</strong>
+        </p>
+
+        <div class="surgery-badges">
+            <span>{{ surgery.procedure_name }}</span>
+            <span>{{ surgery.get_eye_side_display }}</span>
+            <span>{{ surgery.get_status_display }}</span>
+            <span>Surgeon: {{ surgery.surgeon|default:"-" }}</span>
+        </div>
+    </div>
+
+    <div class="surgery-actions">
+        <a href="{% url 'surgery_update' surgery.pk %}" class="btn btn-light btn-sm">Edit</a>
+        <a href="{% url 'surgery_theatre_dashboard' %}" class="btn btn-outline-light btn-sm">Theatre Dashboard</a>
+        <a href="{% url 'patient_surgery_history' surgery.patient.pk %}" class="btn btn-outline-light btn-sm">Patient History</a>
+        <button onclick="window.print()" class="btn btn-warning btn-sm no-print">Print</button>
+    </div>
+</div>
+
+<div class="surgery-action-strip mt-4">
+
+    {% if surgery.status != "IN_PROGRESS" and surgery.status != "COMPLETED" and surgery.status != "CANCELLED" %}
+        <a href="{% url 'surgery_mark_in_progress' surgery.pk %}" class="btn btn-info">
+            Mark In Progress
+        </a>
+    {% endif %}
+
+    {% if surgery.status != "COMPLETED" and surgery.status != "CANCELLED" %}
+        <a href="{% url 'surgery_mark_completed' surgery.pk %}" class="btn btn-success">
+            Mark Completed
+        </a>
+    {% endif %}
+
+    {% if surgery.status != "POSTPONED" and surgery.status != "COMPLETED" and surgery.status != "CANCELLED" %}
+        <a href="{% url 'surgery_mark_postponed' surgery.pk %}" class="btn btn-warning">
+            Mark Postponed
+        </a>
+    {% endif %}
+
+    {% if surgery.status != "CANCELLED" and surgery.status != "COMPLETED" %}
+        <a href="{% url 'surgery_mark_cancelled' surgery.pk %}" class="btn btn-danger">
+            Mark Cancelled
+        </a>
+    {% endif %}
+
+    <a href="{% url 'patient_detail' surgery.patient.pk %}" class="btn btn-outline-primary">
+        Patient Profile
+    </a>
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-xl-3 col-md-6">
+        <div class="surgery-stat-card">
+            <span>👁️</span>
+            <h5>{{ surgery.get_eye_side_display }}</h5>
+            <p>Eye Side</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="surgery-stat-card">
+            <span>📅</span>
+            <h5>{{ surgery.scheduled_date|date:"d M Y"|default:"-" }}</h5>
+            <p>Scheduled Date</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="surgery-stat-card">
+            <span>⏰</span>
+            <h5>{{ surgery.scheduled_date|time:"h:i A"|default:"-" }}</h5>
+            <p>Scheduled Time</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="surgery-stat-card">
+            <span>✅</span>
+            <h5>{{ surgery.get_status_display }}</h5>
+            <p>Status</p>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-lg-4">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Procedure Information</h5>
+            </div>
+
+            <div class="profile-info-list">
+                <p><strong>Procedure No:</strong> {{ surgery.procedure_number }}</p>
+                <p><strong>Name:</strong> {{ surgery.procedure_name }}</p>
+                <p><strong>Type:</strong> {{ surgery.procedure_type|default:"-" }}</p>
+                <p><strong>Eye Side:</strong> {{ surgery.get_eye_side_display }}</p>
+                <p><strong>Status:</strong> {{ surgery.get_status_display }}</p>
+                <p><strong>Scheduled:</strong> {{ surgery.scheduled_date|date:"d M Y, h:i A"|default:"-" }}</p>
+                <p><strong>Done On:</strong> {{ surgery.procedure_date|date:"d M Y, h:i A"|default:"-" }}</p>
+            </div>
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header">
+                <h5>Theatre Staff</h5>
+            </div>
+
+            <p><strong>Surgeon:</strong> {{ surgery.surgeon|default:"-" }}</p>
+            <p><strong>Assistant:</strong> {{ surgery.assistant|default:"-" }}</p>
+            <p><strong>Created By:</strong> {{ surgery.created_by|default:"-" }}</p>
+            <p><strong>Created:</strong> {{ surgery.created_at|date:"d M Y, h:i A" }}</p>
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header">
+                <h5>Linked Records</h5>
+            </div>
+
+            <p>
+                <strong>Visit:</strong>
+                {% if surgery.visit %}
+                    <a href="{% url 'visit_detail' surgery.visit.pk %}">
+                        {{ surgery.visit.visit_number }}
+                    </a>
+                {% else %}
+                    -
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Diagnosis</h5>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="surgery-text-box">
+                        <strong>Pre-op Diagnosis</strong>
+                        <p>{{ surgery.pre_op_diagnosis|linebreaksbr|default:"-" }}</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="surgery-text-box soft">
+                        <strong>Post-op Diagnosis</strong>
+                        <p>{{ surgery.post_op_diagnosis|linebreaksbr|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header">
+                <h5>Theatre / Procedure Notes</h5>
+            </div>
+
+            <div class="surgery-text-box">
+                <strong>Procedure Notes</strong>
+                <p>{{ surgery.procedure_notes|linebreaksbr|default:"-" }}</p>
+            </div>
+
+            <div class="surgery-text-box soft">
+                <strong>Anesthesia Type</strong>
+                <p>{{ surgery.anesthesia_type|default:"-" }}</p>
+            </div>
+
+            <div class="surgery-text-box danger">
+                <strong>Complications</strong>
+                <p>{{ surgery.complications|linebreaksbr|default:"No complication recorded." }}</p>
+            </div>
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header">
+                <h5>Outcome and Post-op Instructions</h5>
+            </div>
+
+            <div class="surgery-text-box">
+                <strong>Outcome</strong>
+                <p>{{ surgery.outcome|linebreaksbr|default:"-" }}</p>
+            </div>
+
+            <div class="surgery-text-box soft">
+                <strong>Post-op Instructions</strong>
+                <p>{{ surgery.post_op_instructions|linebreaksbr|default:"-" }}</p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

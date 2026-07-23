@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Logs | CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Audit Logs</h2>
+        <p>Track user activity, access, imports, exports, edits, and system actions.</p>
+    </div>
+</div>
+
+<div class="enterprise-filter-card">
+    <form method="get" class="row g-2">
+        <div class="col-md-5">
+            <input type="text" name="q" value="{{ query }}" class="form-control"
+                   placeholder="Search by user, module, description, IP...">
+        </div>
+
+        <div class="col-md-3">
+            <select name="action" class="form-select">
+                <option value="">All Actions</option>
+                {% for value, label in action_choices %}
+                    <option value="{{ value }}" {% if action == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <input type="text" name="module" value="{{ module }}" class="form-control"
+                   placeholder="Module">
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="enterprise-table-card">
+    <div class="enterprise-table-header">
+        <div>
+            <h5>Audit Log Records</h5>
+            <small>User activity, access, imports, exports, edits, and system actions.</small>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table enterprise-table">
+            <thead>
+                <tr>
+                    <th>Date/Time</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Module</th>
+                    <th>Description</th>
+                    <th>IP</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for log in logs %}
+                    <tr>
+                        <td data-label="Date/Time">{{ log.created_at|date:"d M Y, h:i A" }}</td>
+
+                        <td data-label="User">
+                            <strong>{{ log.user|default:"System" }}</strong>
+                        </td>
+
+                        <td data-label="Action">
+                            <span class="enterprise-badge dark">{{ log.get_action_display }}</span>
+                        </td>
+
+                        <td data-label="Module">{{ log.module }}</td>
+
+                        <td data-label="Description">{{ log.description }}</td>
+
+                        <td data-label="IP">{{ log.ip_address|default:"-" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="enterprise-empty-state">
+                                <div class="enterprise-empty-icon">📊</div>
+                                <h5>No Audit Logs Found</h5>
+                                <p>System activity will appear here as staff use the platform.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/pagination.html" %}
+</div>
+
+{% endblock %}

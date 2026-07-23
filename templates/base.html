@@ -1,0 +1,351 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/app.css' %}" rel="stylesheet">
+</head>
+<body>
+
+<div id="pageLoader" class="page-loader">
+    <div class="loader-card">
+        <div class="loader-logo">👁</div>
+        <h5>CAPITAL EYE HOSPITAL</h5>
+        <p>Loading records...</p>
+        <div class="loader-bar">
+            <span></span>
+        </div>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+<div class="app-wrapper">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-logo eye-brand-logo">👁</div>
+            <div>
+                <h5>{{ system_settings.hospital_name|default:"CAPITAL EYE" }}</h5>
+                <small>Smart Hospital Records</small>
+            </div>
+        </div>
+
+        <div class="sidebar-user-mini">
+            <div class="sidebar-user-avatar">
+                {{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}
+            </div>
+
+            <div>
+                <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+                <small>{{ request.user.get_role_display }}</small>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}"
+               class="nav-link-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <span>🏠</span> Dashboard
+            </a>
+
+            <a href="{% url 'staff_dashboard' %}"
+               class="nav-link-item {% if 'staff' in request.resolver_match.url_name %}active{% endif %}">
+                <span>👥</span> Staff Management
+            </a>
+
+            <a href="{% url 'patient_list' %}"
+               class="nav-link-item {% if request.resolver_match.url_name == 'patient_list' or request.resolver_match.url_name == 'patient_create' or request.resolver_match.url_name == 'patient_detail' %}active{% endif %}">
+                <span>👤</span> Patients
+            </a>
+
+            <a href="{% url 'family_group_list' %}" class="nav-link-item">
+                <span>👨‍👩‍👧</span> Family Records
+            </a>
+
+            <a href="{% url 'visit_list' %}" class="nav-link-item">
+                <span>🩺</span> Visits / Clinical Records
+            </a>
+
+            <a href="{% url 'surgery_list' %}" class="nav-link-item">
+                <span>🏥</span> Surgery / Procedures
+            </a>
+
+            <a href="{% url 'surgery_theatre_dashboard' %}" class="nav-link-item">
+                <span>🏥</span> Theatre Dashboard
+            </a>
+
+            <a href="{% url 'appointment_list' %}" class="nav-link-item">
+                <span>📅</span> Appointments
+            </a>
+
+            <a href="{% url 'clinic_queue' %}" class="nav-link-item">
+                <span>🏥</span> Clinic Queue
+            </a>
+
+            <a href="{% url 'doctor_worklist' %}" class="nav-link-item">
+                <span>🩺</span> Doctor Worklist
+            </a>
+
+            <a href="{% url 'appointment_calendar' %}" class="nav-link-item">
+                <span>📆</span> Appointment Calendar
+            </a>
+
+            <a href="{% url 'bill_list' %}" class="nav-link-item">
+                <span>💰</span> Billing / Payments
+            </a>
+
+            <a href="{% url 'global_search' %}" class="nav-link-item">
+                <span>🔍</span> Search Records
+            </a>
+
+            <a href="{% url 'notification_list' %}"
+               class="nav-link-item {% if 'notification' in request.resolver_match.url_name %}active{% endif %}">
+                <span>🔔</span> Notifications
+            </a>
+
+            <a href="{% url 'reports_dashboard' %}"
+               class="nav-link-item {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
+                <span>📊</span> Reports
+            </a>
+
+            <a href="{% url 'audit_log_list' %}" class="nav-link-item">
+                <span>📊</span> Audit Logs
+            </a>
+
+            <a href="{% url 'backup_dashboard' %}" class="nav-link-item">
+                <span>💾</span> Backup / Restore
+            </a>
+
+            <a href="{% url 'system_setting_update' %}" class="nav-link-item">
+                <span>⚙️</span> System Settings
+            </a>
+
+            <a href="{% url 'about_system' %}"
+               class="nav-link-item {% if request.resolver_match.url_name == 'about_system' %}active{% endif %}">
+                <span>ℹ️</span> System Information
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar enterprise-topbar">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+            <div class="topbar-title">
+                <strong>{{ system_settings.system_name }}</strong>
+                <span class="system-mode-badge">LAN MODE</span>
+            </div>
+
+            <div class="user-area enterprise-user-area">
+                <a href="{% url 'notification_list' %}" class="topbar-icon-btn position-relative" title="Notifications">
+                    🔔
+                    {% if unread_notifications_count %}
+                        <span class="notification-count-badge">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+
+                <a href="{% url 'change_own_password' %}" class="btn btn-sm btn-outline-primary topbar-password-btn">
+                    🔑 Password
+                </a>
+
+                <div class="topbar-user-card">
+                    <div class="topbar-avatar">
+                        {{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}
+                    </div>
+
+                    <div class="topbar-user-text">
+                        <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+                        <small>{{ request.user.get_role_display }}</small>
+                    </div>
+                </div>
+
+                <a href="{% url 'logout' %}" class="btn btn-sm btn-danger">
+                    Logout
+                </a>
+            </div>
+        </header>
+
+        <section class="page-content page-transition">
+            {% if messages %}
+            <div class="toast-container-custom">
+                {% for message in messages %}
+                    <div class="enterprise-toast toast-{{ message.tags }}">
+                        <div class="toast-icon">
+                            {% if message.tags == "success" %}
+                                ✅
+                            {% elif message.tags == "error" or message.tags == "danger" %}
+                                ⚠️
+                            {% elif message.tags == "warning" %}
+                                ⚠️
+                            {% else %}
+                                ℹ️
+                            {% endif %}
+                        </div>
+
+                        <div class="toast-message">
+                            {{ message }}
+                        </div>
+
+                        <button type="button" class="toast-close" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </section>
+
+        <footer class="enterprise-footer">
+            <div class="enterprise-footer-grid">
+
+                <div class="footer-brand">
+                    <h5>CAPITAL EYE HOSPITAL<br>RECORDS SYSTEM</h5>
+                    <p>Enterprise Edition v1.0</p>
+                    <small>
+                        A complete Clinic Management & Electronic Medical Records System.
+                    </small>
+                </div>
+
+                <div class="footer-section">
+                    <h6>Developed By</h6>
+                    <strong>Mutafs Global Technology</strong>
+                    <p>Software Development | ICT Solutions | Consultancy</p>
+                    <small>Nigeria</small>
+                </div>
+
+                <div class="footer-section">
+                    <h6>System Information</h6>
+                    <p>Python Version: 3.13</p>
+                    <p>Django Version: 5.2.8</p>
+                    <p>Database: PostgreSQL</p>
+                    <p>Environment: LAN / Offline</p>
+                </div>
+
+                <div class="footer-section">
+                    <h6>Current Session</h6>
+                    <p>User: {{ request.user.get_full_name|default:request.user.username }}</p>
+                    <p>Role: {{ request.user.get_role_display }}</p>
+                    <p>Server Time: {% now "d M Y, h:i A" %}</p>
+                </div>
+
+            </div>
+
+            <div class="enterprise-footer-links">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'patient_list' %}">Patients</a>
+                <a href="{% url 'reports_dashboard' %}">Reports</a>
+                <a href="{% url 'backup_dashboard' %}">Backup</a>
+                <a href="{% url 'about_system' %}">System Info</a>
+            </div>
+
+            <div class="enterprise-footer-bottom">
+                © {% now "Y" %} Mutafs Global Technology. All Rights Reserved.
+                <br>
+                CAPITAL EYE HOSPITAL RECORDS SYSTEM is a product of Mutafs Global Technology.
+            </div>
+        </footer>
+    </main>
+
+</div>
+{% else %}
+    {% block public_content %}{% endblock %}
+{% endif %}
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+    function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("show-sidebar");
+    }
+</script>
+
+<script>
+    setTimeout(function () {
+        document.querySelectorAll(".enterprise-toast").forEach(function (toast) {
+            toast.style.opacity = "0";
+            toast.style.transform = "translateX(30px)";
+            setTimeout(function () {
+                toast.remove();
+            }, 400);
+        });
+    }, 5000);
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const counters = document.querySelectorAll(".counter-number");
+
+    counters.forEach(counter => {
+        const target = parseFloat(counter.getAttribute("data-target")) || 0;
+        let current = 0;
+        const duration = 900;
+        const frameRate = 20;
+        const steps = duration / frameRate;
+        const increment = target / steps;
+
+        const updateCounter = () => {
+            current += increment;
+
+            if (current < target) {
+                counter.innerText = Math.floor(current).toLocaleString();
+                setTimeout(updateCounter, frameRate);
+            } else {
+                counter.innerText = target.toLocaleString();
+            }
+        };
+
+        updateCounter();
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const loader = document.getElementById("pageLoader");
+
+    if (loader) {
+        setTimeout(function () {
+            loader.classList.add("hide-loader");
+        }, 450);
+    }
+
+    document.querySelectorAll("a").forEach(function (link) {
+        const href = link.getAttribute("href");
+
+        if (
+            href &&
+            !href.startsWith("#") &&
+            !href.startsWith("javascript:") &&
+            !link.hasAttribute("target") &&
+            !link.classList.contains("no-loader")
+        ) {
+            link.addEventListener("click", function () {
+                if (loader) {
+                    loader.classList.remove("hide-loader");
+                }
+            });
+        }
+    });
+
+    document.querySelectorAll("form").forEach(function (form) {
+        form.addEventListener("submit", function () {
+            const submitButton = form.querySelector("button[type='submit']");
+
+            if (submitButton && !submitButton.dataset.originalText) {
+                submitButton.dataset.originalText = submitButton.innerHTML;
+                submitButton.innerHTML = "Please wait...";
+                submitButton.disabled = true;
+            }
+
+            if (loader) {
+                loader.classList.remove("hide-loader");
+            }
+        });
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}{{ patient.full_name }} | Patient Profile{% endblock %}
+
+{% block content %}
+
+<div class="patient-profile-hero">
+    <div class="patient-avatar">
+        {{ patient.full_name|slice:":1"|upper }}
+    </div>
+
+    <div class="patient-profile-main">
+        <span class="profile-label">Patient Profile</span>
+        <h2>{{ patient.full_name }}</h2>
+        <p>
+            File No: <strong>{{ patient.file_number }}</strong> |
+            Registered: {{ patient.registration_date|date:"d M Y" }}
+        </p>
+
+        <div class="profile-badges">
+            <span>{{ patient.get_gender_display }}</span>
+            <span>Age: {{ patient.display_age|default:"-" }}</span>
+            <span>Phone: {{ patient.phone_number|default:"-" }}</span>
+            <span>Payment: {{ patient.get_payment_status_display }}</span>
+        </div>
+    </div>
+
+    <div class="patient-profile-actions">
+        <a href="{% url 'patient_update' patient.pk %}" class="btn btn-light btn-sm">Edit</a>
+        <a href="{% url 'patient_card_pdf' patient.pk %}" class="btn btn-outline-light btn-sm no-loader">Card PDF</a>
+        <a href="{% url 'patient_report_pdf' patient.pk %}" class="btn btn-outline-light btn-sm no-loader">Full Report</a>
+        <button onclick="window.print()" class="btn btn-warning btn-sm no-print">Print</button>
+    </div>
+</div>
+
+<div class="row g-4 mt-1">
+
+    <div class="col-xl-3 col-md-6">
+        <div class="profile-stat-card">
+            <span>🩺</span>
+            <h3>{{ patient.visits.count }}</h3>
+            <p>Total Visits</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="profile-stat-card">
+            <span>📅</span>
+            <h3>{{ patient.appointments.count }}</h3>
+            <p>Appointments</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="profile-stat-card">
+            <span>🏥</span>
+            <h3>{{ patient.surgeries.count }}</h3>
+            <p>Surgery / Procedures</p>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="profile-stat-card">
+            <span>💰</span>
+            <h3>₦{{ total_balance }}</h3>
+            <p>Outstanding Balance</p>
+        </div>
+    </div>
+
+</div>
+
+<div class="profile-action-strip mt-4">
+    <a href="{% url 'patient_visit_create' patient.pk %}" class="btn btn-success">+ New Visit</a>
+    <a href="{% url 'patient_appointment_create' patient.pk %}" class="btn btn-info">+ Appointment</a>
+    <a href="{% url 'patient_surgery_create' patient.pk %}" class="btn btn-warning">+ Surgery / Procedure</a>
+    <a href="{% url 'patient_bill_create' patient.pk %}" class="btn btn-dark">+ Bill</a>
+
+    <a href="{% url 'patient_visit_history' patient.pk %}" class="btn btn-outline-success">Visit History</a>
+    <a href="{% url 'patient_appointment_history' patient.pk %}" class="btn btn-outline-info">Appointment History</a>
+    <a href="{% url 'patient_surgery_history' patient.pk %}" class="btn btn-outline-warning">Surgery History</a>
+    <a href="{% url 'patient_bill_history' patient.pk %}" class="btn btn-outline-dark">Billing History</a>
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-lg-4">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h5>Patient Information</h5>
+            </div>
+
+            <div class="profile-info-list">
+                <p><strong>Gender:</strong> {{ patient.get_gender_display }}</p>
+                <p><strong>Age:</strong> {{ patient.display_age|default:"-" }}</p>
+                <p><strong>Date of Birth:</strong> {{ patient.date_of_birth|date:"d M Y"|default:"-" }}</p>
+                <p><strong>Phone:</strong> {{ patient.phone_number|default:"-" }}</p>
+                <p><strong>Occupation:</strong> {{ patient.occupation|default:"-" }}</p>
+                <p><strong>Address:</strong><br>{{ patient.address|linebreaksbr|default:"-" }}</p>
+            </div>
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header">
+                <h5>Medical Alerts</h5>
+            </div>
+
+            <div class="medical-alert-box">
+                <strong>Allergy History</strong>
+                <p>{{ patient.allergy_history|linebreaksbr|default:"No allergy recorded." }}</p>
+            </div>
+
+            <div class="medical-alert-box warning">
+                <strong>Medical History</strong>
+                <p>{{ patient.medical_history|linebreaksbr|default:"No medical history recorded." }}</p>
+            </div>
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header">
+                <h5>Next of Kin</h5>
+            </div>
+
+            <p><strong>Name:</strong> {{ patient.next_of_kin_name|default:"-" }}</p>
+            <p><strong>Phone:</strong> {{ patient.next_of_kin_phone|default:"-" }}</p>
+            <p><strong>Relationship:</strong> {{ patient.next_of_kin_relationship|default:"-" }}</p>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+
+        <div class="panel-card">
+            <div class="panel-header d-flex justify-content-between align-items-center">
+                <h5>Medical Timeline</h5>
+                <a href="{% url 'patient_visit_history' patient.pk %}" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+
+            <div class="timeline">
+                {% for visit in visits %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h6>{{ visit.visit_number }} - {{ visit.get_visit_type_display }}</h6>
+                            <small>{{ visit.visit_date|date:"d M Y, h:i A" }} | {{ visit.get_status_display }}</small>
+                            <p>{{ visit.chief_complaint|truncatechars:120|default:"No complaint recorded." }}</p>
+                            <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-sm btn-outline-primary">
+                                Open Visit
+                            </a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="empty-state">No visit timeline available.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="row g-4 mt-1">
+
+            <div class="col-lg-6">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h5>Appointments</h5>
+                    </div>
+
+                    {% for appointment in appointments %}
+                        <div class="mini-list-item">
+                            <strong>{{ appointment.get_appointment_type_display }}</strong>
+                            <small>{{ appointment.appointment_date|date:"d M Y" }} | {{ appointment.appointment_time|time:"h:i A" }}</small>
+                            <a href="{% url 'appointment_detail' appointment.pk %}">Open</a>
+                        </div>
+                    {% empty %}
+                        <div class="empty-state">No appointments recorded.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h5>Surgery / Procedures</h5>
+                    </div>
+
+                    {% for surgery in surgeries %}
+                        <div class="mini-list-item">
+                            <strong>{{ surgery.procedure_name }}</strong>
+                            <small>{{ surgery.procedure_number }} | {{ surgery.get_status_display }}</small>
+                            <a href="{% url 'surgery_detail' surgery.pk %}">Open</a>
+                        </div>
+                    {% empty %}
+                        <div class="empty-state">No surgery/procedure recorded.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="panel-card mt-4">
+            <div class="panel-header">
+                <h5>Billing Summary</h5>
+            </div>
+
+            {% if unpaid_bills_count > 0 %}
+                <div class="alert alert-warning">
+                    This patient has {{ unpaid_bills_count }} unpaid/part-paid bill(s).
+                    Outstanding balance: <strong>₦{{ total_balance }}</strong>
+                </div>
+            {% endif %}
+
+            {% for bill in bills %}
+                <div class="billing-mini-row">
+                    <div>
+                        <strong>{{ bill.bill_number }}</strong>
+                        <small>{{ bill.bill_title }} | {{ bill.get_status_display }}</small>
+                    </div>
+                    <div>
+                        <strong>₦{{ bill.balance }}</strong>
+                        <a href="{% url 'bill_detail' bill.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">No billing record found.</div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

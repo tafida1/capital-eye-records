@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Financial Report{% endblock %}
+
+{% block content %}
+
+<div class="report-page-header no-print">
+    <div>
+        <h2>Financial Report</h2>
+        <p>Payments, bills, balances, discounts, and payment method summaries.</p>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button onclick="window.print()" class="btn btn-primary">Print Report</button>
+
+        <a href="{% url 'financial_report_pdf' %}?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}" class="btn btn-outline-danger no-loader">
+            PDF
+        </a>
+
+        <a href="{% url 'financial_report_excel' %}?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}" class="btn btn-outline-success no-loader">
+            Excel
+        </a>
+    </div>
+</div>
+
+<div class="panel-card mb-4 no-print">
+    <form method="get" class="row g-2">
+        <div class="col-md-5">
+            <label class="form-label">Start Date</label>
+            <input type="date" name="start_date" value="{{ start_date|date:'Y-m-d' }}" class="form-control">
+        </div>
+
+        <div class="col-md-5">
+            <label class="form-label">End Date</label>
+            <input type="date" name="end_date" value="{{ end_date|date:'Y-m-d' }}" class="form-control">
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <label class="form-label">&nbsp;</label>
+            <button class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="print-report-sheet">
+
+    <div class="print-report-title">
+        <h2>{{ system_settings.hospital_name|default:"CAPITAL EYE HOSPITAL" }}</h2>
+        <p>Financial Report</p>
+        <small>{{ start_date }} to {{ end_date }}</small>
+    </div>
+
+    <div class="report-summary-row">
+        <div><span>Total Billed</span><strong>₦{{ total_billed }}</strong></div>
+        <div><span>Total Discount</span><strong>₦{{ total_discount }}</strong></div>
+        <div><span>Total Payments</span><strong>₦{{ total_payments }}</strong></div>
+        <div><span>Outstanding</span><strong>₦{{ outstanding }}</strong></div>
+    </div>
+
+    <h5>Payment Method Summary</h5>
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Payment Method</th>
+                <th>Count</th>
+                <th>Total Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in payment_method_summary %}
+                <tr>
+                    <td>{{ item.payment_method }}</td>
+                    <td>{{ item.count }}</td>
+                    <td>₦{{ item.total }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="3">No payment summary found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h5>Payments</h5>
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Receipt No.</th>
+                <th>Patient</th>
+                <th>Bill</th>
+                <th>Method</th>
+                <th>Amount</th>
+                <th>Received By</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.payment_date|date:"d M Y, h:i A" }}</td>
+                    <td>{{ payment.receipt_number }}</td>
+                    <td>{{ payment.bill.patient.full_name }}</td>
+                    <td>{{ payment.bill.bill_number }}</td>
+                    <td>{{ payment.get_payment_method_display }}</td>
+                    <td>₦{{ payment.amount }}</td>
+                    <td>{{ payment.received_by|default:"-" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">No payments found for this period.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

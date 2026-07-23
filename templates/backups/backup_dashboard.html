@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Backup and Restore{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Backup and Restore</h2>
+        <p>Create, download, and manage system backups.</p>
+    </div>
+
+    <div>
+        <a href="{% url 'create_backup' %}" class="btn btn-primary">
+            Create Backup
+        </a>
+
+        <a href="{% url 'restore_backup' %}" class="btn btn-warning">
+            Restore Backup
+        </a>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    Always copy backup files to an external drive or Google Drive when internet is available.
+</div>
+
+<div class="panel-card">
+    <div class="panel-header">
+        <h5>Available Backups</h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Backup File</th>
+                    <th>Size</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for backup in backups %}
+                    <tr>
+                        <td>{{ backup.name }}</td>
+                        <td>{{ backup.stat.st_size|filesizeformat }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'download_backup' backup.name %}" class="btn btn-sm btn-outline-primary">
+                                Download
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">
+                            No backups created yet.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

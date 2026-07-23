@@ -1,0 +1,90 @@
+<div class="panel-card mb-4">
+    <div class="panel-header">
+        <h5>Procedure Information</h5>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Procedure Name</label>
+            {{ form.procedure_name }}
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Procedure Type</label>
+            {{ form.procedure_type }}
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Eye Side</label>
+            {{ form.eye_side }}
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Scheduled Date</label>
+            {{ form.scheduled_date }}
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Procedure Date</label>
+            {{ form.procedure_date }}
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Status</label>
+            {{ form.status }}
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Surgeon</label>
+            {{ form.surgeon }}
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Assistant</label>
+            {{ form.assistant }}
+        </div>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="panel-header">
+        <h5>Clinical / Theatre Notes</h5>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Pre-op Diagnosis</label>
+            {{ form.pre_op_diagnosis }}
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Post-op Diagnosis</label>
+            {{ form.post_op_diagnosis }}
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Procedure Notes</label>
+            {{ form.procedure_notes }}
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Anesthesia Type</label>
+            {{ form.anesthesia_type }}
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Complications</label>
+            {{ form.complications }}
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Outcome</label>
+            {{ form.outcome }}
+        </div>
+
+        <div class="col-md-12">
+            <label class="form-label">Post-op Instructions</label>
+            {{ form.post_op_instructions }}
+        </div>
+    </div>
+</div>

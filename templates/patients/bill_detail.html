@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bill.bill_number }} | Bill Receipt{% endblock %}
+
+{% block content %}
+
+<div class="bill-hero no-print">
+    <div class="bill-icon">🧾</div>
+
+    <div class="bill-main">
+        <span class="bill-label">Billing Receipt</span>
+        <h2>{{ bill.bill_number }}</h2>
+        <p>
+            Patient:
+            <a href="{% url 'patient_detail' bill.patient.pk %}">
+                <strong>{{ bill.patient.full_name }}</strong>
+            </a>
+            |
+            File No: <strong>{{ bill.patient.file_number }}</strong>
+        </p>
+
+        <div class="bill-badges">
+            <span>{{ bill.get_status_display }}</span>
+            <span>Net: ₦{{ bill.net_amount }}</span>
+            <span>Paid: ₦{{ bill.amount_paid }}</span>
+            <span>Balance: ₦{{ bill.balance }}</span>
+        </div>
+    </div>
+
+    <div class="bill-actions">
+        {% if can_pay %}
+            <a href="{% url 'payment_create' bill.pk %}" class="btn btn-light btn-sm">
+                + Record Payment
+            </a>
+        {% endif %}
+
+        <a href="{% url 'bill_update' bill.pk %}" class="btn btn-outline-light btn-sm">Edit Bill</a>
+        <a href="{% url 'bill_receipt_pdf' bill.pk %}" class="btn btn-outline-light btn-sm no-loader">PDF Receipt</a>
+        <button onclick="window.print()" class="btn btn-warning btn-sm">Print</button>
+        <a href="{% url 'bill_list' %}" class="btn btn-outline-light btn-sm">Back</a>
+    </div>
+</div>
+
+<div class="receipt-paper mt-4">
+
+    <div class="receipt-header">
+        <h2>{{ system_settings.hospital_name|default:"CAPITAL EYE HOSPITAL" }}</h2>
+        <p>{{ system_settings.system_name|default:"CAPITAL EYE HOSPITAL RECORDS SYSTEM" }}</p>
+        <p>{{ system_settings.hospital_address|default:"" }}</p>
+        <p>{{ system_settings.hospital_phone|default:"" }} {% if system_settings.hospital_email %}| {{ system_settings.hospital_email }}{% endif %}</p>
+    </div>
+
+    <div class="receipt-title">
+        <h3>PAYMENT RECEIPT / BILL SUMMARY</h3>
+        <span>{{ bill.bill_number }}</span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="receipt-box">
+                <h5>Patient Information</h5>
+                <p><strong>Name:</strong> {{ bill.patient.full_name }}</p>
+                <p><strong>File No:</strong> {{ bill.patient.file_number }}</p>
+                <p><strong>Phone:</strong> {{ bill.patient.phone_number|default:"-" }}</p>
+                <p><strong>Gender:</strong> {{ bill.patient.get_gender_display }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="receipt-box">
+                <h5>Bill Information</h5>
+                <p><strong>Bill Title:</strong> {{ bill.bill_title }}</p>
+                <p><strong>Status:</strong> {{ bill.get_status_display }}</p>
+                <p><strong>Created:</strong> {{ bill.created_at|date:"d M Y, h:i A" }}</p>
+                <p><strong>Created By:</strong> {{ bill.created_by|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="receipt-amount-grid mt-4">
+        <div>
+            <span>Total Amount</span>
+            <strong>₦{{ bill.total_amount }}</strong>
+        </div>
+
+        <div>
+            <span>Discount</span>
+            <strong>₦{{ bill.discount }}</strong>
+        </div>
+
+        <div>
+            <span>Net Amount</span>
+            <strong>₦{{ bill.net_amount }}</strong>
+        </div>
+
+        <div>
+            <span>Amount Paid</span>
+            <strong>₦{{ bill.amount_paid }}</strong>
+        </div>
+
+        <div class="balance-box">
+            <span>Balance</span>
+            <strong>₦{{ bill.balance }}</strong>
+        </div>
+    </div>
+
+    <div class="receipt-section mt-4">
+        <h5>Payment History</h5>
+
+        {% if payments %}
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead>
+                        <tr>
+                            <th>Receipt No.</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Reference</th>
+                            <th>Date</th>
+                            <th>Received By</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for payment in payments %}
+                            <tr>
+                                <td>{{ payment.receipt_number }}</td>
+                                <td>₦{{ payment.amount }}</td>
+                                <td>{{ payment.get_payment_method_display }}</td>
+                                <td>{{ payment.reference_number|default:"-" }}</td>
+                                <td>{{ payment.payment_date|date:"d M Y, h:i A" }}</td>
+                                <td>{{ payment.received_by|default:"-" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">No payment has been recorded for this bill.</div>
+        {% endif %}
+    </div>
+
+    {% if bill.notes %}
+        <div class="receipt-section mt-4">
+            <h5>Notes</h5>
+            <p>{{ bill.notes|linebreaksbr }}</p>
+        </div>
+    {% endif %}
+
+    <div class="receipt-signatures">
+        <div>
+            <span>Cashier Signature</span>
+        </div>
+
+        <div>
+            <span>Patient / Guardian Signature</span>
+        </div>
+    </div>
+
+    <div class="receipt-footer">
+        {{ system_settings.receipt_footer|default:"Thank you for choosing Capital Eye Hospital." }}
+        <br>
+        <strong>Generated by CAPITAL EYE HOSPITAL RECORDS SYSTEM</strong>
+        <br>
+        Developed by Mutafs Global Technology.
+        <br>
+        © {% now "Y" %} Mutafs Global Technology. All Rights Reserved.
+    </div>
+
+</div>
+
+{% endblock %}

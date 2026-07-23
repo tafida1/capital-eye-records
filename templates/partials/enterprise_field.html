@@ -1,0 +1,22 @@
+<div class="enterprise-field">
+    <label for="{{ field.id_for_label }}">
+        {{ field.label }}
+        {% if field.field.required %}
+            <span class="required-star">*</span>
+        {% endif %}
+    </label>
+
+    {{ field }}
+
+    {% if field.help_text %}
+        <div class="enterprise-help-text">
+            {{ field.help_text }}
+        </div>
+    {% endif %}
+
+    {% if field.errors %}
+        <div class="enterprise-error">
+            {{ field.errors.0 }}
+        </div>
+    {% endif %}
+</div>

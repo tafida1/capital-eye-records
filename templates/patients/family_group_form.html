@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | CAPITAL EYE HOSPITAL RECORDS SYSTEM{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>{{ title }}</h2>
+        <p>Create and manage shared family/group patient records.</p>
+    </div>
+
+    <a href="{% url 'family_group_list' %}" class="btn btn-secondary">
+        Back to Family Groups
+    </a>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5>Family / Group Information</h5>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Family / Group Name</label>
+                {{ form.family_name }}
+                <div class="text-danger small">{{ form.family_name.errors }}</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Head of Family</label>
+                {{ form.head_of_family }}
+                <div class="text-danger small">{{ form.head_of_family.errors }}</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Primary Phone</label>
+                {{ form.primary_phone }}
+                <div class="text-danger small">{{ form.primary_phone.errors }}</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Address</label>
+                {{ form.address }}
+                <div class="text-danger small">{{ form.address.errors }}</div>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Notes</label>
+                {{ form.notes }}
+                <div class="text-danger small">{{ form.notes.errors }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-lg">
+            {{ button_text }}
+        </button>
+
+        <a href="{% url 'family_group_list' %}" class="btn btn-secondary btn-lg">
+            Cancel
+        </a>
+    </div>
+</form>
+
+{% endblock %}
