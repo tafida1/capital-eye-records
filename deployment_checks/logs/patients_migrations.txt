@@ -1,0 +1,16 @@
+patients
+ [X] 0001_initial
+ [X] 0002_familygroup_patient_family_group_and_more
+ [X] 0003_patientvisit
+ [X] 0004_consultation_eyeexamination
+ [X] 0005_diagnosistreatment_prescription
+ [X] 0006_surgeryprocedure
+ [X] 0007_appointment
+ [X] 0008_bill_payment_bill_patients_bi_bill_nu_e43f74_idx_and_more
+ [X] 0009_eyeexamination_left_anterior_chamber_and_more
+ [X] 0010_eyeexamination_auto_refraction_remarks_and_more
+ [X] 0011_eyeexamination_left_near_vision_other_and_more
+ [X] 0012_eyeexamination_left_subjective_add_power_and_more
+ [X] 0013_clinicalattachment
+ [X] 0014_clinicalimageannotation
+ [X] 0015_contactlensassessment_contactlensprescription_and_more

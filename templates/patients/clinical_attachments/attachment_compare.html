@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Compare Clinical Investigations
+{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/clinical_attachments.css' %}?v=20260803-4"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="clinical-comparison-page"
+     id="clinicalComparisonPage">
+
+    <header class="clinical-comparison-header">
+
+        <div>
+
+            <span class="viewer-module-label">
+                Side-by-Side Clinical Review
+            </span>
+
+            <h2>
+                Investigation Comparison
+            </h2>
+
+            <p>
+                {{ patient.full_name }}
+                · {{ patient.file_number }}
+            </p>
+
+        </div>
+
+
+        <div class="d-flex gap-2 flex-wrap">
+
+            <a href="{% url 'clinical_attachment_compare_select' left_attachment.pk %}"
+               class="btn btn-sm btn-outline-light">
+
+                Change Comparison
+
+            </a>
+
+            <button type="button"
+                    class="btn btn-sm btn-outline-light"
+                    id="comparisonSwapButton">
+
+                Swap Sides
+
+            </button>
+
+            <button type="button"
+                    class="btn btn-sm btn-light"
+                    id="comparisonFullScreenButton">
+
+                Full Screen
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <div class="clinical-comparison-toolbar">
+
+        <div class="comparison-toolbar-group">
+
+            <button type="button"
+                    id="comparisonZoomOut"
+                    class="viewer-tool-button">
+                −
+            </button>
+
+            <span id="comparisonZoomDisplay"
+                  class="viewer-zoom-display">
+                100%
+            </span>
+
+            <button type="button"
+                    id="comparisonZoomIn"
+                    class="viewer-tool-button">
+                +
+            </button>
+
+        </div>
+
+
+        <div class="viewer-toolbar-divider"></div>
+
+
+        <div class="comparison-toolbar-group">
+
+            <button type="button"
+                    id="comparisonFitButton"
+                    class="viewer-tool-button viewer-tool-text">
+
+                Fit
+
+            </button>
+
+            <button type="button"
+                    id="comparisonResetButton"
+                    class="viewer-tool-button viewer-tool-text">
+
+                Reset
+
+            </button>
+
+        </div>
+
+
+        <div class="viewer-toolbar-divider image-comparison-control"></div>
+
+
+        <div class="comparison-toolbar-group image-comparison-control">
+
+            <button type="button"
+                    id="comparisonRotateLeft"
+                    class="viewer-tool-button">
+                ↺
+            </button>
+
+            <button type="button"
+                    id="comparisonRotateRight"
+                    class="viewer-tool-button">
+                ↻
+            </button>
+
+        </div>
+
+
+        <div class="viewer-toolbar-spacer"></div>
+
+
+        <label class="comparison-sync-control">
+
+            <input type="checkbox"
+                   id="comparisonSynchronize"
+                   checked>
+
+            Synchronize image controls
+
+        </label>
+
+    </div>
+
+
+    <main class="clinical-comparison-layout"
+          id="clinicalComparisonLayout">
+
+        <!-- LEFT SIDE -->
+
+        <section class="comparison-side"
+                 id="comparisonLeftSide">
+
+            <div class="comparison-side-header">
+
+                <div>
+
+                    <span>LEFT PANEL</span>
+
+                    <h4>{{ left_attachment.title }}</h4>
+
+                    <p>
+                        {{ left_attachment.get_eye_side_display }}
+                        · {{ left_attachment.investigation_date|date:"d M Y"|default:"Date not specified" }}
+                        · {{ left_attachment.visit.visit_number }}
+                    </p>
+
+                </div>
+
+
+                <div class="d-flex gap-2">
+
+                    <a href="{% url 'clinical_attachment_viewer' left_attachment.pk %}?scope=patient"
+                       class="btn btn-sm btn-outline-light">
+
+                        Full Viewer
+
+                    </a>
+
+                    <a href="{% url 'clinical_attachment_download' left_attachment.pk %}"
+                       class="btn btn-sm btn-light">
+
+                        Download
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="comparison-stage"
+                 data-comparison-stage="left">
+
+                {% if left_attachment.is_image %}
+
+                    <div class="comparison-image-viewport"
+                         data-comparison-viewport="left">
+
+                        <img src="{% url 'clinical_attachment_preview' left_attachment.pk %}"
+                             alt="{{ left_attachment.title }}"
+                             data-comparison-image="left"
+                             draggable="false">
+
+                    </div>
+
+                {% else %}
+
+                    <iframe src="{% url 'clinical_attachment_preview' left_attachment.pk %}#toolbar=1&navpanes=0"
+                            title="{{ left_attachment.title }}"
+                            class="comparison-pdf-frame">
+                    </iframe>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="comparison-side-metadata">
+
+                <span>
+                    {% if left_attachment.category == "OTHER" %}
+                        {{ left_attachment.category_other }}
+                    {% else %}
+                        {{ left_attachment.get_category_display }}
+                    {% endif %}
+                </span>
+
+                <span>
+                    {{ left_attachment.file_size_display }}
+                </span>
+
+                <span class="review-status-badge
+                    {% if left_attachment.review_status == 'REVIEWED' %}
+                        reviewed
+                    {% elif left_attachment.review_status == 'NEEDS_ATTENTION' %}
+                        attention
+                    {% else %}
+                        pending
+                    {% endif %}">
+
+                    {{ left_attachment.get_review_status_display }}
+
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- RIGHT SIDE -->
+
+        <section class="comparison-side"
+                 id="comparisonRightSide">
+
+            <div class="comparison-side-header">
+
+                <div>
+
+                    <span>RIGHT PANEL</span>
+
+                    <h4>{{ right_attachment.title }}</h4>
+
+                    <p>
+                        {{ right_attachment.get_eye_side_display }}
+                        · {{ right_attachment.investigation_date|date:"d M Y"|default:"Date not specified" }}
+                        · {{ right_attachment.visit.visit_number }}
+                    </p>
+
+                </div>
+
+
+                <div class="d-flex gap-2">
+
+                    <a href="{% url 'clinical_attachment_viewer' right_attachment.pk %}?scope=patient"
+                       class="btn btn-sm btn-outline-light">
+
+                        Full Viewer
+
+                    </a>
+
+                    <a href="{% url 'clinical_attachment_download' right_attachment.pk %}"
+                       class="btn btn-sm btn-light">
+
+                        Download
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="comparison-stage"
+                 data-comparison-stage="right">
+
+                {% if right_attachment.is_image %}
+
+                    <div class="comparison-image-viewport"
+                         data-comparison-viewport="right">
+
+                        <img src="{% url 'clinical_attachment_preview' right_attachment.pk %}"
+                             alt="{{ right_attachment.title }}"
+                             data-comparison-image="right"
+                             draggable="false">
+
+                    </div>
+
+                {% else %}
+
+                    <iframe src="{% url 'clinical_attachment_preview' right_attachment.pk %}#toolbar=1&navpanes=0"
+                            title="{{ right_attachment.title }}"
+                            class="comparison-pdf-frame">
+                    </iframe>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="comparison-side-metadata">
+
+                <span>
+                    {% if right_attachment.category == "OTHER" %}
+                        {{ right_attachment.category_other }}
+                    {% else %}
+                        {{ right_attachment.get_category_display }}
+                    {% endif %}
+                </span>
+
+                <span>
+                    {{ right_attachment.file_size_display }}
+                </span>
+
+                <span class="review-status-badge
+                    {% if right_attachment.review_status == 'REVIEWED' %}
+                        reviewed
+                    {% elif right_attachment.review_status == 'NEEDS_ATTENTION' %}
+                        attention
+                    {% else %}
+                        pending
+                    {% endif %}">
+
+                    {{ right_attachment.get_review_status_display }}
+
+                </span>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+window.clinicalComparisonConfiguration = {
+    leftIsImage: {{ left_attachment.is_image|yesno:"true,false" }},
+    rightIsImage: {{ right_attachment.is_image|yesno:"true,false" }}
+};
+</script>
+
+<script src="{% static 'js/clinical_attachment_compare.js' %}?v=20260803-1">
+</script>
+
+{% endblock %}

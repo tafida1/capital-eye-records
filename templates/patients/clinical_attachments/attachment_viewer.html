@@ -1,0 +1,636 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Investigation Viewer | {{ attachment.title }}
+{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/clinical_attachments.css' %}?v=20260803-2"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="investigation-viewer-page"
+     id="investigationViewerPage">
+
+    <!-- ================================================== -->
+    <!-- TOP HEADER -->
+    <!-- ================================================== -->
+
+    <header class="investigation-viewer-header">
+
+        <div class="viewer-header-identity">
+
+            <a href="{% url 'clinical_attachment_detail' attachment.pk %}"
+               class="viewer-back-button"
+               title="Return to attachment details">
+                ←
+            </a>
+
+            <div class="viewer-file-type-icon
+                {% if attachment.is_pdf %}pdf{% else %}image{% endif %}">
+
+                {% if attachment.is_pdf %}
+                    PDF
+                {% else %}
+                    🖼️
+                {% endif %}
+
+            </div>
+
+            <div class="viewer-title-block">
+
+                <span class="viewer-module-label">
+                    Clinical Investigation Viewer
+                </span>
+
+                <h2 title="{{ attachment.title }}">
+                    {{ attachment.title }}
+                </h2>
+
+                <p>
+                    {{ patient.full_name }}
+                    · {{ patient.file_number }}
+                    · {{ visit.visit_number }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="viewer-header-actions">
+
+            <span class="review-status-badge large
+                {% if attachment.review_status == 'REVIEWED' %}
+                    reviewed
+                {% elif attachment.review_status == 'NEEDS_ATTENTION' %}
+                    attention
+                {% else %}
+                    pending
+                {% endif %}">
+
+                {{ attachment.get_review_status_display }}
+
+            </span>
+
+
+            {% if can_review_attachment %}
+                <a href="{% url 'clinical_attachment_review' attachment.pk %}"
+                   class="btn btn-sm btn-outline-success">
+                    Review Result
+                </a>
+            {% endif %}
+
+
+            {% if attachment.is_image %}
+
+                <a href="{% url 'clinical_attachment_annotation_workspace' attachment.pk %}"
+                   class="btn btn-sm btn-outline-warning">
+                    Annotate
+                </a>
+
+            {% endif %}
+
+
+            <a href="{% url 'clinical_attachment_compare_select' attachment.pk %}"
+               class="btn btn-sm btn-outline-warning">
+
+                Compare
+
+            </a>
+
+
+            <a href="{% url 'clinical_attachment_download' attachment.pk %}"
+               class="btn btn-sm btn-primary">
+                Download
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- ================================================== -->
+    <!-- VIEWER TOOLBAR -->
+    <!-- ================================================== -->
+
+    <div class="investigation-viewer-toolbar">
+
+        <div class="viewer-toolbar-group">
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="viewerZoomOut"
+                    title="Zoom out (-)">
+                −
+            </button>
+
+            <div class="viewer-zoom-display"
+                 id="viewerZoomDisplay">
+                100%
+            </div>
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="viewerZoomIn"
+                    title="Zoom in (+)">
+                +
+            </button>
+
+        </div>
+
+
+        <div class="viewer-toolbar-divider"></div>
+
+
+        <div class="viewer-toolbar-group">
+
+            <button type="button"
+                    class="viewer-tool-button viewer-tool-text"
+                    id="viewerFitScreen"
+                    title="Fit image to screen">
+                Fit
+            </button>
+
+            <button type="button"
+                    class="viewer-tool-button viewer-tool-text"
+                    id="viewerActualSize"
+                    title="Display at 100%">
+                1:1
+            </button>
+
+            <button type="button"
+                    class="viewer-tool-button viewer-tool-text"
+                    id="viewerReset"
+                    title="Reset viewer">
+                Reset
+            </button>
+
+        </div>
+
+
+        <div class="viewer-toolbar-divider image-only-control"></div>
+
+
+        <div class="viewer-toolbar-group image-only-control">
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="viewerRotateLeft"
+                    title="Rotate left">
+                ↺
+            </button>
+
+            <span class="viewer-toolbar-label">
+                Rotate
+            </span>
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="viewerRotateRight"
+                    title="Rotate right">
+                ↻
+            </button>
+
+        </div>
+
+
+        <div class="viewer-toolbar-spacer"></div>
+
+
+        <div class="viewer-toolbar-group">
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="viewerToggleInformation"
+                    title="Show or hide information panel">
+                ℹ
+            </button>
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="viewerPrint"
+                    title="Print investigation">
+                🖨
+            </button>
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="viewerFullScreen"
+                    title="Full screen">
+                ⛶
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- MAIN VIEWER LAYOUT -->
+    <!-- ================================================== -->
+
+    <div class="investigation-viewer-layout"
+         id="investigationViewerLayout">
+
+        <!-- VIEWING STAGE -->
+
+        <main class="investigation-viewer-stage"
+              id="investigationViewerStage">
+
+            <div class="viewer-loading-state"
+                 id="viewerLoadingState">
+
+                <div class="viewer-loading-spinner"></div>
+
+                <strong>
+                    Loading clinical investigation…
+                </strong>
+
+            </div>
+
+
+            {% if attachment.is_image %}
+
+                <div class="viewer-image-viewport"
+                     id="viewerImageViewport">
+
+                    <img src="{% url 'clinical_attachment_preview' attachment.pk %}"
+                         alt="{{ attachment.title }}"
+                         id="clinicalViewerImage"
+                         draggable="false">
+
+                </div>
+
+            {% elif attachment.is_pdf %}
+
+                <div class="viewer-pdf-viewport"
+                     id="viewerPdfViewport">
+
+                    <iframe
+                        src="{% url 'clinical_attachment_preview' attachment.pk %}#toolbar=1&navpanes=0&scrollbar=1"
+                        title="{{ attachment.title }}"
+                        id="clinicalViewerPdf">
+                    </iframe>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- PREVIOUS ATTACHMENT -->
+
+            {% if previous_attachment %}
+
+                <a href="{% url 'clinical_attachment_viewer' previous_attachment.pk %}?scope={{ viewer_scope }}"
+                   class="viewer-navigation-button previous"
+                   title="Previous investigation">
+
+                    <span>‹</span>
+
+                    <div>
+                        <small>Previous</small>
+
+                        <strong>
+                            {{ previous_attachment.title|truncatechars:30 }}
+                        </strong>
+                    </div>
+
+                </a>
+
+            {% endif %}
+
+
+            <!-- NEXT ATTACHMENT -->
+
+            {% if next_attachment %}
+
+                <a href="{% url 'clinical_attachment_viewer' next_attachment.pk %}?scope={{ viewer_scope }}"
+                   class="viewer-navigation-button next"
+                   title="Next investigation">
+
+                    <div>
+                        <small>Next</small>
+
+                        <strong>
+                            {{ next_attachment.title|truncatechars:30 }}
+                        </strong>
+                    </div>
+
+                    <span>›</span>
+
+                </a>
+
+            {% endif %}
+
+
+            <div class="viewer-position-indicator">
+
+                {{ current_position }} of {{ total_viewable }}
+
+                {% if viewer_scope == "patient" %}
+                    patient investigations
+                {% else %}
+                    visit investigations
+                {% endif %}
+
+            </div>
+
+        </main>
+
+
+        <!-- INFORMATION PANEL -->
+
+        <aside class="investigation-information-panel"
+               id="investigationInformationPanel">
+
+            <div class="viewer-information-header">
+
+                <div>
+                    <span>
+                        Investigation Information
+                    </span>
+
+                    <strong>
+                        Clinical Metadata
+                    </strong>
+                </div>
+
+                <button type="button"
+                        id="viewerCloseInformation"
+                        class="viewer-panel-close"
+                        title="Hide information panel">
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="viewer-information-body">
+
+                <section class="viewer-patient-card">
+
+                    <div class="viewer-patient-avatar">
+                        {{ patient.full_name|slice:":1"|upper }}
+                    </div>
+
+                    <div>
+                        <strong>
+                            {{ patient.full_name }}
+                        </strong>
+
+                        <small>
+                            {{ patient.file_number }}
+                        </small>
+
+                        <small>
+                            {{ patient.get_gender_display }}
+                            · Age {{ patient.display_age|default:"-" }}
+                        </small>
+                    </div>
+
+                </section>
+
+
+                <dl class="viewer-metadata-list">
+
+                    <div>
+                        <dt>Title</dt>
+                        <dd>{{ attachment.title }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Category</dt>
+
+                        <dd>
+                            {% if attachment.category == "OTHER" %}
+                                {{ attachment.category_other }}
+                            {% else %}
+                                {{ attachment.get_category_display }}
+                            {% endif %}
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Eye</dt>
+                        <dd>{{ attachment.get_eye_side_display }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Investigation Date</dt>
+
+                        <dd>
+                            {{ attachment.investigation_date|date:"d M Y"|default:"Not specified" }}
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Visit</dt>
+
+                        <dd>
+                            <a href="{% url 'visit_detail' visit.pk %}">
+                                {{ visit.visit_number }}
+                            </a>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Visit Date</dt>
+
+                        <dd>
+                            {{ visit.visit_date|date:"d M Y, h:i A" }}
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>File Type</dt>
+                        <dd>{{ attachment.file_extension|upper }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>File Size</dt>
+                        <dd>{{ attachment.file_size_display }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Original Filename</dt>
+
+                        <dd class="text-break">
+                            {{ attachment.original_filename }}
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Uploaded By</dt>
+
+                        <dd>
+                            {% if attachment.uploaded_by %}
+                                {{ attachment.uploaded_by.get_full_name|default:attachment.uploaded_by.username }}
+                            {% else %}
+                                Unknown uploader
+                            {% endif %}
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Uploaded At</dt>
+
+                        <dd>
+                            {{ attachment.uploaded_at|date:"d M Y, h:i A" }}
+                        </dd>
+                    </div>
+
+                </dl>
+
+
+                {% if attachment.description %}
+
+                    <section class="viewer-information-section">
+
+                        <h5>
+                            Clinical Description
+                        </h5>
+
+                        <p>
+                            {{ attachment.description|linebreaksbr }}
+                        </p>
+
+                    </section>
+
+                {% endif %}
+
+
+                <section class="viewer-information-section">
+
+                    <h5>
+                        Review Status
+                    </h5>
+
+                    <span class="review-status-badge large
+                        {% if attachment.review_status == 'REVIEWED' %}
+                            reviewed
+                        {% elif attachment.review_status == 'NEEDS_ATTENTION' %}
+                            attention
+                        {% else %}
+                            pending
+                        {% endif %}">
+
+                        {{ attachment.get_review_status_display }}
+
+                    </span>
+
+
+                    {% if attachment.review_notes %}
+
+                        <div class="viewer-review-notes">
+
+                            <p>
+                                {{ attachment.review_notes|linebreaksbr }}
+                            </p>
+
+                            {% if attachment.reviewed_by %}
+
+                                <small>
+                                    Reviewed by
+                                    <strong>
+                                        {{ attachment.reviewed_by.get_full_name|default:attachment.reviewed_by.username }}
+                                    </strong>
+
+                                    {% if attachment.reviewed_at %}
+                                        on
+                                        {{ attachment.reviewed_at|date:"d M Y, h:i A" }}
+                                    {% endif %}
+                                </small>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% endif %}
+
+
+                    {% if can_review_attachment %}
+
+                        <a href="{% url 'clinical_attachment_review' attachment.pk %}"
+                           class="btn btn-outline-success w-100 mt-3">
+
+                            Review Investigation
+
+                        </a>
+
+                    {% endif %}
+
+                </section>
+
+
+                <section class="viewer-information-section">
+
+                    <h5>
+                        Viewer Scope
+                    </h5>
+
+                    <div class="viewer-scope-selector">
+
+                        <a href="{% url 'clinical_attachment_viewer' attachment.pk %}?scope=visit"
+                           class="{% if viewer_scope == 'visit' %}active{% endif %}">
+
+                            This Visit
+
+                        </a>
+
+                        <a href="{% url 'clinical_attachment_viewer' attachment.pk %}?scope=patient"
+                           class="{% if viewer_scope == 'patient' %}active{% endif %}">
+
+                            Entire Patient History
+
+                        </a>
+
+                    </div>
+
+                </section>
+
+
+                <section class="viewer-information-section viewer-shortcuts">
+
+                    <h5>
+                        Keyboard Shortcuts
+                    </h5>
+
+                    <div>
+                        <span><kbd>+</kbd> Zoom in</span>
+                        <span><kbd>−</kbd> Zoom out</span>
+                        <span><kbd>0</kbd> Reset</span>
+                        <span><kbd>F</kbd> Fit screen</span>
+                        <span><kbd>R</kbd> Rotate right</span>
+                        <span><kbd>←</kbd> Previous</span>
+                        <span><kbd>→</kbd> Next</span>
+                        <span><kbd>Esc</kbd> Exit full screen</span>
+                    </div>
+
+                </section>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+
+<script>
+    window.clinicalViewerConfiguration = {
+        fileType: "{% if attachment.is_pdf %}pdf{% else %}image{% endif %}",
+        printUrl: "{% url 'clinical_attachment_preview' attachment.pk %}",
+        previousUrl: "{% if previous_attachment %}{% url 'clinical_attachment_viewer' previous_attachment.pk %}?scope={{ viewer_scope }}{% endif %}",
+        nextUrl: "{% if next_attachment %}{% url 'clinical_attachment_viewer' next_attachment.pk %}?scope={{ viewer_scope }}{% endif %}"
+    };
+</script>
+
+<script src="{% static 'js/clinical_attachment_viewer.js' %}?v=20260803-1">
+</script>
+
+{% endblock %}

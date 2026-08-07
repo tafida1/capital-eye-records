@@ -1,0 +1,607 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>
+        {{ prescription.prescription_number }}
+        — Contact Lens Prescription
+    </title>
+
+    <link href="{% static 'css/contact_lens_print.css' %}?v=20260805-1"
+          rel="stylesheet">
+
+</head>
+
+
+<body>
+
+    <div class="cl-print-toolbar">
+
+        <a href="{% url 'contact_lens_prescription_detail' prescription.pk %}"
+           class="secondary">
+            ← Back to Prescription
+        </a>
+
+        <button type="button"
+                onclick="window.print()">
+            Print Prescription
+        </button>
+
+        {% if is_final_prescription %}
+
+            <a href="{% url 'contact_lens_prescription_pdf' prescription.pk %}">
+                Open PDF
+            </a>
+
+        {% endif %}
+
+    </div>
+
+
+    <main class="cl-prescription-sheet">
+
+        {% if not is_final_prescription %}
+
+            <div class="cl-draft-watermark">
+                NOT APPROVED — DRAFT
+            </div>
+
+        {% elif is_expired %}
+
+            <div class="cl-draft-watermark">
+                EXPIRED
+            </div>
+
+        {% endif %}
+
+
+        <div class="cl-document-content">
+
+            <header class="cl-letterhead">
+
+                <div class="cl-logo-area">
+
+                    {% if system_settings.logo %}
+
+                        <img src="{{ system_settings.logo.url }}"
+                             alt="Hospital logo">
+
+                    {% else %}
+
+                        <span class="cl-logo-fallback">
+                            CEC
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="cl-hospital-details">
+
+                    <h1>
+                        {{ system_settings.system_name|default:"CAPITAL EYE CLINIC" }}
+                    </h1>
+
+                    {% if system_settings.address %}
+                        <p>{{ system_settings.address }}</p>
+                    {% endif %}
+
+                    <p>
+                        {% if system_settings.phone %}
+                            Tel: {{ system_settings.phone }}
+                        {% endif %}
+
+                        {% if system_settings.email %}
+                            · Email: {{ system_settings.email }}
+                        {% endif %}
+                    </p>
+
+                </div>
+
+
+                <div class="cl-document-code">
+
+                    <strong>
+                        {{ prescription.prescription_number }}
+                    </strong>
+
+                    <span>
+                        Version {{ prescription.version }}
+                    </span>
+
+                    <span>
+                        Generated:
+                        {{ generated_at|date:"d M Y, h:i A" }}
+                    </span>
+
+                </div>
+
+            </header>
+
+
+            <section class="cl-document-title">
+
+                <h2>Contact Lens Prescription</h2>
+
+                <p>
+                    Clinical contact-lens specification and patient
+                    wearing instructions
+                </p>
+
+            </section>
+
+
+            <div class="cl-status-line">
+
+                <span class="cl-status-badge
+                    {% if is_final_prescription %}
+                        final
+                    {% else %}
+                        draft
+                    {% endif %}">
+
+                    {{ prescription.get_status_display }}
+
+                    {% if is_expired %}
+                        · Expired
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <section class="cl-patient-grid">
+
+                <div class="cl-patient-item">
+                    <label>Patient Name</label>
+                    <strong>{{ patient.full_name }}</strong>
+                </div>
+
+                <div class="cl-patient-item">
+                    <label>Hospital Number</label>
+                    <strong>{{ patient.file_number }}</strong>
+                </div>
+
+                <div class="cl-patient-item">
+                    <label>Visit Number</label>
+                    <strong>{{ visit.visit_number }}</strong>
+                </div>
+
+                <div class="cl-patient-item">
+                    <label>Gender</label>
+                    <strong>{{ patient.get_gender_display }}</strong>
+                </div>
+
+                <div class="cl-patient-item">
+                    <label>Age</label>
+                    <strong>{{ patient.display_age|default:"-" }}</strong>
+                </div>
+
+                <div class="cl-patient-item">
+                    <label>Prescription Date</label>
+                    <strong>
+                        {{ prescription.prescription_date|date:"d M Y" }}
+                    </strong>
+                </div>
+
+                <div class="cl-patient-item">
+                    <label>Valid Until</label>
+                    <strong>
+                        {{ prescription.valid_until|date:"d M Y"|default:"Not specified" }}
+                    </strong>
+                </div>
+
+                <div class="cl-patient-item">
+                    <label>Prescription Version</label>
+                    <strong>Version {{ prescription.version }}</strong>
+                </div>
+
+            </section>
+
+
+            <section class="cl-section">
+
+                <div class="cl-section-title">
+                    Prescribed Contact Lens Parameters
+                </div>
+
+                <table class="cl-prescription-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Eye</th>
+                            <th>Design</th>
+                            <th>Manufacturer / Brand</th>
+                            <th>Material</th>
+                            <th>BC</th>
+                            <th>DIA</th>
+                            <th>SPH</th>
+                            <th>CYL</th>
+                            <th>Axis</th>
+                            <th>Add</th>
+                            <th>Colour</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% if right_has_prescription %}
+
+                            <tr>
+                                <td>Right / OD</td>
+
+                                <td>
+                                    {% if prescription.right_lens_design == "OTHER" %}
+                                        {{ prescription.right_lens_design_other }}
+                                    {% else %}
+                                        {{ prescription.get_right_lens_design_display|default:"-" }}
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {{ prescription.right_manufacturer|default:"-" }}
+
+                                    {% if prescription.right_brand_name %}
+                                        / {{ prescription.right_brand_name }}
+                                    {% endif %}
+                                </td>
+
+                                <td>{{ prescription.right_material|default:"-" }}</td>
+                                <td>{{ prescription.right_base_curve|default:"-" }}</td>
+                                <td>{{ prescription.right_diameter|default:"-" }}</td>
+                                <td>{{ prescription.right_sphere|default:"-" }}</td>
+                                <td>{{ prescription.right_cylinder|default:"-" }}</td>
+                                <td>{{ prescription.right_axis|default:"-" }}</td>
+                                <td>{{ prescription.right_add_power|default:"-" }}</td>
+                                <td>{{ prescription.right_colour|default:"-" }}</td>
+                            </tr>
+
+                        {% else %}
+
+                            <tr>
+                                <td>Right / OD</td>
+                                <td colspan="10">No right-eye lens prescribed</td>
+                            </tr>
+
+                        {% endif %}
+
+
+                        {% if left_has_prescription %}
+
+                            <tr>
+                                <td>Left / OS</td>
+
+                                <td>
+                                    {% if prescription.left_lens_design == "OTHER" %}
+                                        {{ prescription.left_lens_design_other }}
+                                    {% else %}
+                                        {{ prescription.get_left_lens_design_display|default:"-" }}
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {{ prescription.left_manufacturer|default:"-" }}
+
+                                    {% if prescription.left_brand_name %}
+                                        / {{ prescription.left_brand_name }}
+                                    {% endif %}
+                                </td>
+
+                                <td>{{ prescription.left_material|default:"-" }}</td>
+                                <td>{{ prescription.left_base_curve|default:"-" }}</td>
+                                <td>{{ prescription.left_diameter|default:"-" }}</td>
+                                <td>{{ prescription.left_sphere|default:"-" }}</td>
+                                <td>{{ prescription.left_cylinder|default:"-" }}</td>
+                                <td>{{ prescription.left_axis|default:"-" }}</td>
+                                <td>{{ prescription.left_add_power|default:"-" }}</td>
+                                <td>{{ prescription.left_colour|default:"-" }}</td>
+                            </tr>
+
+                        {% else %}
+
+                            <tr>
+                                <td>Left / OS</td>
+                                <td colspan="10">No left-eye lens prescribed</td>
+                            </tr>
+
+                        {% endif %}
+
+                    </tbody>
+
+                </table>
+
+            </section>
+
+
+            <section class="cl-section">
+
+                <div class="cl-section-title">
+                    Wearing and Replacement Instructions
+                </div>
+
+                <div class="cl-instruction-grid">
+
+                    <div class="cl-instruction-item">
+
+                        <label>Replacement Schedule</label>
+
+                        <strong>
+                            {% if prescription.replacement_schedule == "OTHER" %}
+                                {{ prescription.replacement_schedule_other }}
+                            {% else %}
+                                {{ prescription.get_replacement_schedule_display }}
+                            {% endif %}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cl-instruction-item">
+
+                        <label>Wearing Schedule</label>
+
+                        <strong>
+                            {{ prescription.get_wearing_schedule_display }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cl-instruction-item">
+
+                        <label>Maximum Daily Wear</label>
+
+                        <strong>
+                            {% if prescription.maximum_daily_wear_hours %}
+                                {{ prescription.maximum_daily_wear_hours }}
+                                hours
+                            {% else %}
+                                As directed
+                            {% endif %}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cl-instruction-item">
+
+                        <label>Cleaning Solution</label>
+
+                        <strong>
+                            {{ prescription.cleaning_solution|default:"As directed" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cl-instruction-item">
+
+                        <label>Prescription Status</label>
+
+                        <strong>
+                            {{ prescription.get_status_display }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cl-instruction-item">
+
+                        <label>Dispensing Date</label>
+
+                        <strong>
+                            {{ prescription.dispensed_at|date:"d M Y"|default:"Not yet dispensed" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                {% if prescription.cleaning_instructions %}
+
+                    <div class="cl-wide-note">
+
+                        <label>Cleaning Instructions</label>
+
+                        <p>{{ prescription.cleaning_instructions }}</p>
+
+                    </div>
+
+                {% endif %}
+
+
+                {% if prescription.dispensing_instructions %}
+
+                    <div class="cl-wide-note">
+
+                        <label>Additional Instructions</label>
+
+                        <p>{{ prescription.dispensing_instructions }}</p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <section class="cl-section">
+
+                <div class="cl-section-title">
+                    Patient Safety Training
+                </div>
+
+                <div class="cl-safety-grid">
+
+                    <div class="cl-safety-item">
+
+                        <span>
+                            {% if prescription.insertion_removal_training_completed %}
+                                ✓
+                            {% else %}
+                                ✗
+                            {% endif %}
+                        </span>
+
+                        <strong>
+                            Insertion and Removal Training
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cl-safety-item">
+
+                        <span>
+                            {% if prescription.hygiene_training_completed %}
+                                ✓
+                            {% else %}
+                                ✗
+                            {% endif %}
+                        </span>
+
+                        <strong>
+                            Contact Lens Hygiene Training
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cl-safety-item">
+
+                        <span>
+                            {% if prescription.emergency_warning_signs_explained %}
+                                ✓
+                            {% else %}
+                                ✗
+                            {% endif %}
+                        </span>
+
+                        <strong>
+                            Emergency Warning Signs Explained
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            {% if prescription.clinical_notes %}
+
+                <section class="cl-section">
+
+                    <div class="cl-section-title">
+                        Clinical Notes
+                    </div>
+
+                    <div class="cl-wide-note">
+                        <p>{{ prescription.clinical_notes }}</p>
+                    </div>
+
+                </section>
+
+            {% endif %}
+
+
+            <section class="cl-approval-grid">
+
+                <div>
+
+                    <div class="cl-signature-box">
+
+                        <strong>
+                            {% if prescription.prescribed_by %}
+                                {{ prescription.prescribed_by.get_full_name|default:prescription.prescribed_by.username }}
+                            {% else %}
+                                Prescriber not recorded
+                            {% endif %}
+                        </strong>
+
+                        <small>
+                            Prescribing Clinician
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div>
+
+                    <div class="cl-signature-box">
+
+                        <strong>
+                            {% if prescription.approved_by %}
+                                {{ prescription.approved_by.get_full_name|default:prescription.approved_by.username }}
+                            {% else %}
+                                Not yet approved
+                            {% endif %}
+                        </strong>
+
+                        <small>
+                            Approved Clinician
+
+                            {% if prescription.approved_at %}
+                                · {{ prescription.approved_at|date:"d M Y" }}
+                            {% endif %}
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <div class="cl-emergency-notice">
+
+                Stop lens wear immediately and contact the clinic if there
+                is pain, redness, discharge, persistent blurred vision,
+                severe light sensitivity or sudden reduction in vision.
+
+            </div>
+
+
+            <footer class="cl-footer">
+
+                <span>
+                    Original clinical prescription:
+                    {{ prescription.prescription_number }}
+                    · Version {{ prescription.version }}
+                </span>
+
+                <span>
+                    Printed by:
+                    {% if generated_by %}
+                        {{ generated_by.get_full_name|default:generated_by.username }}
+                    {% else %}
+                        System
+                    {% endif %}
+                </span>
+
+            </footer>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

@@ -34,6 +34,11 @@ urlpatterns = [
 
     path("", views.patient_list, name="patient_list"),
     path("register/", views.patient_create, name="patient_create"),
+    path(
+        "ophthalmology-dashboard/",
+        views.ophthalmology_dashboard,
+        name="ophthalmology_dashboard",
+    ),
     path("<int:pk>/", views.patient_detail, name="patient_detail"),
     path("<int:pk>/edit/", views.patient_update, name="patient_update"),
 
@@ -55,6 +60,239 @@ urlpatterns = [
 
     path("visits/<int:visit_pk>/eye-exam/create/", views.eye_examination_create, name="eye_examination_create"),
     path("eye-exams/<int:pk>/edit/", views.eye_examination_update, name="eye_examination_update"),
+
+    # =====================================================
+    # CLINICAL ATTACHMENTS / INVESTIGATION RESULTS
+    # =====================================================
+
+    path(
+        "visits/<int:visit_pk>/attachments/",
+        views.visit_clinical_attachment_list,
+        name="visit_clinical_attachment_list",
+    ),
+
+    path(
+        "visits/<int:visit_pk>/attachments/upload/",
+        views.clinical_attachment_create,
+        name="clinical_attachment_create",
+    ),
+
+    path(
+        "patients/<int:patient_pk>/attachments/",
+        views.patient_clinical_attachment_list,
+        name="patient_clinical_attachment_list",
+    ),
+
+    path(
+        "patients/<int:patient_pk>/ophthalmology-timeline/",
+        views.patient_ophthalmology_timeline,
+        name="patient_ophthalmology_timeline",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/",
+        views.clinical_attachment_detail,
+        name="clinical_attachment_detail",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/viewer/",
+        views.clinical_attachment_viewer,
+        name="clinical_attachment_viewer",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/edit/",
+        views.clinical_attachment_update,
+        name="clinical_attachment_update",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/preview/",
+        views.clinical_attachment_preview,
+        name="clinical_attachment_preview",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/download/",
+        views.clinical_attachment_download,
+        name="clinical_attachment_download",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/review/",
+        views.clinical_attachment_review,
+        name="clinical_attachment_review",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/deactivate/",
+        views.clinical_attachment_deactivate,
+        name="clinical_attachment_deactivate",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/restore/",
+        views.clinical_attachment_restore,
+        name="clinical_attachment_restore",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/permanent-delete/",
+        views.clinical_attachment_permanent_delete,
+        name="clinical_attachment_permanent_delete",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/compare/select/",
+        views.clinical_attachment_compare_select,
+        name="clinical_attachment_compare_select",
+    ),
+
+    path(
+        (
+            "clinical-attachments/compare/"
+            "<int:left_pk>/<int:right_pk>/"
+        ),
+        views.clinical_attachment_compare,
+        name="clinical_attachment_compare",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/annotate/",
+        views.clinical_attachment_annotation_workspace,
+        name="clinical_attachment_annotation_workspace",
+    ),
+
+    path(
+        "clinical-attachments/<int:pk>/annotations/save/",
+        views.clinical_attachment_annotation_save,
+        name="clinical_attachment_annotation_save",
+    ),
+
+    path(
+        "clinical-image-annotations/<int:annotation_pk>/deactivate/",
+        views.clinical_image_annotation_deactivate,
+        name="clinical_image_annotation_deactivate",
+    ),
+
+    # ============================================================
+    # CONTACT LENS MODULE
+    # ============================================================
+
+    path(
+        "visits/<int:visit_pk>/contact-lens/assessment/create/",
+        views.contact_lens_assessment_create,
+        name="contact_lens_assessment_create",
+    ),
+
+    path(
+        "contact-lens/assessments/<int:pk>/",
+        views.contact_lens_assessment_detail,
+        name="contact_lens_assessment_detail",
+    ),
+
+    path(
+        "contact-lens/assessments/<int:pk>/edit/",
+        views.contact_lens_assessment_update,
+        name="contact_lens_assessment_update",
+    ),
+
+    path(
+        "contact-lens/assessments/<int:assessment_pk>/trials/create/",
+        views.contact_lens_trial_create,
+        name="contact_lens_trial_create",
+    ),
+
+    path(
+        "contact-lens/trials/<int:pk>/edit/",
+        views.contact_lens_trial_update,
+        name="contact_lens_trial_update",
+    ),
+
+    path(
+        "contact-lens/assessments/<int:assessment_pk>/prescriptions/create/",
+        views.contact_lens_prescription_create,
+        name="contact_lens_prescription_create",
+    ),
+
+    path(
+        "contact-lens/prescriptions/<int:pk>/",
+        views.contact_lens_prescription_detail,
+        name="contact_lens_prescription_detail",
+    ),
+
+    path(
+        "contact-lens/prescriptions/<int:pk>/edit/",
+        views.contact_lens_prescription_update,
+        name="contact_lens_prescription_update",
+    ),
+
+    path(
+        "contact-lens/prescriptions/<int:pk>/submit/",
+        views.contact_lens_prescription_submit,
+        name="contact_lens_prescription_submit",
+    ),
+
+    path(
+        "contact-lens/prescriptions/<int:pk>/approve/",
+        views.contact_lens_prescription_approve,
+        name="contact_lens_prescription_approve",
+    ),
+
+    path(
+        "contact-lens/prescriptions/<int:pk>/dispense/",
+        views.contact_lens_prescription_dispense,
+        name="contact_lens_prescription_dispense",
+    ),
+
+    path(
+        "contact-lens/prescriptions/<int:pk>/new-version/",
+        views.contact_lens_prescription_new_version,
+        name="contact_lens_prescription_new_version",
+    ),
+
+    path(
+        "contact-lens/prescriptions/<int:pk>/print/",
+        views.contact_lens_prescription_print,
+        name="contact_lens_prescription_print",
+    ),
+
+    path(
+        "contact-lens/prescriptions/<int:pk>/pdf/",
+        views.contact_lens_prescription_pdf,
+        name="contact_lens_prescription_pdf",
+    ),
+
+    path(
+        "contact-lens/follow-up-queue/",
+        views.contact_lens_follow_up_queue,
+        name="contact_lens_follow_up_queue",
+    ),
+
+    path(
+        "contact-lens/prescriptions/<int:prescription_pk>/follow-ups/create/",
+        views.contact_lens_follow_up_create,
+        name="contact_lens_follow_up_create",
+    ),
+
+    path(
+        "contact-lens/follow-ups/<int:pk>/",
+        views.contact_lens_follow_up_detail,
+        name="contact_lens_follow_up_detail",
+    ),
+
+    path(
+        "contact-lens/follow-ups/<int:pk>/edit/",
+        views.contact_lens_follow_up_update,
+        name="contact_lens_follow_up_update",
+    ),
+
+    path(
+        "patients/<int:patient_pk>/contact-lens-history/",
+        views.patient_contact_lens_history,
+        name="patient_contact_lens_history",
+    ),
 
     path("visits/<int:visit_pk>/diagnosis-treatment/create/", views.diagnosis_treatment_create, name="diagnosis_treatment_create"),
     path("diagnosis-treatment/<int:pk>/edit/", views.diagnosis_treatment_update, name="diagnosis_treatment_update"),

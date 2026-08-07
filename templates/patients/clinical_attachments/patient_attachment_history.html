@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Attachment History | {{ patient.full_name }}{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/clinical_attachments.css' %}?v=20260802-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header attachment-page-header">
+
+    <div>
+        <span class="attachment-page-label">
+            Patient Investigation History
+        </span>
+
+        <h2>Clinical Attachment History</h2>
+
+        <p>
+            {{ patient.full_name }} ·
+            {{ patient.file_number }}
+        </p>
+    </div>
+
+    <a href="{% url 'patient_detail' patient.pk %}"
+       class="btn btn-outline-secondary">
+        ← Patient Profile
+    </a>
+
+</div>
+
+
+<div class="attachment-filter-card mb-4">
+
+    <form method="get" class="row g-3 align-items-end">
+
+        <div class="col-lg-5">
+            <label class="form-label">Search Attachment History</label>
+
+            <input type="search"
+                   name="q"
+                   value="{{ query }}"
+                   class="form-control"
+                   placeholder="Title, visit number, filename...">
+        </div>
+
+        <div class="col-md-4 col-lg-3">
+            <label class="form-label">Category</label>
+
+            <select name="category" class="form-select">
+                <option value="">All Categories</option>
+
+                {% for value, label in category_choices %}
+                    <option value="{{ value }}"
+                            {% if selected_category == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4 col-lg-2">
+            <label class="form-label">Review Status</label>
+
+            <select name="review_status" class="form-select">
+                <option value="">All Statuses</option>
+
+                {% for value, label in review_status_choices %}
+                    <option value="{{ value }}"
+                            {% if selected_review_status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4 col-lg-2">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">
+                    Search
+                </button>
+
+                <a href="{% url 'patient_clinical_attachment_list' patient.pk %}"
+                   class="btn btn-outline-secondary">
+                    Reset
+                </a>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+
+{% if attachments %}
+
+    <div class="attachment-history-table-wrapper">
+
+        <div class="table-responsive">
+
+            <table class="table attachment-history-table">
+
+                <thead>
+                    <tr>
+                        <th>Investigation</th>
+                        <th>Visit</th>
+                        <th>Eye</th>
+                        <th>Date</th>
+                        <th>Review</th>
+                        <th>File</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for attachment in attachments %}
+                        <tr>
+
+                            <td>
+                                <div class="attachment-table-title">
+                                    <span>
+                                        {% if attachment.is_image %}
+                                            🖼️
+                                        {% elif attachment.is_pdf %}
+                                            📕
+                                        {% else %}
+                                            📘
+                                        {% endif %}
+                                    </span>
+
+                                    <div>
+                                        <strong>{{ attachment.title }}</strong>
+
+                                        <small>
+                                            {% if attachment.category == "OTHER" %}
+                                                {{ attachment.category_other }}
+                                            {% else %}
+                                                {{ attachment.get_category_display }}
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <a href="{% url 'visit_detail' attachment.visit.pk %}">
+                                    {{ attachment.visit.visit_number }}
+                                </a>
+
+                                <small class="d-block text-muted">
+                                    {{ attachment.visit.visit_date|date:"d M Y" }}
+                                </small>
+                            </td>
+
+                            <td>
+                                {{ attachment.get_eye_side_display }}
+                            </td>
+
+                            <td>
+                                {{ attachment.investigation_date|date:"d M Y"|default:"-" }}
+                            </td>
+
+                            <td>
+                                <span class="review-status-badge
+                                    {% if attachment.review_status == 'REVIEWED' %}
+                                        reviewed
+                                    {% elif attachment.review_status == 'NEEDS_ATTENTION' %}
+                                        attention
+                                    {% else %}
+                                        pending
+                                    {% endif %}">
+                                    {{ attachment.get_review_status_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ attachment.file_size_display }}
+
+                                <small class="d-block text-muted">
+                                    {{ attachment.file_extension|upper }}
+                                </small>
+                            </td>
+
+                            <td>
+                                <div class="d-flex gap-2 flex-wrap">
+
+                                    <a href="{% url 'clinical_attachment_detail' attachment.pk %}"
+                                       class="btn btn-sm btn-primary">
+                                        View
+                                    </a>
+
+                                    <a href="{% url 'clinical_attachment_download' attachment.pk %}"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        Download
+                                    </a>
+
+                                </div>
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+{% else %}
+
+    <div class="attachment-empty-state">
+        <div class="attachment-empty-icon">📂</div>
+
+        <h4>No patient attachment history</h4>
+
+        <p>
+            No active investigation files were found for this patient.
+        </p>
+    </div>
+
+{% endif %}
+
+
+{% if page_obj.paginator.num_pages > 1 %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ page_obj.previous_page_number }}&q={{ query|urlencode }}&category={{ selected_category }}&review_status={{ selected_review_status }}">
+                        Previous
+                    </a>
+                </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">
+                    {{ page_obj.number }}
+                    of {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ page_obj.next_page_number }}&q={{ query|urlencode }}&category={{ selected_category }}&review_status={{ selected_review_status }}">
+                        Next
+                    </a>
+                </li>
+            {% endif %}
+
+        </ul>
+    </nav>
+{% endif %}
+
+{% endblock %}

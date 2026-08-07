@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ attachment.title }}{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/clinical_attachments.css' %}?v=20260802-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header attachment-page-header">
+
+    <div>
+        <span class="attachment-page-label">
+            Clinical Attachment
+        </span>
+
+        <h2>{{ attachment.title }}</h2>
+
+        <p>
+            {{ patient.full_name }} ·
+            {{ patient.file_number }} ·
+            {{ visit.visit_number }}
+        </p>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+
+        <a href="{% url 'visit_clinical_attachment_list' visit.pk %}"
+           class="btn btn-outline-secondary">
+            ← All Attachments
+        </a>
+
+        {% if can_manage_attachment %}
+            <a href="{% url 'clinical_attachment_update' attachment.pk %}"
+               class="btn btn-outline-primary">
+                Edit
+            </a>
+        {% endif %}
+
+        {% if can_review_attachment and attachment.is_active %}
+            <a href="{% url 'clinical_attachment_review' attachment.pk %}"
+               class="btn btn-primary">
+                Review Result
+            </a>
+        {% endif %}
+
+        {% if attachment.is_active %}
+            {% if attachment.is_image or attachment.is_pdf %}
+
+                <a href="{% url 'clinical_attachment_compare_select' attachment.pk %}"
+                   class="btn btn-outline-success">
+
+                    Compare Investigation
+
+                </a>
+
+            {% endif %}
+        {% endif %}
+
+        {% if attachment.is_active and attachment.is_image %}
+
+            <a href="{% url 'clinical_attachment_annotation_workspace' attachment.pk %}"
+               class="btn btn-outline-warning">
+                Annotate Image
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+{% if not attachment.is_active %}
+    <div class="alert alert-warning">
+        <strong>This attachment is inactive.</strong>
+        It is hidden from normal clinical attachment lists but retained
+        for audit purposes.
+    </div>
+{% endif %}
+
+
+<div class="row g-4">
+
+    <div class="col-xl-8">
+
+        <div class="attachment-preview-card mb-4">
+
+            <div class="attachment-preview-toolbar">
+
+                <div>
+                    <strong>Protected Clinical Preview</strong>
+
+                    <small>
+                        {{ attachment.original_filename }}
+                    </small>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+
+                    {% if attachment.is_active %}
+                        {% if attachment.is_image or attachment.is_pdf %}
+
+                        <a href="{% url 'clinical_attachment_viewer' attachment.pk %}"
+                           class="btn btn-sm btn-primary">
+                            Open Investigation Viewer
+                        </a>
+
+                        <a href="{% url 'clinical_attachment_preview' attachment.pk %}"
+                           class="btn btn-sm btn-outline-primary"
+                           target="_blank"
+                           rel="noopener">
+                            Open Raw File
+                        </a>
+
+                    {% endif %}
+
+                        <a href="{% url 'clinical_attachment_download' attachment.pk %}"
+                           class="btn btn-sm btn-primary">
+                            Download File
+                        </a>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="attachment-large-preview">
+
+                {% if attachment.is_active and attachment.is_image %}
+
+                    <img src="{% url 'clinical_attachment_preview' attachment.pk %}"
+                         alt="{{ attachment.title }}">
+
+                {% elif attachment.is_active and attachment.is_pdf %}
+
+                    <iframe src="{% url 'clinical_attachment_preview' attachment.pk %}"
+                            title="{{ attachment.title }}">
+                    </iframe>
+
+                {% else %}
+
+                    <div class="attachment-document-preview">
+                        <span>📄</span>
+
+                        <h4>Preview unavailable</h4>
+
+                        <p>
+                            This document type must be downloaded and opened
+                            using a compatible application.
+                        </p>
+
+                        {% if attachment.is_active %}
+                            <a href="{% url 'clinical_attachment_download' attachment.pk %}"
+                               class="btn btn-primary">
+                                Download Document
+                            </a>
+                        {% endif %}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        {% if attachment.description %}
+            <div class="attachment-detail-card mb-4">
+                <h5>Clinical Description</h5>
+
+                <p class="mb-0">
+                    {{ attachment.description|linebreaksbr }}
+                </p>
+            </div>
+        {% endif %}
+
+
+        {% if attachment.review_notes %}
+            <div class="attachment-detail-card clinical-review-notes">
+                <h5>Clinical Review Notes</h5>
+
+                <p>
+                    {{ attachment.review_notes|linebreaksbr }}
+                </p>
+
+                <div class="review-clinician-line">
+                    Reviewed by:
+
+                    <strong>
+                        {% if attachment.reviewed_by %}
+                            {{ attachment.reviewed_by.get_full_name|default:attachment.reviewed_by.username }}
+                        {% else %}
+                            Authorized clinician
+                        {% endif %}
+                    </strong>
+
+                    {% if attachment.reviewed_at %}
+                        · {{ attachment.reviewed_at|date:"d M Y, h:i A" }}
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+
+    <div class="col-xl-4">
+
+        <div class="attachment-detail-card mb-4">
+
+            <div class="attachment-detail-card-header">
+                File Information
+            </div>
+
+            <dl class="attachment-detail-list">
+
+                <div>
+                    <dt>Category</dt>
+                    <dd>
+                        {% if attachment.category == "OTHER" %}
+                            {{ attachment.category_other }}
+                        {% else %}
+                            {{ attachment.get_category_display }}
+                        {% endif %}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Eye</dt>
+                    <dd>{{ attachment.get_eye_side_display }}</dd>
+                </div>
+
+                <div>
+                    <dt>Investigation Date</dt>
+                    <dd>
+                        {{ attachment.investigation_date|date:"d M Y"|default:"Not specified" }}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Original Filename</dt>
+                    <dd class="text-break">
+                        {{ attachment.original_filename }}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>File Type</dt>
+                    <dd>
+                        {{ attachment.file_extension|upper }}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>File Size</dt>
+                    <dd>{{ attachment.file_size_display }}</dd>
+                </div>
+
+                <div>
+                    <dt>Uploaded By</dt>
+                    <dd>
+                        {% if attachment.uploaded_by %}
+                            {{ attachment.uploaded_by.get_full_name|default:attachment.uploaded_by.username }}
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Uploaded At</dt>
+                    <dd>
+                        {{ attachment.uploaded_at|date:"d M Y, h:i A" }}
+                    </dd>
+                </div>
+
+            </dl>
+
+        </div>
+
+
+        <div class="attachment-detail-card mb-4">
+
+            <div class="attachment-detail-card-header">
+                Review Status
+            </div>
+
+            <div class="attachment-review-status-panel">
+
+                <span class="review-status-badge large
+                    {% if attachment.review_status == 'REVIEWED' %}
+                        reviewed
+                    {% elif attachment.review_status == 'NEEDS_ATTENTION' %}
+                        attention
+                    {% else %}
+                        pending
+                    {% endif %}">
+                    {{ attachment.get_review_status_display }}
+                </span>
+
+                {% if can_review_attachment and attachment.is_active %}
+                    <a href="{% url 'clinical_attachment_review' attachment.pk %}"
+                       class="btn btn-outline-primary w-100 mt-3">
+                        Update Clinical Review
+                    </a>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        {% if can_manage_attachment %}
+            <div class="attachment-detail-card attachment-management-card">
+
+                <div class="attachment-detail-card-header">
+                    Attachment Management
+                </div>
+
+                {% if attachment.is_active %}
+
+                    <p>
+                        Deactivation hides this file from normal clinical
+                        lists while preserving its audit record.
+                    </p>
+
+                    <form method="post"
+                          action="{% url 'clinical_attachment_deactivate' attachment.pk %}"
+                          onsubmit="return confirm('Deactivate this clinical attachment?');">
+
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="btn btn-warning w-100">
+                            Deactivate Attachment
+                        </button>
+                    </form>
+
+                {% else %}
+
+                    <form method="post"
+                          action="{% url 'clinical_attachment_restore' attachment.pk %}">
+
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="btn btn-success w-100">
+                            Restore Attachment
+                        </button>
+                    </form>
+
+                {% endif %}
+
+
+                {% if can_permanently_delete %}
+                    <hr>
+
+                    <p class="text-danger">
+                        Permanent deletion removes both the database record
+                        and physical file. This cannot be undone.
+                    </p>
+
+                    <form method="post"
+                          action="{% url 'clinical_attachment_permanent_delete' attachment.pk %}"
+                          onsubmit="return confirm('Permanently delete this file? This action cannot be undone.');">
+
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="btn btn-danger w-100">
+                            Permanently Delete
+                        </button>
+                    </form>
+                {% endif %}
+
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,1624 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Ophthalmology Clinical Dashboard
+{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/clinical_attachments.css' %}?v=20260804-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header ophthalmology-dashboard-header">
+
+    <div>
+        <span class="attachment-page-label">
+            Specialist Clinical Intelligence
+        </span>
+
+        <h2>Ophthalmology Dashboard</h2>
+
+        <p>
+            Eye examinations, investigation reviews, procedures,
+            annotations and specialist clinical activity.
+        </p>
+    </div>
+
+
+    <form method="get"
+          class="ophthalmology-period-selector">
+
+        <label for="ophthalmologyPeriod">
+            Reporting Period
+        </label>
+
+        <select name="period"
+                id="ophthalmologyPeriod"
+                class="form-select"
+                onchange="this.form.submit()">
+
+            <option value="today"
+                    {% if selected_period == "today" %}selected{% endif %}>
+                Today
+            </option>
+
+            <option value="7days"
+                    {% if selected_period == "7days" %}selected{% endif %}>
+                Last 7 Days
+            </option>
+
+            <option value="30days"
+                    {% if selected_period == "30days" %}selected{% endif %}>
+                Last 30 Days
+            </option>
+
+            <option value="90days"
+                    {% if selected_period == "90days" %}selected{% endif %}>
+                Last 90 Days
+            </option>
+
+            <option value="year"
+                    {% if selected_period == "year" %}selected{% endif %}>
+                This Year
+            </option>
+
+            <option value="all"
+                    {% if selected_period == "all" %}selected{% endif %}>
+                All Records
+            </option>
+
+        </select>
+
+    </form>
+
+</div>
+
+
+{% if start_date and end_date %}
+
+    <div class="ophthalmology-reporting-period mb-4">
+        Showing clinical activity from
+        <strong>{{ start_date|date:"d M Y" }}</strong>
+        to
+        <strong>{{ end_date|date:"d M Y" }}</strong>.
+    </div>
+
+{% endif %}
+
+
+<!-- ====================================================== -->
+<!-- PRIMARY KPI CARDS -->
+<!-- ====================================================== -->
+
+<div class="ophthalmology-primary-kpi-grid mb-4">
+
+    <a href="{% url 'patient_list' %}"
+       class="ophthalmology-kpi-card patients">
+
+        <span class="ophthalmology-kpi-icon">
+            👥
+        </span>
+
+        <div>
+            <strong>{{ patient_count }}</strong>
+            <small>Patients</small>
+        </div>
+
+    </a>
+
+
+    <a href="{% url 'visit_list' %}"
+       class="ophthalmology-kpi-card visits">
+
+        <span class="ophthalmology-kpi-icon">
+            🏥
+        </span>
+
+        <div>
+            <strong>{{ visit_count }}</strong>
+            <small>Clinical Visits</small>
+        </div>
+
+    </a>
+
+
+    <div class="ophthalmology-kpi-card examinations">
+
+        <span class="ophthalmology-kpi-icon">
+            👁️
+        </span>
+
+        <div>
+            <strong>{{ examination_count }}</strong>
+            <small>Eye Examinations</small>
+        </div>
+
+    </div>
+
+
+    <div class="ophthalmology-kpi-card attachments">
+
+        <span class="ophthalmology-kpi-icon">
+            📎
+        </span>
+
+        <div>
+            <strong>{{ attachment_count }}</strong>
+            <small>Investigation Files</small>
+        </div>
+
+    </div>
+
+
+    <div class="ophthalmology-kpi-card surgeries">
+
+        <span class="ophthalmology-kpi-icon">
+            🏨
+        </span>
+
+        <div>
+            <strong>{{ surgery_count }}</strong>
+            <small>Procedures</small>
+        </div>
+
+    </div>
+
+
+    <div class="ophthalmology-kpi-card appointments">
+
+        <span class="ophthalmology-kpi-icon">
+            📅
+        </span>
+
+        <div>
+            <strong>{{ appointment_count }}</strong>
+            <small>Appointments</small>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- CONTACT LENS CLINICAL SERVICE -->
+<!-- ====================================================== -->
+
+<section class="ophthalmology-contact-lens-dashboard mb-4">
+
+    <div class="ophthalmology-contact-lens-dashboard-header">
+
+        <div>
+            <span>Specialist Contact Lens Service</span>
+
+            <h3>Contact Lens Clinical Operations</h3>
+
+            <p>
+                Assessments, fitting trials, prescription approvals,
+                dispensing and follow-up safety monitoring.
+            </p>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+
+            <a href="{% url 'contact_lens_follow_up_queue' %}"
+               class="btn btn-outline-warning">
+
+                Follow-up Queue
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="ophthalmology-contact-lens-kpi-grid">
+
+        <div class="ophthalmology-contact-lens-kpi">
+
+            <span>👁️</span>
+
+            <div>
+                <strong>
+                    {{ contact_lens_assessment_count }}
+                </strong>
+
+                <small>
+                    Assessments
+                </small>
+            </div>
+
+        </div>
+
+
+        <div class="ophthalmology-contact-lens-kpi">
+
+            <span>◉</span>
+
+            <div>
+                <strong>
+                    {{ contact_lens_trial_count }}
+                </strong>
+
+                <small>
+                    Trial Lenses
+                </small>
+            </div>
+
+        </div>
+
+
+        <div class="ophthalmology-contact-lens-kpi">
+
+            <span>📄</span>
+
+            <div>
+                <strong>
+                    {{ contact_lens_prescription_count }}
+                </strong>
+
+                <small>
+                    Prescriptions
+                </small>
+            </div>
+
+        </div>
+
+
+        <div class="ophthalmology-contact-lens-kpi pending">
+
+            <span>⏳</span>
+
+            <div>
+                <strong>
+                    {{ contact_lens_pending_approval_count }}
+                </strong>
+
+                <small>
+                    Pending Approval
+                </small>
+            </div>
+
+        </div>
+
+
+        <div class="ophthalmology-contact-lens-kpi approved">
+
+            <span>✓</span>
+
+            <div>
+                <strong>
+                    {{ contact_lens_approved_count }}
+                </strong>
+
+                <small>
+                    Approved
+                </small>
+            </div>
+
+        </div>
+
+
+        <div class="ophthalmology-contact-lens-kpi dispensed">
+
+            <span>📦</span>
+
+            <div>
+                <strong>
+                    {{ contact_lens_dispensed_count }}
+                </strong>
+
+                <small>
+                    Dispensed
+                </small>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="ophthalmology-contact-lens-alert-grid">
+
+        <a href="{% url 'contact_lens_follow_up_queue' %}?queue=overdue"
+           class="ophthalmology-contact-lens-alert overdue">
+
+            <span>!</span>
+
+            <div>
+                <strong>
+                    {{ contact_lens_overdue_follow_up_count }}
+                </strong>
+
+                <small>
+                    Overdue Follow-ups
+                </small>
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'contact_lens_follow_up_queue' %}?queue=today"
+           class="ophthalmology-contact-lens-alert today">
+
+            <span>📅</span>
+
+            <div>
+                <strong>
+                    {{ contact_lens_due_today_count }}
+                </strong>
+
+                <small>
+                    Due Today
+                </small>
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'contact_lens_follow_up_queue' %}?queue=due_soon"
+           class="ophthalmology-contact-lens-alert soon">
+
+            <span>⏳</span>
+
+            <div>
+                <strong>
+                    {{ contact_lens_due_soon_count }}
+                </strong>
+
+                <small>
+                    Due Within 7 Days
+                </small>
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'contact_lens_follow_up_queue' %}?queue=complications"
+           class="ophthalmology-contact-lens-alert complication">
+
+            <span>⚠</span>
+
+            <div>
+                <strong>
+                    {{ contact_lens_complication_count }}
+                </strong>
+
+                <small>
+                    Complication Records
+                </small>
+            </div>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- ====================================================== -->
+<!-- CLINICAL REVIEW KPI CARDS -->
+<!-- ====================================================== -->
+
+<div class="ophthalmology-review-kpi-grid mb-4">
+
+    <div class="ophthalmology-review-card pending">
+
+        <span>⏳</span>
+
+        <div>
+            <strong>{{ pending_attachment_count }}</strong>
+            <small>Pending Investigation Reviews</small>
+        </div>
+
+    </div>
+
+
+    <div class="ophthalmology-review-card attention">
+
+        <span>⚠</span>
+
+        <div>
+            <strong>{{ needs_attention_count }}</strong>
+            <small>Investigations Needing Attention</small>
+        </div>
+
+    </div>
+
+
+    <div class="ophthalmology-review-card reviewed">
+
+        <span>✓</span>
+
+        <div>
+            <strong>{{ reviewed_attachment_count }}</strong>
+            <small>Reviewed Investigations</small>
+        </div>
+
+    </div>
+
+
+    <div class="ophthalmology-review-card refraction">
+
+        <span>👓</span>
+
+        <div>
+            <strong>{{ approved_refraction_count }}</strong>
+            <small>Approved Refractions</small>
+        </div>
+
+    </div>
+
+
+    <div class="ophthalmology-review-card annotations">
+
+        <span>✎</span>
+
+        <div>
+            <strong>{{ annotation_count }}</strong>
+            <small>Annotation Layers</small>
+        </div>
+
+    </div>
+
+
+    <div class="ophthalmology-review-card finalized">
+
+        <span>🔒</span>
+
+        <div>
+            <strong>{{ finalized_annotation_count }}</strong>
+            <small>Finalized Annotations</small>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- CHARTS -->
+<!-- ====================================================== -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-xl-8">
+
+        <section class="ophthalmology-dashboard-card h-100">
+
+            <div class="ophthalmology-dashboard-card-header">
+
+                <div>
+                    <h4>12-Month Clinical Activity</h4>
+
+                    <p>
+                        Visits, eye examinations and investigation uploads.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="ophthalmology-dashboard-card-body">
+
+                <div class="ophthalmology-chart-container">
+                    <canvas id="ophthalmologyActivityChart">
+                    </canvas>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <div class="col-xl-4">
+
+        <section class="ophthalmology-dashboard-card h-100">
+
+            <div class="ophthalmology-dashboard-card-header">
+
+                <div>
+                    <h4>Investigation Eye Distribution</h4>
+
+                    <p>
+                        Right, left, both-eye and non-specific results.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="ophthalmology-dashboard-card-body">
+
+                {% if eye_side_statistics %}
+
+                    <div class="ophthalmology-stat-list">
+
+                        {% for item in eye_side_statistics %}
+
+                            <div class="ophthalmology-stat-row">
+
+                                <span>{{ item.label }}</span>
+
+                                <strong>{{ item.total }}</strong>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-mini-empty-state">
+                        No investigation eye statistics available.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- WORK QUEUES -->
+<!-- ====================================================== -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-xl-6">
+
+        <section class="ophthalmology-dashboard-card h-100">
+
+            <div class="ophthalmology-dashboard-card-header">
+
+                <div>
+                    <h4>Pending Investigation Reviews</h4>
+
+                    <p>
+                        Oldest active results awaiting clinical review.
+                    </p>
+                </div>
+
+                <span class="review-status-badge pending">
+                    {{ pending_attachment_count }} Pending
+                </span>
+
+            </div>
+
+
+            <div class="ophthalmology-dashboard-card-body p-0">
+
+                {% if pending_review_queue %}
+
+                    <div class="ophthalmology-work-queue">
+
+                        {% for attachment in pending_review_queue %}
+
+                            <article class="ophthalmology-work-item">
+
+                                <div class="ophthalmology-work-icon">
+                                    {% if attachment.is_image %}
+                                        🖼️
+                                    {% elif attachment.is_pdf %}
+                                        📕
+                                    {% else %}
+                                        📘
+                                    {% endif %}
+                                </div>
+
+                                <div class="ophthalmology-work-content">
+
+                                    <span>
+                                        {{ attachment.get_category_display }}
+                                    </span>
+
+                                    <strong>
+                                        {{ attachment.title }}
+                                    </strong>
+
+                                    <small>
+                                        {{ attachment.patient.full_name }}
+                                        · {{ attachment.patient.file_number }}
+                                        · {{ attachment.visit.visit_number }}
+                                    </small>
+
+                                </div>
+
+
+                                <div class="ophthalmology-work-actions">
+
+                                    {% if attachment.is_image or attachment.is_pdf %}
+
+                                        <a href="{% url 'clinical_attachment_viewer' attachment.pk %}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            View
+                                        </a>
+
+                                    {% else %}
+
+                                        <a href="{% url 'clinical_attachment_detail' attachment.pk %}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Details
+                                        </a>
+
+                                    {% endif %}
+
+
+                                    {% if can_review_attachments %}
+
+                                        <a href="{% url 'clinical_attachment_review' attachment.pk %}"
+                                           class="btn btn-sm btn-success">
+                                            Review
+                                        </a>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-large-empty-state">
+
+                        <span>✓</span>
+
+                        <h5>No pending investigation reviews</h5>
+
+                        <p>
+                            All active investigation files in the selected
+                            period have been reviewed.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <div class="col-xl-6">
+
+        <section class="ophthalmology-dashboard-card h-100">
+
+            <div class="ophthalmology-dashboard-card-header">
+
+                <div>
+                    <h4>Needs Clinical Attention</h4>
+
+                    <p>
+                        Investigation results marked for follow-up.
+                    </p>
+                </div>
+
+                <span class="review-status-badge attention">
+                    {{ needs_attention_count }} Alerts
+                </span>
+
+            </div>
+
+
+            <div class="ophthalmology-dashboard-card-body p-0">
+
+                {% if attention_queue %}
+
+                    <div class="ophthalmology-work-queue">
+
+                        {% for attachment in attention_queue %}
+
+                            <article class="ophthalmology-work-item attention">
+
+                                <div class="ophthalmology-work-icon">
+                                    ⚠
+                                </div>
+
+                                <div class="ophthalmology-work-content">
+
+                                    <span>
+                                        {{ attachment.get_category_display }}
+                                    </span>
+
+                                    <strong>
+                                        {{ attachment.title }}
+                                    </strong>
+
+                                    <small>
+                                        {{ attachment.patient.full_name }}
+                                        · {{ attachment.visit.visit_number }}
+                                    </small>
+
+                                    {% if attachment.review_notes %}
+
+                                        <p>
+                                            {{ attachment.review_notes|truncatechars:110 }}
+                                        </p>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div class="ophthalmology-work-actions">
+
+                                    <a href="{% url 'clinical_attachment_detail' attachment.pk %}"
+                                       class="btn btn-sm btn-outline-danger">
+                                        Open
+                                    </a>
+
+                                    {% if can_review_attachments %}
+
+                                        <a href="{% url 'clinical_attachment_review' attachment.pk %}"
+                                           class="btn btn-sm btn-danger">
+                                            Update
+                                        </a>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-large-empty-state">
+
+                        <span>🛡</span>
+
+                        <h5>No investigation alerts</h5>
+
+                        <p>
+                            No active investigation is presently marked as
+                            needing clinical attention.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- CONTACT LENS APPROVAL QUEUE AND DESIGN STATISTICS -->
+<!-- ====================================================== -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-xl-7">
+
+        <section class="ophthalmology-dashboard-card h-100">
+
+            <div class="ophthalmology-dashboard-card-header">
+
+                <div>
+                    <h4>
+                        Contact Lens Prescriptions Awaiting Approval
+                    </h4>
+
+                    <p>
+                        Drafts submitted for clinical authorization.
+                    </p>
+                </div>
+
+                <span class="review-status-badge pending">
+                    {{ contact_lens_pending_approval_count }}
+                    Pending
+                </span>
+
+            </div>
+
+
+            <div class="ophthalmology-dashboard-card-body p-0">
+
+                {% if contact_lens_pending_approval_queue %}
+
+                    <div class="ophthalmology-work-queue">
+
+                        {% for prescription in contact_lens_pending_approval_queue %}
+
+                            <article class="ophthalmology-work-item">
+
+                                <div class="ophthalmology-work-icon">
+                                    ◉
+                                </div>
+
+                                <div class="ophthalmology-work-content">
+
+                                    <span>
+                                        Contact Lens Prescription
+                                    </span>
+
+                                    <strong>
+                                        {{ prescription.prescription_number }}
+                                        · Version {{ prescription.version }}
+                                    </strong>
+
+                                    <small>
+                                        {{ prescription.patient.full_name }}
+                                        ·
+                                        {{ prescription.patient.file_number }}
+                                        ·
+                                        {{ prescription.visit.visit_number }}
+                                    </small>
+
+                                </div>
+
+
+                                <div class="ophthalmology-work-actions">
+
+                                    <a href="{% url 'contact_lens_prescription_detail' prescription.pk %}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Open
+                                    </a>
+
+                                    {% if can_approve_contact_lenses %}
+
+                                        <a href="{% url 'contact_lens_prescription_approve' prescription.pk %}"
+                                           class="btn btn-sm btn-success">
+                                            Review
+                                        </a>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-large-empty-state">
+
+                        <span>✓</span>
+
+                        <h5>
+                            No Contact Lens prescriptions awaiting approval
+                        </h5>
+
+                        <p>
+                            Every submitted Contact Lens prescription
+                            has been reviewed.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <div class="col-xl-5">
+
+        <section class="ophthalmology-dashboard-card h-100">
+
+            <div class="ophthalmology-dashboard-card-header">
+
+                <div>
+                    <h4>Contact Lens Designs</h4>
+
+                    <p>
+                        Most frequently prescribed lens designs.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="ophthalmology-dashboard-card-body">
+
+                {% if contact_lens_design_statistics %}
+
+                    <div class="ophthalmology-ranked-list">
+
+                        {% for item in contact_lens_design_statistics %}
+
+                            <div class="ophthalmology-ranked-item">
+
+                                <span class="ophthalmology-rank-number">
+                                    {{ forloop.counter }}
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        {{ item.label }}
+                                    </strong>
+
+                                    <small>
+                                        Prescribed-eye records
+                                    </small>
+                                </div>
+
+                                <b>{{ item.total }}</b>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-mini-empty-state">
+                        No Contact Lens design statistics are available.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- CATEGORY AND DIAGNOSIS STATISTICS -->
+<!-- ====================================================== -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-xl-6">
+
+        <section class="ophthalmology-dashboard-card h-100">
+
+            <div class="ophthalmology-dashboard-card-header">
+                <div>
+                    <h4>Investigation Categories</h4>
+                    <p>Most frequently uploaded clinical result types.</p>
+                </div>
+            </div>
+
+            <div class="ophthalmology-dashboard-card-body">
+
+                {% if category_statistics %}
+
+                    <div class="ophthalmology-ranked-list">
+
+                        {% for item in category_statistics %}
+
+                            <div class="ophthalmology-ranked-item">
+
+                                <span class="ophthalmology-rank-number">
+                                    {{ forloop.counter }}
+                                </span>
+
+                                <div>
+                                    <strong>{{ item.label }}</strong>
+                                    <small>Clinical investigations</small>
+                                </div>
+
+                                <b>{{ item.total }}</b>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-mini-empty-state">
+                        No investigation categories are available.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <div class="col-xl-6">
+
+        <section class="ophthalmology-dashboard-card h-100">
+
+            <div class="ophthalmology-dashboard-card-header">
+                <div>
+                    <h4>Top Recorded Diagnoses</h4>
+                    <p>Frequently recorded diagnoses in the period.</p>
+                </div>
+            </div>
+
+            <div class="ophthalmology-dashboard-card-body">
+
+                {% if top_diagnoses %}
+
+                    <div class="ophthalmology-ranked-list">
+
+                        {% for item in top_diagnoses %}
+
+                            <div class="ophthalmology-ranked-item">
+
+                                <span class="ophthalmology-rank-number">
+                                    {{ forloop.counter }}
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        {{ item.label|truncatechars:80 }}
+                                    </strong>
+
+                                    <small>Diagnosis records</small>
+                                </div>
+
+                                <b>{{ item.total }}</b>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-mini-empty-state">
+                        The current diagnosis model does not contain
+                        enough categorized information for this summary.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- RECENT CLINICAL ACTIVITY -->
+<!-- ====================================================== -->
+
+<div class="row g-4">
+
+    <div class="col-xl-6">
+
+        <section class="ophthalmology-dashboard-card">
+
+            <div class="ophthalmology-dashboard-card-header">
+                <div>
+                    <h4>Recent Eye Examinations</h4>
+                    <p>Latest structured ophthalmology examinations.</p>
+                </div>
+            </div>
+
+            <div class="ophthalmology-dashboard-card-body p-0">
+
+                {% if recent_examinations %}
+
+                    <div class="ophthalmology-activity-list">
+
+                        {% for examination in recent_examinations %}
+
+                            <article class="ophthalmology-activity-item">
+
+                                <div class="ophthalmology-activity-avatar">
+                                    👁️
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        {{ examination.visit.patient.full_name }}
+                                    </strong>
+
+                                    <small>
+                                        {{ examination.visit.patient.file_number }}
+                                        · {{ examination.visit.visit_number }}
+                                    </small>
+
+                                    <span>
+                                        R VA:
+                                        {{ examination.right_visual_acuity|default:"-" }}
+                                        ·
+                                        L VA:
+                                        {{ examination.left_visual_acuity|default:"-" }}
+                                    </span>
+
+                                </div>
+
+                                <a href="{% url 'eye_examination_update' examination.pk %}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Open
+                                </a>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-mini-empty-state">
+                        No eye examinations found for this period.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <div class="col-xl-6">
+
+        <section class="ophthalmology-dashboard-card">
+
+            <div class="ophthalmology-dashboard-card-header">
+                <div>
+                    <h4>Recent Finalized Annotations</h4>
+                    <p>Latest finalized image interpretation layers.</p>
+                </div>
+            </div>
+
+            <div class="ophthalmology-dashboard-card-body p-0">
+
+                {% if recent_finalized_annotations %}
+
+                    <div class="ophthalmology-activity-list">
+
+                        {% for annotation in recent_finalized_annotations %}
+
+                            <article class="ophthalmology-activity-item">
+
+                                <div class="ophthalmology-activity-avatar annotation">
+                                    ✎
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        {{ annotation.title }}
+                                    </strong>
+
+                                    <small>
+                                        {{ annotation.attachment.patient.full_name }}
+                                        ·
+                                        {{ annotation.attachment.title }}
+                                    </small>
+
+                                    <span>
+                                        Finalized
+                                        {{ annotation.finalized_at|date:"d M Y, h:i A" }}
+                                    </span>
+
+                                </div>
+
+                                <a href="{% url 'clinical_attachment_annotation_workspace' annotation.attachment.pk %}"
+                                   class="btn btn-sm btn-outline-warning">
+                                    Open
+                                </a>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-mini-empty-state">
+                        No finalized image annotations found.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- RECENT CONTACT LENS ACTIVITY -->
+<!-- ====================================================== -->
+
+<div class="row g-4 mt-1">
+
+    <div class="col-xl-4">
+
+        <section class="ophthalmology-dashboard-card h-100">
+
+            <div class="ophthalmology-dashboard-card-header">
+                <div>
+                    <h4>Recent Contact Lens Assessments</h4>
+                    <p>Latest suitability assessments.</p>
+                </div>
+            </div>
+
+            <div class="ophthalmology-dashboard-card-body p-0">
+
+                {% if recent_contact_lens_assessments %}
+
+                    <div class="ophthalmology-activity-list">
+
+                        {% for assessment in recent_contact_lens_assessments %}
+
+                            <article class="ophthalmology-activity-item">
+
+                                <div class="ophthalmology-activity-avatar">
+                                    👁️
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        {{ assessment.patient.full_name }}
+                                    </strong>
+
+                                    <small>
+                                        {{ assessment.patient.file_number }}
+                                        · {{ assessment.visit.visit_number }}
+                                    </small>
+
+                                    <span>
+                                        {{ assessment.get_suitability_status_display }}
+                                    </span>
+
+                                </div>
+
+                                <a href="{% url 'contact_lens_assessment_detail' assessment.pk %}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Open
+                                </a>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-mini-empty-state">
+                        No Contact Lens assessments are available.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <div class="col-xl-4">
+
+        <section class="ophthalmology-dashboard-card h-100">
+
+            <div class="ophthalmology-dashboard-card-header">
+                <div>
+                    <h4>Recent Contact Lens Prescriptions</h4>
+                    <p>Latest prescription activity.</p>
+                </div>
+            </div>
+
+            <div class="ophthalmology-dashboard-card-body p-0">
+
+                {% if recent_contact_lens_prescriptions %}
+
+                    <div class="ophthalmology-activity-list">
+
+                        {% for prescription in recent_contact_lens_prescriptions %}
+
+                            <article class="ophthalmology-activity-item">
+
+                                <div class="ophthalmology-activity-avatar annotation">
+                                    ◉
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        {{ prescription.prescription_number }}
+                                    </strong>
+
+                                    <small>
+                                        {{ prescription.patient.full_name }}
+                                        · V{{ prescription.version }}
+                                    </small>
+
+                                    <span>
+                                        {{ prescription.get_status_display }}
+                                    </span>
+
+                                </div>
+
+                                <a href="{% url 'contact_lens_prescription_detail' prescription.pk %}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Open
+                                </a>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-mini-empty-state">
+                        No Contact Lens prescriptions are available.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <div class="col-xl-4">
+
+        <section class="ophthalmology-dashboard-card h-100">
+
+            <div class="ophthalmology-dashboard-card-header">
+                <div>
+                    <h4>Recent Contact Lens Follow-ups</h4>
+                    <p>Latest scheduled and completed reviews.</p>
+                </div>
+            </div>
+
+            <div class="ophthalmology-dashboard-card-body p-0">
+
+                {% if recent_contact_lens_follow_ups %}
+
+                    <div class="ophthalmology-activity-list">
+
+                        {% for follow_up in recent_contact_lens_follow_ups %}
+
+                            <article class="ophthalmology-activity-item">
+
+                                <div class="ophthalmology-activity-avatar">
+                                    📅
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        {{ follow_up.patient.full_name }}
+                                    </strong>
+
+                                    <small>
+                                        {{ follow_up.prescription.prescription_number }}
+                                    </small>
+
+                                    <span>
+                                        {{ follow_up.get_status_display }}
+                                        ·
+                                        {{ follow_up.follow_up_date|date:"d M Y" }}
+                                    </span>
+
+                                </div>
+
+                                <a href="{% url 'contact_lens_follow_up_detail' follow_up.pk %}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Open
+                                </a>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="ophthalmology-mini-empty-state">
+                        No Contact Lens follow-ups are available.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+{{ monthly_visit_labels|json_script:"monthly-visit-labels" }}
+{{ monthly_visit_values|json_script:"monthly-visit-values" }}
+
+{{ monthly_attachment_labels|json_script:"monthly-attachment-labels" }}
+{{ monthly_attachment_values|json_script:"monthly-attachment-values" }}
+
+{{ monthly_examination_labels|json_script:"monthly-examination-labels" }}
+{{ monthly_examination_values|json_script:"monthly-examination-values" }}
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const canvas = document.getElementById(
+        "ophthalmologyActivityChart"
+    );
+
+    if (!canvas || typeof Chart === "undefined") {
+        return;
+    }
+
+    function scriptData(elementId) {
+        const element = document.getElementById(
+            elementId
+        );
+
+        if (!element) {
+            return [];
+        }
+
+        try {
+            return JSON.parse(
+                element.textContent
+            );
+        } catch (error) {
+            return [];
+        }
+    }
+
+    const visitLabels = scriptData(
+        "monthly-visit-labels"
+    );
+
+    const visitValues = scriptData(
+        "monthly-visit-values"
+    );
+
+    const attachmentLabels = scriptData(
+        "monthly-attachment-labels"
+    );
+
+    const attachmentValues = scriptData(
+        "monthly-attachment-values"
+    );
+
+    const examinationLabels = scriptData(
+        "monthly-examination-labels"
+    );
+
+    const examinationValues = scriptData(
+        "monthly-examination-values"
+    );
+
+    const allLabels = Array.from(
+        new Set(
+            visitLabels
+                .concat(attachmentLabels)
+                .concat(examinationLabels)
+        )
+    );
+
+    function valuesForLabels(
+        labels,
+        values
+    ) {
+        const valueMap = {};
+
+        labels.forEach(function (
+            label,
+            index
+        ) {
+            valueMap[label] = values[index] || 0;
+        });
+
+        return allLabels.map(function (label) {
+            return valueMap[label] || 0;
+        });
+    }
+
+    new Chart(
+        canvas,
+        {
+            type: "line",
+
+            data: {
+                labels: allLabels,
+
+                datasets: [
+                    {
+                        label: "Visits",
+                        data: valuesForLabels(
+                            visitLabels,
+                            visitValues
+                        ),
+                        tension: 0.3,
+                    },
+                    {
+                        label: "Eye Examinations",
+                        data: valuesForLabels(
+                            examinationLabels,
+                            examinationValues
+                        ),
+                        tension: 0.3,
+                    },
+                    {
+                        label: "Investigation Uploads",
+                        data: valuesForLabels(
+                            attachmentLabels,
+                            attachmentValues
+                        ),
+                        tension: 0.3,
+                    },
+                ],
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                interaction: {
+                    mode: "index",
+                    intersect: false,
+                },
+
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                    },
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                        },
+                    },
+                },
+            },
+        }
+    );
+});
+</script>
+
+{% endblock %}

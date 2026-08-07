@@ -1,0 +1,22 @@
+ Volume in drive C has no label.
+ Volume Serial Number is 40FE-E02C
+
+ Directory of C:\Users\BMBABW\capital_eye_records\templates\patients\contact_lens
+
+08/06/2026  01:54 PM    <DIR>          .
+08/06/2026  01:54 PM    <DIR>          ..
+08/05/2026  02:58 PM            15,694 assessment_detail.html
+08/05/2026  02:55 PM            17,148 assessment_form.html
+08/05/2026  03:10 PM             6,306 follow_up_detail.html
+08/05/2026  03:09 PM             7,073 follow_up_form.html
+08/06/2026  01:48 PM            20,074 follow_up_queue.html
+08/05/2026  03:11 PM            13,237 patient_history.html
+08/05/2026  03:07 PM             2,484 prescription_approve.html
+08/06/2026  01:53 PM            18,896 prescription_detail.html
+08/05/2026  03:08 PM             2,399 prescription_dispense.html
+08/05/2026  02:58 PM            11,721 prescription_form.html
+08/06/2026  01:51 AM            18,553 prescription_print.html
+08/05/2026  02:56 PM             9,634 trial_form.html
+08/05/2026  02:55 PM               986 _field.html
+              13 File(s)        144,205 bytes
+               2 Dir(s)  391,234,478,080 bytes free

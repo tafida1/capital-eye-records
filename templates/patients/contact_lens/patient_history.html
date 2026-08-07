@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Contact Lens History | {{ patient.full_name }}
+{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/contact_lens.css' %}?v=20260805-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="contact-lens-page">
+
+    <div class="contact-lens-page-header">
+
+        <div>
+            <span class="contact-lens-page-label">
+                Patient Contact Lens History
+            </span>
+
+            <h2>{{ patient.full_name }}</h2>
+
+            <p>
+                {{ patient.file_number }}
+                · Assessments, prescriptions and follow-up reviews
+            </p>
+        </div>
+
+        <a href="{% url 'patient_detail' patient.pk %}"
+           class="btn btn-outline-secondary">
+            ← Patient Profile
+        </a>
+
+    </div>
+
+
+    <div class="contact-lens-kpi-grid">
+
+        <a href="{% url 'patient_contact_lens_history' patient.pk %}"
+           class="contact-lens-kpi-card text-decoration-none text-reset">
+            <span class="contact-lens-kpi-icon">📚</span>
+            <div>
+                <strong>{{ prescription_counts.all }}</strong>
+                <small>All Prescriptions</small>
+            </div>
+        </a>
+
+        <a href="?status=DRAFT"
+           class="contact-lens-kpi-card text-decoration-none text-reset">
+            <span class="contact-lens-kpi-icon">✎</span>
+            <div>
+                <strong>{{ prescription_counts.draft }}</strong>
+                <small>Drafts</small>
+            </div>
+        </a>
+
+        <a href="?status=PENDING_APPROVAL"
+           class="contact-lens-kpi-card text-decoration-none text-reset">
+            <span class="contact-lens-kpi-icon">⏳</span>
+            <div>
+                <strong>{{ prescription_counts.pending }}</strong>
+                <small>Pending Approval</small>
+            </div>
+        </a>
+
+        <a href="?status=APPROVED"
+           class="contact-lens-kpi-card text-decoration-none text-reset">
+            <span class="contact-lens-kpi-icon">✓</span>
+            <div>
+                <strong>{{ prescription_counts.approved }}</strong>
+                <small>Approved</small>
+            </div>
+        </a>
+
+    </div>
+
+
+    <section class="contact-lens-form-card">
+
+        <div class="contact-lens-card-body">
+
+            <form method="get"
+                  class="row g-3 align-items-end">
+
+                <div class="col-lg-6">
+                    <label class="form-label">
+                        Search Contact Lens History
+                    </label>
+
+                    <input type="search"
+                           name="q"
+                           value="{{ query }}"
+                           class="form-control"
+                           placeholder="Prescription number, brand or visit number">
+                </div>
+
+                <div class="col-lg-4">
+                    <label class="form-label">
+                        Prescription Status
+                    </label>
+
+                    <select name="status"
+                            class="form-select">
+
+                        <option value="">All Statuses</option>
+
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}"
+                                    {% if selected_status == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
+                    <div class="d-grid gap-2">
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Filter
+                        </button>
+
+                        <a href="{% url 'patient_contact_lens_history' patient.pk %}"
+                           class="btn btn-outline-secondary">
+                            Reset
+                        </a>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <div class="contact-lens-history-grid">
+
+        <div>
+
+            <section class="contact-lens-detail-card">
+
+                <div class="contact-lens-card-header">
+                    <div>
+                        <h4>Prescription History</h4>
+                        <p>All active Contact Lens prescription versions.</p>
+                    </div>
+                </div>
+
+
+                {% if prescriptions %}
+
+                    <div class="contact-lens-table-wrapper">
+
+                        <table class="contact-lens-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Prescription</th>
+                                    <th>Version</th>
+                                    <th>Visit</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Right Brand</th>
+                                    <th>Left Brand</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for prescription in prescriptions %}
+
+                                    <tr>
+                                        <td>{{ prescription.prescription_number }}</td>
+                                        <td>V{{ prescription.version }}</td>
+                                        <td>{{ prescription.visit.visit_number }}</td>
+                                        <td>{{ prescription.prescription_date|date:"d M Y" }}</td>
+                                        <td>
+                                            <span class="contact-lens-status-badge
+                                                {% if prescription.status == 'APPROVED' %}
+                                                    approved
+                                                {% elif prescription.status == 'DISPENSED' %}
+                                                    dispensed
+                                                {% elif prescription.status == 'PENDING_APPROVAL' %}
+                                                    pending
+                                                {% else %}
+                                                    draft
+                                                {% endif %}">
+                                                {{ prescription.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ prescription.right_brand_name|default:"-" }}</td>
+                                        <td>{{ prescription.left_brand_name|default:"-" }}</td>
+                                        <td>
+                                            <a href="{% url 'contact_lens_prescription_detail' prescription.pk %}"
+                                               class="btn btn-sm btn-outline-primary">
+                                                Open
+                                            </a>
+                                        </td>
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="contact-lens-empty-state">
+                        <span>📄</span>
+                        <h5>No matching prescription</h5>
+                        <p>No active prescription matches the selected filters.</p>
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+
+        <aside>
+
+            <section class="contact-lens-detail-card">
+
+                <div class="contact-lens-card-header">
+                    <div>
+                        <h4>Assessment History</h4>
+                    </div>
+                </div>
+
+                <div class="contact-lens-card-body">
+
+                    {% if assessments %}
+
+                        <div class="contact-lens-timeline">
+
+                            {% for assessment in assessments %}
+
+                                <article class="contact-lens-timeline-item">
+
+                                    <h5>
+                                        {{ assessment.get_suitability_status_display }}
+                                    </h5>
+
+                                    <small>
+                                        {{ assessment.assessment_date|date:"d M Y" }}
+                                        · {{ assessment.visit.visit_number }}
+                                    </small>
+
+                                    <p>
+                                        {{ assessment.get_lens_purpose_display|default:"Purpose not specified" }}
+                                    </p>
+
+                                    <a href="{% url 'contact_lens_assessment_detail' assessment.pk %}"
+                                       class="btn btn-sm btn-outline-primary mt-2">
+                                        Open Assessment
+                                    </a>
+
+                                </article>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="contact-lens-empty-state">
+                            <span>👁️</span>
+                            <h5>No Contact Lens assessment</h5>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+
+            <section class="contact-lens-detail-card">
+
+                <div class="contact-lens-card-header">
+                    <div>
+                        <h4>Recent Follow-ups</h4>
+                    </div>
+                </div>
+
+                <div class="contact-lens-card-body">
+
+                    {% if follow_ups %}
+
+                        <div class="contact-lens-timeline">
+
+                            {% for follow_up in follow_ups %}
+
+                                <article class="contact-lens-timeline-item">
+
+                                    <h5>{{ follow_up.get_status_display }}</h5>
+
+                                    <small>
+                                        {{ follow_up.follow_up_date|date:"d M Y" }}
+                                        · {{ follow_up.prescription.prescription_number }}
+                                    </small>
+
+                                    {% if follow_up.complications %}
+                                        <p>{{ follow_up.complications|truncatechars:100 }}</p>
+                                    {% endif %}
+
+                                    <a href="{% url 'contact_lens_follow_up_detail' follow_up.pk %}"
+                                       class="btn btn-sm btn-outline-primary mt-2">
+                                        Open Review
+                                    </a>
+
+                                </article>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="contact-lens-empty-state">
+                            <span>📅</span>
+                            <h5>No follow-up records</h5>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+        </aside>
+
+    </div>
+
+
+    {% if page_obj.paginator.num_pages > 1 %}
+
+        <nav class="mt-4">
+
+            <ul class="pagination justify-content-center">
+
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ page_obj.previous_page_number }}&q={{ query|urlencode }}&status={{ selected_status }}">
+                            Previous
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Page {{ page_obj.number }}
+                        of {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ page_obj.next_page_number }}&q={{ query|urlencode }}&status={{ selected_status }}">
+                            Next
+                        </a>
+                    </li>
+                {% endif %}
+
+            </ul>
+
+        </nav>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,467 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Ophthalmology Timeline | {{ patient.full_name }}
+{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/clinical_attachments.css' %}?v=20260803-3"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header ophthalmology-timeline-header">
+
+    <div>
+        <span class="attachment-page-label">
+            Unified Clinical History
+        </span>
+
+        <h2>Ophthalmology Timeline</h2>
+
+        <p>
+            {{ patient.full_name }} ·
+            {{ patient.file_number }} ·
+            {{ patient.get_gender_display }} ·
+            Age {{ patient.display_age|default:"-" }}
+        </p>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+
+        <a href="{% url 'patient_detail' patient.pk %}"
+           class="btn btn-outline-secondary">
+            ← Patient Profile
+        </a>
+
+        <a href="{% url 'patient_clinical_attachment_list' patient.pk %}"
+           class="btn btn-outline-primary">
+            Investigation Files
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- PATIENT SUMMARY -->
+<!-- ====================================================== -->
+
+<div class="timeline-patient-summary mb-4">
+
+    <div class="timeline-patient-avatar">
+        {{ patient.full_name|slice:":1"|upper }}
+    </div>
+
+    <div class="flex-grow-1">
+        <strong>{{ patient.full_name }}</strong>
+
+        <small>
+            File Number: {{ patient.file_number }}
+            · Phone: {{ patient.phone_number|default:"Not recorded" }}
+        </small>
+    </div>
+
+    <div class="timeline-record-count">
+        <strong>{{ event_counts.all }}</strong>
+        <small>Clinical Events</small>
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- TIMELINE KPIs -->
+<!-- ====================================================== -->
+
+<div class="timeline-statistics-grid mb-4">
+
+    <a href="{% url 'patient_ophthalmology_timeline' patient.pk %}"
+       class="timeline-stat-card all">
+
+        <span>📚</span>
+
+        <div>
+            <strong>{{ event_counts.all }}</strong>
+            <small>All Events</small>
+        </div>
+    </a>
+
+
+    <a href="{% url 'patient_ophthalmology_timeline' patient.pk %}?event_type=VISIT"
+       class="timeline-stat-card visits">
+
+        <span>🏥</span>
+
+        <div>
+            <strong>{{ event_counts.visits }}</strong>
+            <small>Visits</small>
+        </div>
+    </a>
+
+
+    <a href="{% url 'patient_ophthalmology_timeline' patient.pk %}?event_type=EYE_EXAMINATION"
+       class="timeline-stat-card examinations">
+
+        <span>👁️</span>
+
+        <div>
+            <strong>{{ event_counts.examinations }}</strong>
+            <small>Eye Exams</small>
+        </div>
+    </a>
+
+
+    <a href="{% url 'patient_ophthalmology_timeline' patient.pk %}?event_type=DIAGNOSIS"
+       class="timeline-stat-card diagnoses">
+
+        <span>🧠</span>
+
+        <div>
+            <strong>{{ event_counts.diagnoses }}</strong>
+            <small>Diagnoses</small>
+        </div>
+    </a>
+
+
+    <a href="{% url 'patient_ophthalmology_timeline' patient.pk %}?event_type=PRESCRIPTION"
+       class="timeline-stat-card prescriptions">
+
+        <span>💊</span>
+
+        <div>
+            <strong>{{ event_counts.prescriptions }}</strong>
+            <small>Prescriptions</small>
+        </div>
+    </a>
+
+
+    <a href="{% url 'patient_ophthalmology_timeline' patient.pk %}?event_type=SURGERY"
+       class="timeline-stat-card surgeries">
+
+        <span>🏨</span>
+
+        <div>
+            <strong>{{ event_counts.surgeries }}</strong>
+            <small>Procedures</small>
+        </div>
+    </a>
+
+
+    <a href="{% url 'patient_ophthalmology_timeline' patient.pk %}?event_type=ATTACHMENT"
+       class="timeline-stat-card attachments">
+
+        <span>📎</span>
+
+        <div>
+            <strong>{{ event_counts.attachments }}</strong>
+            <small>Investigations</small>
+        </div>
+    </a>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- FILTERS -->
+<!-- ====================================================== -->
+
+<div class="timeline-filter-card mb-4">
+
+    <form method="get"
+          class="row g-3 align-items-end">
+
+        <div class="col-lg-6">
+            <label class="form-label">
+                Search Clinical Timeline
+            </label>
+
+            <input type="search"
+                   name="q"
+                   value="{{ query }}"
+                   class="form-control"
+                   placeholder="Diagnosis, prescription, visit, staff, result...">
+        </div>
+
+
+        <div class="col-md-7 col-lg-4">
+            <label class="form-label">
+                Event Type
+            </label>
+
+            <select name="event_type"
+                    class="form-select">
+
+                {% for value, label in event_type_choices %}
+
+                    <option value="{{ value }}"
+                            {% if selected_event_type == value %}selected{% endif %}>
+
+                        {{ label }}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+        </div>
+
+
+        <div class="col-md-5 col-lg-2">
+            <div class="d-grid gap-2">
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Apply Filter
+                </button>
+
+                <a href="{% url 'patient_ophthalmology_timeline' patient.pk %}"
+                   class="btn btn-outline-secondary">
+                    Reset
+                </a>
+
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- UNIFIED TIMELINE -->
+<!-- ====================================================== -->
+
+{% if timeline_events %}
+
+    <div class="ophthalmology-timeline">
+
+        {% for event in timeline_events %}
+
+            <article class="ophthalmology-timeline-event
+                            {{ event.css_class }}">
+
+                <div class="timeline-event-marker">
+                    <span>{{ event.icon }}</span>
+                </div>
+
+
+                <div class="timeline-event-card">
+
+                    <div class="timeline-event-card-header">
+
+                        <div class="timeline-event-heading">
+
+                            <span class="timeline-event-type">
+                                {{ event.event_type|title }}
+                            </span>
+
+                            <h4>
+                                {{ event.title }}
+                            </h4>
+
+                            {% if event.subtitle %}
+                                <small>
+                                    {{ event.subtitle }}
+                                </small>
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="timeline-event-date">
+
+                            <strong>
+                                {{ event.date|date:"d M Y" }}
+                            </strong>
+
+                            <small>
+                                {{ event.date|date:"h:i A" }}
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="timeline-event-card-body">
+
+                        {% if event.description %}
+                            <p>
+                                {{ event.description|truncatechars:400|linebreaksbr }}
+                            </p>
+                        {% endif %}
+
+
+                        <div class="timeline-event-metadata">
+
+                            <span>
+                                👤
+                                {{ event.staff_name }}
+                            </span>
+
+                            {% if event.visit %}
+                                <span>
+                                    🩺
+                                    {{ event.visit.visit_number }}
+                                </span>
+                            {% endif %}
+
+                            {% if event.status %}
+
+                                <span class="timeline-status-badge
+                                    {% if event.review_status == 'REVIEWED' %}
+                                        reviewed
+                                    {% elif event.review_status == 'NEEDS_ATTENTION' %}
+                                        attention
+                                    {% elif event.review_status == 'PENDING' %}
+                                        pending
+                                    {% endif %}">
+
+                                    {{ event.status }}
+
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="timeline-event-card-footer">
+
+                        {% if event.event_type == "ATTACHMENT" %}
+
+                            <a href="{% url event.url_name event.url_kwargs.pk %}{{ event.url_query|default:'' }}"
+                               class="btn btn-sm btn-primary">
+
+                                Open Investigation
+
+                            </a>
+
+                        {% elif event.event_type == "EYE_EXAMINATION" %}
+
+                            <a href="{% url 'eye_examination_update' event.url_kwargs.pk %}"
+                               class="btn btn-sm btn-primary">
+
+                                Open Eye Examination
+
+                            </a>
+
+                        {% elif event.visit %}
+
+                            <a href="{% url 'visit_detail' event.visit.pk %}"
+                               class="btn btn-sm btn-primary">
+
+                                View Clinical Record
+
+                            </a>
+
+                        {% endif %}
+
+
+                        {% if event.visit %}
+
+                            <a href="{% url 'visit_detail' event.visit.pk %}"
+                               class="btn btn-sm btn-outline-secondary">
+
+                                Visit Details
+
+                            </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% if page_obj.paginator.num_pages > 1 %}
+
+        <nav class="mt-4"
+             aria-label="Ophthalmology timeline pages">
+
+            <ul class="pagination justify-content-center">
+
+                {% if page_obj.has_previous %}
+
+                    <li class="page-item">
+
+                        <a class="page-link"
+                           href="?page={{ page_obj.previous_page_number }}&q={{ query|urlencode }}&event_type={{ selected_event_type }}">
+
+                            Previous
+
+                        </a>
+
+                    </li>
+
+                {% endif %}
+
+
+                <li class="page-item active">
+
+                    <span class="page-link">
+
+                        Page {{ page_obj.number }}
+                        of {{ page_obj.paginator.num_pages }}
+
+                    </span>
+
+                </li>
+
+
+                {% if page_obj.has_next %}
+
+                    <li class="page-item">
+
+                        <a class="page-link"
+                           href="?page={{ page_obj.next_page_number }}&q={{ query|urlencode }}&event_type={{ selected_event_type }}">
+
+                            Next
+
+                        </a>
+
+                    </li>
+
+                {% endif %}
+
+            </ul>
+
+        </nav>
+
+    {% endif %}
+
+
+{% else %}
+
+    <div class="timeline-empty-state">
+
+        <div>📚</div>
+
+        <h4>No timeline events found</h4>
+
+        <p>
+            No clinical events match the selected timeline filters.
+        </p>
+
+        <a href="{% url 'patient_ophthalmology_timeline' patient.pk %}"
+           class="btn btn-outline-primary">
+            Clear Filters
+        </a>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

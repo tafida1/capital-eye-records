@@ -1,0 +1,6 @@
+26 objects imported automatically (use -v 2 for details).
+
+Assessments: 1
+Trials: 1
+Prescriptions: 0
+Follow-ups: 0

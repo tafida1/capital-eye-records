@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Annotate Investigation | {{ attachment.title }}
+{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/clinical_attachments.css' %}?v=20260803-5"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="clinical-annotation-page"
+     id="clinicalAnnotationPage">
+
+    <header class="clinical-annotation-header">
+
+        <div class="annotation-header-identity">
+
+            <a href="{% url 'clinical_attachment_viewer' attachment.pk %}"
+               class="viewer-back-button">
+                ←
+            </a>
+
+            <div>
+
+                <span class="viewer-module-label">
+                    Non-Destructive Clinical Annotation
+                </span>
+
+                <h2>{{ attachment.title }}</h2>
+
+                <p>
+                    {{ patient.full_name }}
+                    · {{ patient.file_number }}
+                    · {{ visit.visit_number }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="d-flex gap-2 flex-wrap">
+
+            <a href="{% url 'clinical_attachment_viewer' attachment.pk %}"
+               class="btn btn-sm btn-outline-light">
+                Investigation Viewer
+            </a>
+
+            <a href="{% url 'clinical_attachment_download' attachment.pk %}"
+               class="btn btn-sm btn-outline-light">
+                Download Original
+            </a>
+
+            {% if can_edit_annotations %}
+
+                <button type="button"
+                        class="btn btn-sm btn-light"
+                        id="saveAnnotationDraftButton">
+                    Save Draft
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-success"
+                        id="finalizeAnnotationButton">
+                    Finalize
+                </button>
+
+            {% endif %}
+
+        </div>
+
+    </header>
+
+
+    <div class="clinical-annotation-toolbar">
+
+        <div class="annotation-toolbar-group">
+
+            <button type="button"
+                    class="annotation-tool-button active"
+                    data-annotation-tool="select"
+                    title="Select and navigate">
+                ↖
+                <small>Select</small>
+            </button>
+
+            <button type="button"
+                    class="annotation-tool-button"
+                    data-annotation-tool="freehand"
+                    title="Freehand drawing">
+                ✎
+                <small>Draw</small>
+            </button>
+
+            <button type="button"
+                    class="annotation-tool-button"
+                    data-annotation-tool="arrow"
+                    title="Draw arrow">
+                ➜
+                <small>Arrow</small>
+            </button>
+
+            <button type="button"
+                    class="annotation-tool-button"
+                    data-annotation-tool="rectangle"
+                    title="Draw rectangle">
+                ▭
+                <small>Box</small>
+            </button>
+
+            <button type="button"
+                    class="annotation-tool-button"
+                    data-annotation-tool="ellipse"
+                    title="Draw ellipse">
+                ◯
+                <small>Circle</small>
+            </button>
+
+            <button type="button"
+                    class="annotation-tool-button"
+                    data-annotation-tool="text"
+                    title="Insert text note">
+                T
+                <small>Text</small>
+            </button>
+
+        </div>
+
+
+        <div class="viewer-toolbar-divider"></div>
+
+
+        <div class="annotation-toolbar-group">
+
+            <label class="annotation-colour-control">
+                Colour
+
+                <input type="color"
+                       id="annotationColour"
+                       value="#ff0000">
+            </label>
+
+            <label class="annotation-stroke-control">
+                Width
+
+                <input type="range"
+                       id="annotationStrokeWidth"
+                       min="1"
+                       max="12"
+                       value="3">
+
+                <span id="annotationStrokeValue">
+                    3
+                </span>
+            </label>
+
+        </div>
+
+
+        <div class="viewer-toolbar-divider"></div>
+
+
+        <div class="annotation-toolbar-group">
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="annotationUndoButton"
+                    title="Undo">
+                ↶
+            </button>
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="annotationRedoButton"
+                    title="Redo">
+                ↷
+            </button>
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="annotationClearButton"
+                    title="Clear current drawing">
+                🗑
+            </button>
+
+        </div>
+
+
+        <div class="viewer-toolbar-spacer"></div>
+
+
+        <div class="annotation-toolbar-group">
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="annotationZoomOut">
+                −
+            </button>
+
+            <span class="viewer-zoom-display"
+                  id="annotationZoomDisplay">
+                100%
+            </span>
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="annotationZoomIn">
+                +
+            </button>
+
+            <button type="button"
+                    class="viewer-tool-button viewer-tool-text"
+                    id="annotationFitButton">
+                Fit
+            </button>
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="annotationToggleVisibility"
+                    title="Show or hide annotation layer">
+                👁
+            </button>
+
+            <button type="button"
+                    class="viewer-tool-button"
+                    id="annotationFullScreenButton">
+                ⛶
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="clinical-annotation-layout">
+
+        <main class="clinical-annotation-stage"
+              id="clinicalAnnotationStage">
+
+            <div class="annotation-image-container"
+                 id="annotationImageContainer">
+
+                <img src="{% url 'clinical_attachment_preview' attachment.pk %}"
+                     alt="{{ attachment.title }}"
+                     id="annotationSourceImage"
+                     draggable="false">
+
+                <canvas id="clinicalAnnotationCanvas">
+                </canvas>
+
+            </div>
+
+            <div class="annotation-stage-instruction"
+                 id="annotationStageInstruction">
+                Select a tool above to begin annotation.
+            </div>
+
+        </main>
+
+
+        <aside class="clinical-annotation-sidebar">
+
+            <section class="annotation-sidebar-section">
+
+                <div class="annotation-sidebar-heading">
+
+                    <div>
+                        <span>Current Layer</span>
+                        <strong>Annotation Details</strong>
+                    </div>
+
+                    <button type="button"
+                            id="newAnnotationButton"
+                            class="btn btn-sm btn-outline-primary"
+                            {% if not can_edit_annotations %}disabled{% endif %}>
+                        New
+                    </button>
+
+                </div>
+
+
+                <input type="hidden"
+                       id="activeAnnotationId">
+
+                <div class="mb-3">
+
+                    <label class="form-label"
+                           for="annotationTitle">
+                        Annotation Title
+                    </label>
+
+                    <input type="text"
+                           id="annotationTitle"
+                           class="form-control"
+                           maxlength="200"
+                           value="Clinical Annotation"
+                           {% if not can_edit_annotations %}disabled{% endif %}>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label"
+                           for="annotationClinicalNote">
+                        Clinical Note
+                    </label>
+
+                    <textarea id="annotationClinicalNote"
+                              class="form-control"
+                              rows="5"
+                              maxlength="5000"
+                              placeholder="Explain the marked findings..."
+                              {% if not can_edit_annotations %}disabled{% endif %}></textarea>
+
+                </div>
+
+
+                <div class="annotation-current-status">
+
+                    <span>Status</span>
+
+                    <strong id="activeAnnotationStatus">
+                        Unsaved
+                    </strong>
+
+                </div>
+
+            </section>
+
+
+            <section class="annotation-sidebar-section">
+
+                <div class="annotation-sidebar-heading">
+
+                    <div>
+                        <span>Saved Layers</span>
+                        <strong>Clinical Annotations</strong>
+                    </div>
+
+                    <span class="annotation-layer-count"
+                          id="annotationLayerCount">
+                        0
+                    </span>
+
+                </div>
+
+
+                <div class="annotation-layer-list"
+                     id="annotationLayerList">
+
+                    <div class="annotation-empty-layers"
+                         id="annotationEmptyLayers">
+                        No annotation layers have been saved.
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="annotation-sidebar-section">
+
+                <div class="annotation-integrity-notice">
+
+                    <span>🔐</span>
+
+                    <div>
+                        <strong>
+                            Original Image Protected
+                        </strong>
+
+                        <p>
+                            These markings are stored separately. The
+                            uploaded clinical image is never overwritten.
+                        </p>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </aside>
+
+    </div>
+
+</div>
+
+
+{{ annotation_payloads|json_script:"existing-annotations-data" }}
+
+
+<script>
+window.clinicalAnnotationConfiguration = {
+    attachmentId: {{ attachment.pk }},
+    saveUrl: "{% url 'clinical_attachment_annotation_save' attachment.pk %}",
+    deactivateUrlTemplate: (
+        "{% url 'clinical_image_annotation_deactivate' 999999 %}"
+    ),
+    csrfToken: "{{ csrf_token }}",
+    canEdit: {{ can_edit_annotations|yesno:"true,false" }}
+};
+</script>
+
+<script src="{% static 'js/clinical_attachment_annotation.js' %}?v=20260803-1">
+</script>
+
+{% endblock %}

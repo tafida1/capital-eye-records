@@ -10,13 +10,13 @@ DEBUG = config("DEBUG", default=True, cast=bool)
 
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
-    default="127.0.0.1,localhost,192.168.8.103",
+    default="127.0.0.1,localhost,10.167.73.244,capitaleye.local",
     cast=Csv()
 )
 
 CSRF_TRUSTED_ORIGINS = config(                                     
     "CSRF_TRUSTED_ORIGINS",
-    default="http://127.0.0.1:8000,http://localhost:8000",
+    default="http://127.0.0.1:8000,http://localhost:8000,http://10.167.73.244,http://capitaleye.local",
     cast=Csv()
 )
 

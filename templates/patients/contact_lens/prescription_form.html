@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/contact_lens.css' %}?v=20260805-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="contact-lens-page">
+
+    <div class="contact-lens-page-header">
+
+        <div>
+            <span class="contact-lens-page-label">
+                Contact Lens Prescription
+            </span>
+
+            <h2>{{ page_title }}</h2>
+
+            <p>
+                Final right and left lens parameters, wearing schedule,
+                replacement plan and patient safety instructions.
+            </p>
+        </div>
+
+        <a href="{% url 'contact_lens_assessment_detail' assessment.pk %}"
+           class="btn btn-outline-secondary">
+            ← Assessment
+        </a>
+
+    </div>
+
+
+    <div class="contact-lens-patient-banner">
+
+        <div class="contact-lens-patient-avatar">
+            {{ patient.full_name|slice:":1"|upper }}
+        </div>
+
+        <div>
+            <strong>{{ patient.full_name }}</strong>
+            <small>{{ patient.file_number }}</small>
+        </div>
+
+        <div class="contact-lens-visit-badge">
+            {{ visit.visit_number }}
+        </div>
+
+    </div>
+
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+
+    <form method="post"
+          novalidate
+          data-contact-lens-prescription-form>
+
+        {% csrf_token %}
+
+
+        <section class="contact-lens-form-card">
+
+            <div class="contact-lens-card-header">
+                <div>
+                    <h4>Prescription Validity</h4>
+                    <p>Issue and expiry dates.</p>
+                </div>
+            </div>
+
+            <div class="contact-lens-card-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.prescription_date %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.valid_until %}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="contact-lens-form-card">
+
+            <div class="contact-lens-card-header">
+                <div>
+                    <h4>Final Lens Parameters</h4>
+                    <p>Parameters may be populated from accepted trial lenses.</p>
+                </div>
+            </div>
+
+            <div class="contact-lens-card-body">
+
+                <div class="contact-lens-eye-grid">
+
+                    <div class="contact-lens-eye-panel">
+
+                        <div class="contact-lens-eye-panel-header">
+                            <strong>Right Eye</strong>
+                            <small>Final prescription</small>
+                        </div>
+
+                        <div class="contact-lens-eye-panel-body">
+
+                            {% include "patients/contact_lens/_field.html" with field=form.right_lens_design %}
+                            {% include "patients/contact_lens/_field.html" with field=form.right_lens_design_other %}
+                            {% include "patients/contact_lens/_field.html" with field=form.right_manufacturer %}
+                            {% include "patients/contact_lens/_field.html" with field=form.right_brand_name %}
+                            {% include "patients/contact_lens/_field.html" with field=form.right_material %}
+
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.right_base_curve %}
+                                </div>
+
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.right_diameter %}
+                                </div>
+
+                                <div class="col-4">
+                                    {% include "patients/contact_lens/_field.html" with field=form.right_sphere %}
+                                </div>
+
+                                <div class="col-4">
+                                    {% include "patients/contact_lens/_field.html" with field=form.right_cylinder %}
+                                </div>
+
+                                <div class="col-4">
+                                    {% include "patients/contact_lens/_field.html" with field=form.right_axis %}
+                                </div>
+                            </div>
+
+                            {% include "patients/contact_lens/_field.html" with field=form.right_add_power %}
+                            {% include "patients/contact_lens/_field.html" with field=form.right_colour %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="contact-lens-eye-panel left">
+
+                        <div class="contact-lens-eye-panel-header">
+                            <strong>Left Eye</strong>
+                            <small>Final prescription</small>
+                        </div>
+
+                        <div class="contact-lens-eye-panel-body">
+
+                            {% include "patients/contact_lens/_field.html" with field=form.left_lens_design %}
+                            {% include "patients/contact_lens/_field.html" with field=form.left_lens_design_other %}
+                            {% include "patients/contact_lens/_field.html" with field=form.left_manufacturer %}
+                            {% include "patients/contact_lens/_field.html" with field=form.left_brand_name %}
+                            {% include "patients/contact_lens/_field.html" with field=form.left_material %}
+
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.left_base_curve %}
+                                </div>
+
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.left_diameter %}
+                                </div>
+
+                                <div class="col-4">
+                                    {% include "patients/contact_lens/_field.html" with field=form.left_sphere %}
+                                </div>
+
+                                <div class="col-4">
+                                    {% include "patients/contact_lens/_field.html" with field=form.left_cylinder %}
+                                </div>
+
+                                <div class="col-4">
+                                    {% include "patients/contact_lens/_field.html" with field=form.left_axis %}
+                                </div>
+                            </div>
+
+                            {% include "patients/contact_lens/_field.html" with field=form.left_add_power %}
+                            {% include "patients/contact_lens/_field.html" with field=form.left_colour %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="contact-lens-form-card">
+
+            <div class="contact-lens-card-header">
+                <div>
+                    <h4>Wearing and Replacement Schedule</h4>
+                    <p>Replacement cycle, maximum wear and cleaning instructions.</p>
+                </div>
+            </div>
+
+            <div class="contact-lens-card-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.replacement_schedule %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.replacement_schedule_other %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.wearing_schedule %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.maximum_daily_wear_hours %}
+                    </div>
+
+                    <div class="col-md-8">
+                        {% include "patients/contact_lens/_field.html" with field=form.cleaning_solution %}
+                    </div>
+
+                    <div class="col-12">
+                        {% include "patients/contact_lens/_field.html" with field=form.cleaning_instructions %}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="contact-lens-form-card">
+
+            <div class="contact-lens-card-header">
+                <div>
+                    <h4>Training and Safety</h4>
+                    <p>All safety requirements must be completed before approval.</p>
+                </div>
+            </div>
+
+            <div class="contact-lens-card-body">
+
+                <div class="contact-lens-alert warning mb-3">
+                    The prescription cannot be approved until insertion and
+                    removal training, hygiene training and emergency warning
+                    signs have all been completed.
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.insertion_removal_training_completed %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.hygiene_training_completed %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.emergency_warning_signs_explained %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.clinical_notes %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.dispensing_instructions %}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <div class="contact-lens-form-actions">
+
+            {% if prescription %}
+                <a href="{% url 'contact_lens_prescription_detail' prescription.pk %}"
+                   class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            {% else %}
+                <a href="{% url 'contact_lens_assessment_detail' assessment.pk %}"
+                   class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            {% endif %}
+
+            <button type="submit"
+                    class="btn btn-primary">
+                {{ submit_label }}
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script src="{% static 'js/contact_lens.js' %}?v=20260805-1"></script>
+
+{% endblock %}

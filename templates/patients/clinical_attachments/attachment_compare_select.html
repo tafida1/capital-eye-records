@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Select Investigation to Compare
+{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/clinical_attachments.css' %}?v=20260803-4"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header attachment-page-header">
+
+    <div>
+        <span class="attachment-page-label">
+            Investigation Comparison
+        </span>
+
+        <h2>Select Result to Compare</h2>
+
+        <p>
+            {{ patient.full_name }} ·
+            {{ patient.file_number }}
+        </p>
+    </div>
+
+    <a href="{% url 'clinical_attachment_detail' primary_attachment.pk %}"
+       class="btn btn-outline-secondary">
+        ← Attachment Details
+    </a>
+
+</div>
+
+
+<section class="comparison-primary-record mb-4">
+
+    <div class="comparison-primary-preview">
+
+        {% if primary_attachment.is_image %}
+            <img src="{% url 'clinical_attachment_preview' primary_attachment.pk %}"
+                 alt="{{ primary_attachment.title }}">
+        {% else %}
+            <span class="comparison-pdf-icon">
+                PDF
+            </span>
+        {% endif %}
+
+    </div>
+
+    <div class="comparison-primary-information">
+
+        <span class="attachment-page-label">
+            Primary Investigation
+        </span>
+
+        <h4>{{ primary_attachment.title }}</h4>
+
+        <p>
+            {% if primary_attachment.category == "OTHER" %}
+                {{ primary_attachment.category_other }}
+            {% else %}
+                {{ primary_attachment.get_category_display }}
+            {% endif %}
+
+            · {{ primary_attachment.get_eye_side_display }}
+            · {{ primary_attachment.investigation_date|date:"d M Y"|default:"Date not specified" }}
+        </p>
+
+        <small>
+            Visit {{ primary_attachment.visit.visit_number }}
+        </small>
+
+    </div>
+
+</section>
+
+
+<div class="attachment-filter-card mb-4">
+
+    <form method="get"
+          class="row g-3 align-items-end">
+
+        <div class="col-lg-5">
+
+            <label class="form-label">
+                Search Investigations
+            </label>
+
+            <input type="search"
+                   name="q"
+                   value="{{ query }}"
+                   class="form-control"
+                   placeholder="Title, visit number, filename...">
+
+        </div>
+
+
+        <div class="col-md-5 col-lg-3">
+
+            <label class="form-label">
+                Category
+            </label>
+
+            <select name="category"
+                    class="form-select">
+
+                <option value="">
+                    All Categories
+                </option>
+
+                {% for value, label in category_choices %}
+
+                    <option value="{{ value }}"
+                            {% if selected_category == value %}selected{% endif %}>
+
+                        {{ label }}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div class="col-md-4 col-lg-2">
+
+            <label class="form-label">
+                Eye
+            </label>
+
+            <select name="eye_side"
+                    class="form-select">
+
+                <option value="">
+                    All Eyes
+                </option>
+
+                {% for value, label in eye_side_choices %}
+
+                    <option value="{{ value }}"
+                            {% if selected_eye_side == value %}selected{% endif %}>
+
+                        {{ label }}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div class="col-md-3 col-lg-2">
+
+            <div class="d-grid gap-2">
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Filter
+                </button>
+
+                <a href="{% url 'clinical_attachment_compare_select' primary_attachment.pk %}"
+                   class="btn btn-outline-secondary">
+                    Reset
+                </a>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+{% if candidate_attachments %}
+
+    <div class="comparison-candidate-grid">
+
+        {% for candidate in candidate_attachments %}
+
+            <article class="comparison-candidate-card">
+
+                <div class="comparison-candidate-preview">
+
+                    {% if candidate.is_image %}
+
+                        <img src="{% url 'clinical_attachment_preview' candidate.pk %}"
+                             alt="{{ candidate.title }}"
+                             loading="lazy">
+
+                    {% else %}
+
+                        <div class="attachment-file-placeholder pdf">
+                            <span>PDF</span>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="comparison-candidate-body">
+
+                    <span class="attachment-category-label">
+
+                        {% if candidate.category == "OTHER" %}
+                            {{ candidate.category_other }}
+                        {% else %}
+                            {{ candidate.get_category_display }}
+                        {% endif %}
+
+                    </span>
+
+                    <h5>{{ candidate.title }}</h5>
+
+                    <div class="comparison-candidate-meta">
+
+                        <span>
+                            👁 {{ candidate.get_eye_side_display }}
+                        </span>
+
+                        <span>
+                            📅
+                            {{ candidate.investigation_date|date:"d M Y"|default:"-" }}
+                        </span>
+
+                        <span>
+                            🩺 {{ candidate.visit.visit_number }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="comparison-candidate-footer">
+
+                    <a href="{% url 'clinical_attachment_compare' primary_attachment.pk candidate.pk %}"
+                       class="btn btn-primary w-100">
+
+                        Compare with This Result
+
+                    </a>
+
+                </div>
+
+            </article>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% if page_obj.paginator.num_pages > 1 %}
+
+        <nav class="mt-4">
+
+            <ul class="pagination justify-content-center">
+
+                {% if page_obj.has_previous %}
+
+                    <li class="page-item">
+
+                        <a class="page-link"
+                           href="?page={{ page_obj.previous_page_number }}&q={{ query|urlencode }}&category={{ selected_category }}&eye_side={{ selected_eye_side }}">
+
+                            Previous
+
+                        </a>
+
+                    </li>
+
+                {% endif %}
+
+
+                <li class="page-item active">
+
+                    <span class="page-link">
+                        Page {{ page_obj.number }}
+                        of {{ page_obj.paginator.num_pages }}
+                    </span>
+
+                </li>
+
+
+                {% if page_obj.has_next %}
+
+                    <li class="page-item">
+
+                        <a class="page-link"
+                           href="?page={{ page_obj.next_page_number }}&q={{ query|urlencode }}&category={{ selected_category }}&eye_side={{ selected_eye_side }}">
+
+                            Next
+
+                        </a>
+
+                    </li>
+
+                {% endif %}
+
+            </ul>
+
+        </nav>
+
+    {% endif %}
+
+{% else %}
+
+    <div class="attachment-empty-state">
+
+        <div class="attachment-empty-icon">
+            🔍
+        </div>
+
+        <h4>No comparable investigation found</h4>
+
+        <p>
+            Upload another image or PDF investigation for this patient,
+            or adjust the selected filters.
+        </p>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

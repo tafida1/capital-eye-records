@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dispense Contact Lens Prescription{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/contact_lens.css' %}?v=20260805-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="contact-lens-page">
+
+    <div class="contact-lens-page-header">
+        <div>
+            <span class="contact-lens-page-label">Optical Dispensing</span>
+            <h2>Dispense Contact Lens Prescription</h2>
+            <p>{{ prescription.prescription_number }} · {{ patient.full_name }}</p>
+        </div>
+
+        <a href="{% url 'contact_lens_prescription_detail' prescription.pk %}"
+           class="btn btn-outline-secondary">
+            ← Prescription
+        </a>
+    </div>
+
+
+    <section class="contact-lens-form-card">
+
+        <div class="contact-lens-card-header">
+            <div>
+                <h4>Dispensing Confirmation</h4>
+                <p>Confirm that the approved lenses were supplied to the patient.</p>
+            </div>
+        </div>
+
+        <div class="contact-lens-card-body">
+
+            <div class="contact-lens-alert mb-4">
+                This action records the dispensing staff member and server
+                timestamp. The prescription must already be approved.
+            </div>
+
+            <form method="post"
+                  data-confirm-contact-lens-action="Confirm that these Contact Lenses were dispensed?">
+
+                {% csrf_token %}
+
+                {{ form.non_field_errors }}
+
+                {% include "patients/contact_lens/_field.html" with field=form.confirm_dispensing %}
+                {% include "patients/contact_lens/_field.html" with field=form.dispensing_note %}
+
+                <div class="contact-lens-form-actions">
+
+                    <a href="{% url 'contact_lens_prescription_detail' prescription.pk %}"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-success">
+                        Confirm Dispensing
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </section>
+
+</div>
+
+<script src="{% static 'js/contact_lens.js' %}?v=20260805-1"></script>
+
+{% endblock %}

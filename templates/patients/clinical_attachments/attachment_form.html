@@ -1,0 +1,664 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/clinical_attachments.css' %}?v=20260802-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header attachment-page-header">
+    <div>
+        <span class="attachment-page-label">
+            Clinical Investigation Result
+        </span>
+
+        <h2>{{ title }}</h2>
+
+        <p>
+            Patient:
+            <strong>{{ patient.full_name }}</strong>
+
+            <span class="mx-1">|</span>
+
+            File No:
+            <strong>{{ patient.file_number }}</strong>
+
+            <span class="mx-1">|</span>
+
+            Visit:
+            <strong>{{ visit.visit_number }}</strong>
+        </p>
+    </div>
+
+    <a href="{% url 'visit_clinical_attachment_list' visit.pk %}"
+       class="btn btn-outline-secondary">
+        ← Back to Attachments
+    </a>
+</div>
+
+
+<div class="attachment-patient-strip mb-4">
+
+    <div class="attachment-patient-avatar">
+        {{ patient.full_name|slice:":1"|upper }}
+    </div>
+
+    <div class="flex-grow-1">
+        <strong>{{ patient.full_name }}</strong>
+
+        <small>
+            {{ patient.file_number }} ·
+            {{ patient.get_gender_display }} ·
+            Age: {{ patient.display_age|default:"-" }}
+        </small>
+    </div>
+
+    <div class="attachment-visit-badge">
+        {{ visit.get_visit_type_display }}
+    </div>
+
+</div>
+
+
+<form method="post"
+      enctype="multipart/form-data"
+      id="clinicalAttachmentForm"
+      class="clinical-attachment-form"
+      novalidate>
+
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            <strong>The attachment could not be saved:</strong>
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+
+    <div class="row g-4">
+
+        <div class="col-xl-8">
+
+            <!-- FILE SELECTION -->
+            <div class="attachment-form-card mb-4">
+
+                <div class="attachment-form-card-header">
+                    <div class="attachment-card-icon">
+                        📎
+                    </div>
+
+                    <div>
+                        <h5>Select Clinical File</h5>
+
+                        <p>
+                            Upload an investigation image, report, scan or
+                            supporting clinical document.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="attachment-form-card-body">
+
+                    <div class="clinical-drop-zone"
+                         id="clinicalDropZone">
+
+                        <div class="clinical-drop-icon">
+                            ☁️
+                        </div>
+
+                        <h5>Drag and drop the clinical file here</h5>
+
+                        <p>
+                            or click the button below to select a file
+                            from this computer.
+                        </p>
+
+                        <label for="{{ form.attachment_file.id_for_label }}"
+                               class="btn btn-primary">
+                            Choose Clinical File
+                        </label>
+
+                        <div class="attachment-native-input">
+                            {{ form.attachment_file }}
+                        </div>
+
+                        <div class="selected-file-panel"
+                             id="selectedFilePanel"
+                             hidden>
+
+                            <div class="selected-file-icon"
+                                 id="selectedFileIcon">
+                                📄
+                            </div>
+
+                            <div class="selected-file-information">
+                                <strong id="selectedFileName"></strong>
+                                <small id="selectedFileSize"></small>
+                            </div>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    id="clearSelectedFile">
+                                Remove
+                            </button>
+
+                        </div>
+
+                        <small class="attachment-upload-rules">
+                            JPG, JPEG, PNG, PDF, DOC or DOCX · Maximum 10 MB
+                        </small>
+
+                    </div>
+
+                    {% if form.attachment_file.help_text %}
+                        <div class="form-text mt-3">
+                            {{ form.attachment_file.help_text }}
+                        </div>
+                    {% endif %}
+
+                    {% if form.attachment_file.errors %}
+                        <div class="field-error mt-3">
+                            {{ form.attachment_file.errors.0 }}
+                        </div>
+                    {% endif %}
+
+                    {% if attachment and attachment.attachment_file %}
+                        <div class="existing-file-notice mt-3">
+                            <span>📁</span>
+
+                            <div>
+                                <strong>Current file</strong>
+
+                                <small>
+                                    {{ attachment.original_filename|default:attachment.attachment_file.name }}
+                                    · {{ attachment.file_size_display }}
+                                </small>
+                            </div>
+
+                            <a href="{% url 'clinical_attachment_download' attachment.pk %}"
+                               class="btn btn-sm btn-outline-primary">
+                                Download
+                            </a>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+
+
+            <!-- FILE DETAILS -->
+            <div class="attachment-form-card mb-4">
+
+                <div class="attachment-form-card-header">
+                    <div class="attachment-card-icon">
+                        📝
+                    </div>
+
+                    <div>
+                        <h5>Investigation Information</h5>
+
+                        <p>
+                            Describe the file clearly so clinicians can
+                            locate and understand it quickly.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="attachment-form-card-body">
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+                            <label class="form-label"
+                                   for="{{ form.category.id_for_label }}">
+                                {{ form.category.label }}
+                            </label>
+
+                            {{ form.category }}
+
+                            {% if form.category.errors %}
+                                <div class="field-error">
+                                    {{ form.category.errors.0 }}
+                                </div>
+                            {% endif %}
+
+                            <div class="other-field-wrapper mt-2"
+                                 data-other-wrapper="id_category_other">
+
+                                {{ form.category_other }}
+
+                                {% if form.category_other.errors %}
+                                    <div class="field-error">
+                                        {{ form.category_other.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <label class="form-label"
+                                   for="{{ form.eye_side.id_for_label }}">
+                                {{ form.eye_side.label }}
+                            </label>
+
+                            {{ form.eye_side }}
+
+                            {% if form.eye_side.help_text %}
+                                <div class="form-text">
+                                    {{ form.eye_side.help_text }}
+                                </div>
+                            {% endif %}
+
+                            {% if form.eye_side.errors %}
+                                <div class="field-error">
+                                    {{ form.eye_side.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+
+                        <div class="col-md-8">
+                            <label class="form-label"
+                                   for="{{ form.title.id_for_label }}">
+                                {{ form.title.label }}
+                            </label>
+
+                            {{ form.title }}
+
+                            {% if form.title.errors %}
+                                <div class="field-error">
+                                    {{ form.title.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+
+                        <div class="col-md-4">
+                            <label class="form-label"
+                                   for="{{ form.investigation_date.id_for_label }}">
+                                {{ form.investigation_date.label }}
+                            </label>
+
+                            {{ form.investigation_date }}
+
+                            {% if form.investigation_date.help_text %}
+                                <div class="form-text">
+                                    {{ form.investigation_date.help_text }}
+                                </div>
+                            {% endif %}
+
+                            {% if form.investigation_date.errors %}
+                                <div class="field-error">
+                                    {{ form.investigation_date.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+
+                        <div class="col-12">
+                            <label class="form-label"
+                                   for="{{ form.description.id_for_label }}">
+                                {{ form.description.label }}
+                            </label>
+
+                            {{ form.description }}
+
+                            <div class="attachment-character-counter">
+                                <span id="descriptionCharacterCount">0</span>
+                                / 2000
+                            </div>
+
+                            {% if form.description.errors %}
+                                <div class="field-error">
+                                    {{ form.description.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- SECURITY / GUIDANCE PANEL -->
+        <div class="col-xl-4">
+
+            <div class="attachment-side-card mb-4">
+
+                <div class="attachment-side-card-header">
+                    <span>🔐</span>
+                    Secure Clinical Upload
+                </div>
+
+                <div class="attachment-side-card-body">
+
+                    <div class="attachment-guidance-item">
+                        <span>✓</span>
+
+                        <div>
+                            <strong>Protected access</strong>
+                            <small>
+                                Files are served through authenticated
+                                clinical routes.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="attachment-guidance-item">
+                        <span>✓</span>
+
+                        <div>
+                            <strong>Patient linked</strong>
+                            <small>
+                                The system links the file to
+                                {{ patient.full_name }} and this visit.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="attachment-guidance-item">
+                        <span>✓</span>
+
+                        <div>
+                            <strong>Audit recorded</strong>
+                            <small>
+                                The uploader, date and file metadata are
+                                captured automatically.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="attachment-guidance-item">
+                        <span>✓</span>
+
+                        <div>
+                            <strong>File inspection</strong>
+                            <small>
+                                Extension, content type, size and basic file
+                                signature are validated.
+                            </small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="attachment-side-card mb-4">
+
+                <div class="attachment-side-card-header">
+                    <span>📋</span>
+                    Upload Guidance
+                </div>
+
+                <div class="attachment-side-card-body">
+                    <ol class="attachment-guidance-list">
+                        <li>Select the correct investigation category.</li>
+                        <li>Choose the affected eye where applicable.</li>
+                        <li>Use a clear and descriptive title.</li>
+                        <li>Confirm the investigation date.</li>
+                        <li>Verify the selected file before uploading.</li>
+                    </ol>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="attachment-sticky-actions">
+
+        <div class="attachment-save-note">
+            <span>💾</span>
+
+            <div>
+                <strong>
+                    {% if attachment %}
+                        Save attachment changes
+                    {% else %}
+                        Upload clinical investigation
+                    {% endif %}
+                </strong>
+
+                <small>
+                    The clinical file will be linked to
+                    {{ visit.visit_number }}.
+                </small>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+
+            <a href="{% url 'visit_clinical_attachment_list' visit.pk %}"
+               class="btn btn-outline-secondary">
+                Cancel
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary px-4"
+                    id="saveClinicalAttachmentButton">
+                {{ button_text }}
+            </button>
+
+        </div>
+
+    </div>
+
+</form>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("clinicalAttachmentForm");
+    const fileInput = document.getElementById(
+        "{{ form.attachment_file.id_for_label }}"
+    );
+    const dropZone = document.getElementById("clinicalDropZone");
+    const selectedFilePanel = document.getElementById(
+        "selectedFilePanel"
+    );
+    const selectedFileName = document.getElementById(
+        "selectedFileName"
+    );
+    const selectedFileSize = document.getElementById(
+        "selectedFileSize"
+    );
+    const selectedFileIcon = document.getElementById(
+        "selectedFileIcon"
+    );
+    const clearSelectedFile = document.getElementById(
+        "clearSelectedFile"
+    );
+
+    function readableFileSize(bytes) {
+        if (!Number.isFinite(bytes) || bytes <= 0) {
+            return "Unknown size";
+        }
+
+        if (bytes < 1024) {
+            return bytes + " bytes";
+        }
+
+        if (bytes < 1024 * 1024) {
+            return (bytes / 1024).toFixed(1) + " KB";
+        }
+
+        return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    }
+
+    function fileIcon(filename) {
+        const extension = filename
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+        if (["jpg", "jpeg", "png"].includes(extension)) {
+            return "🖼️";
+        }
+
+        if (extension === "pdf") {
+            return "📕";
+        }
+
+        if (["doc", "docx"].includes(extension)) {
+            return "📘";
+        }
+
+        return "📄";
+    }
+
+    function displaySelectedFile(file) {
+        if (!file || !selectedFilePanel) {
+            return;
+        }
+
+        selectedFileName.textContent = file.name;
+        selectedFileSize.textContent = readableFileSize(file.size);
+        selectedFileIcon.textContent = fileIcon(file.name);
+        selectedFilePanel.hidden = false;
+
+        dropZone.classList.add("has-file");
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener("change", function () {
+            if (fileInput.files && fileInput.files.length > 0) {
+                displaySelectedFile(fileInput.files[0]);
+            }
+        });
+    }
+
+    if (dropZone && fileInput) {
+        ["dragenter", "dragover"].forEach(function (eventName) {
+            dropZone.addEventListener(eventName, function (event) {
+                event.preventDefault();
+                dropZone.classList.add("drag-over");
+            });
+        });
+
+        ["dragleave", "drop"].forEach(function (eventName) {
+            dropZone.addEventListener(eventName, function (event) {
+                event.preventDefault();
+                dropZone.classList.remove("drag-over");
+            });
+        });
+
+        dropZone.addEventListener("drop", function (event) {
+            const droppedFiles = event.dataTransfer.files;
+
+            if (!droppedFiles || droppedFiles.length === 0) {
+                return;
+            }
+
+            const transfer = new DataTransfer();
+            transfer.items.add(droppedFiles[0]);
+            fileInput.files = transfer.files;
+
+            displaySelectedFile(droppedFiles[0]);
+        });
+    }
+
+    if (clearSelectedFile && fileInput) {
+        clearSelectedFile.addEventListener("click", function () {
+            fileInput.value = "";
+
+            if (selectedFilePanel) {
+                selectedFilePanel.hidden = true;
+            }
+
+            if (dropZone) {
+                dropZone.classList.remove("has-file");
+            }
+        });
+    }
+
+    function updateOtherCategory() {
+        const categorySelect = document.getElementById(
+            "id_category"
+        );
+
+        const otherInput = document.getElementById(
+            "id_category_other"
+        );
+
+        const wrapper = document.querySelector(
+            '[data-other-wrapper="id_category_other"]'
+        );
+
+        if (!categorySelect || !otherInput || !wrapper) {
+            return;
+        }
+
+        const showOther = categorySelect.value === "OTHER";
+
+        wrapper.classList.toggle("show", showOther);
+        otherInput.disabled = !showOther;
+
+        if (!showOther) {
+            otherInput.value = "";
+        }
+    }
+
+    const categorySelect = document.getElementById("id_category");
+
+    if (categorySelect) {
+        updateOtherCategory();
+
+        categorySelect.addEventListener(
+            "change",
+            updateOtherCategory
+        );
+    }
+
+    const descriptionInput = document.getElementById(
+        "id_description"
+    );
+
+    const descriptionCharacterCount = document.getElementById(
+        "descriptionCharacterCount"
+    );
+
+    function updateDescriptionCount() {
+        if (!descriptionInput || !descriptionCharacterCount) {
+            return;
+        }
+
+        descriptionCharacterCount.textContent =
+            descriptionInput.value.length;
+    }
+
+    if (descriptionInput) {
+        updateDescriptionCount();
+
+        descriptionInput.addEventListener(
+            "input",
+            updateDescriptionCount
+        );
+    }
+
+    if (form) {
+        form.addEventListener("submit", function () {
+            const button = document.getElementById(
+                "saveClinicalAttachmentButton"
+            );
+
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = "Processing Clinical File...";
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

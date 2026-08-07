@@ -1,0 +1,495 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/contact_lens.css' %}?v=20260805-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="contact-lens-page">
+
+    <div class="contact-lens-page-header">
+
+        <div>
+            <span class="contact-lens-page-label">
+                Specialist Contact Lens Service
+            </span>
+
+            <h2>{{ page_title }}</h2>
+
+            <p>
+                Suitability, ocular measurements, tear-film assessment,
+                keratometry, hygiene and patient education.
+            </p>
+        </div>
+
+        <a href="{% url 'visit_detail' visit.pk %}"
+           class="btn btn-outline-secondary">
+            ← Visit Details
+        </a>
+
+    </div>
+
+
+    <div class="contact-lens-patient-banner">
+
+        <div class="contact-lens-patient-avatar">
+            {{ patient.full_name|slice:":1"|upper }}
+        </div>
+
+        <div>
+            <strong>{{ patient.full_name }}</strong>
+
+            <small>
+                {{ patient.file_number }}
+                · {{ patient.get_gender_display }}
+                · Age {{ patient.display_age|default:"-" }}
+            </small>
+        </div>
+
+        <div class="contact-lens-visit-badge">
+            Visit {{ visit.visit_number }}
+        </div>
+
+    </div>
+
+
+    {% if form.non_field_errors %}
+
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+
+    {% endif %}
+
+
+    <form method="post"
+          novalidate>
+
+        {% csrf_token %}
+
+
+        <section class="contact-lens-form-card">
+
+            <div class="contact-lens-card-header">
+                <div>
+                    <h4>Assessment Information</h4>
+                    <p>Purpose, experience and related eye examination.</p>
+                </div>
+            </div>
+
+            <div class="contact-lens-card-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.assessment_date %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.eye_examination %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.wearing_experience %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.lens_purpose %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.lens_purpose_other %}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="contact-lens-form-card">
+
+            <div class="contact-lens-card-header">
+                <div>
+                    <h4>Previous Contact Lens History</h4>
+                    <p>Previous brands, wearing schedules and complications.</p>
+                </div>
+            </div>
+
+            <div class="contact-lens-card-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.previous_lens_brand %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.previous_lens_type %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.previous_wearing_schedule %}
+                    </div>
+
+                    <div class="col-12">
+                        {% include "patients/contact_lens/_field.html" with field=form.previous_lens_problems %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.previous_contact_lens_infection %}
+                    </div>
+
+                    <div class="col-md-8">
+                        {% include "patients/contact_lens/_field.html" with field=form.previous_contact_lens_infection_details %}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="contact-lens-form-card">
+
+            <div class="contact-lens-card-header">
+                <div>
+                    <h4>Lifestyle and Medical History</h4>
+                    <p>Occupation, environment and relevant health information.</p>
+                </div>
+            </div>
+
+            <div class="contact-lens-card-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.occupation %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.average_daily_wear_hours_requested %}
+                    </div>
+
+                    <div class="col-12">
+                        {% include "patients/contact_lens/_field.html" with field=form.environmental_exposure %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.allergies %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.systemic_conditions %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.current_medications %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.ocular_history %}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="contact-lens-form-card">
+
+            <div class="contact-lens-card-header">
+                <div>
+                    <h4>Ocular Measurements</h4>
+                    <p>HVID, pupil diameter and palpebral aperture.</p>
+                </div>
+            </div>
+
+            <div class="contact-lens-card-body">
+
+                <div class="contact-lens-eye-grid">
+
+                    <div class="contact-lens-eye-panel">
+
+                        <div class="contact-lens-eye-panel-header">
+                            <strong>Right Eye</strong>
+                            <small>Ocular measurements</small>
+                        </div>
+
+                        <div class="contact-lens-eye-panel-body">
+
+                            {% include "patients/contact_lens/_field.html" with field=form.right_horizontal_visible_iris_diameter %}
+                            {% include "patients/contact_lens/_field.html" with field=form.right_pupil_diameter %}
+                            {% include "patients/contact_lens/_field.html" with field=form.right_palpebral_aperture %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="contact-lens-eye-panel left">
+
+                        <div class="contact-lens-eye-panel-header">
+                            <strong>Left Eye</strong>
+                            <small>Ocular measurements</small>
+                        </div>
+
+                        <div class="contact-lens-eye-panel-body">
+
+                            {% include "patients/contact_lens/_field.html" with field=form.left_horizontal_visible_iris_diameter %}
+                            {% include "patients/contact_lens/_field.html" with field=form.left_pupil_diameter %}
+                            {% include "patients/contact_lens/_field.html" with field=form.left_palpebral_aperture %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="contact-lens-form-card">
+
+            <div class="contact-lens-card-header">
+                <div>
+                    <h4>Keratometry</h4>
+                    <p>K1, K2 and axes for both eyes.</p>
+                </div>
+            </div>
+
+            <div class="contact-lens-card-body">
+
+                <div class="contact-lens-eye-grid">
+
+                    <div class="contact-lens-eye-panel">
+
+                        <div class="contact-lens-eye-panel-header">
+                            <strong>Right Eye Keratometry</strong>
+                        </div>
+
+                        <div class="contact-lens-eye-panel-body">
+
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.right_k1 %}
+                                </div>
+
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.right_k1_axis %}
+                                </div>
+
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.right_k2 %}
+                                </div>
+
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.right_k2_axis %}
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="contact-lens-eye-panel left">
+
+                        <div class="contact-lens-eye-panel-header">
+                            <strong>Left Eye Keratometry</strong>
+                        </div>
+
+                        <div class="contact-lens-eye-panel-body">
+
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.left_k1 %}
+                                </div>
+
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.left_k1_axis %}
+                                </div>
+
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.left_k2 %}
+                                </div>
+
+                                <div class="col-6">
+                                    {% include "patients/contact_lens/_field.html" with field=form.left_k2_axis %}
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="contact-lens-form-card">
+
+            <div class="contact-lens-card-header">
+                <div>
+                    <h4>Tear Film and Ocular Surface</h4>
+                    <p>TBUT, Schirmer test, cornea, lids and conjunctiva.</p>
+                </div>
+            </div>
+
+            <div class="contact-lens-card-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.tear_film_status %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.tear_break_up_time_right %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.tear_break_up_time_left %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.schirmer_right %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.schirmer_left %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.corneal_status %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.corneal_status_other %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.right_cornea_notes %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.left_cornea_notes %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.right_lid_notes %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.left_lid_notes %}
+                    </div>
+
+                    <div class="col-12">
+                        {% include "patients/contact_lens/_field.html" with field=form.conjunctival_findings %}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="contact-lens-form-card">
+
+            <div class="contact-lens-card-header">
+                <div>
+                    <h4>Suitability and Patient Education</h4>
+                    <p>Clinical decision, handling ability and safety education.</p>
+                </div>
+            </div>
+
+            <div class="contact-lens-card-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.hygiene_assessment %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.handling_ability %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.motivation_and_expectations %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.contraindications %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.suitability_status %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% include "patients/contact_lens/_field.html" with field=form.suitability_reason %}
+                    </div>
+
+                    <div class="col-12">
+                        {% include "patients/contact_lens/_field.html" with field=form.assessment_notes %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% include "patients/contact_lens/_field.html" with field=form.patient_education_provided %}
+                    </div>
+
+                    <div class="col-md-8">
+                        {% include "patients/contact_lens/_field.html" with field=form.patient_education_notes %}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <div class="contact-lens-form-actions">
+
+            {% if assessment %}
+                <a href="{% url 'contact_lens_assessment_detail' assessment.pk %}"
+                   class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            {% else %}
+                <a href="{% url 'visit_detail' visit.pk %}"
+                   class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            {% endif %}
+
+            <button type="submit"
+                    class="btn btn-primary">
+                {{ submit_label }}
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script src="{% static 'js/contact_lens.js' %}?v=20260805-1"></script>
+
+{% endblock %}

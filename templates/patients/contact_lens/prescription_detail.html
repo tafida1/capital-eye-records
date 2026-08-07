@@ -1,0 +1,528 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ prescription.prescription_number }}
+{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/contact_lens.css' %}?v=20260805-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="contact-lens-page">
+
+    <div class="contact-lens-page-header">
+
+        <div>
+            <span class="contact-lens-page-label">
+                Contact Lens Prescription
+            </span>
+
+            <h2>{{ prescription.prescription_number }}</h2>
+
+            <p>
+                Version {{ prescription.version }}
+                · {{ patient.full_name }}
+                · {{ patient.file_number }}
+            </p>
+        </div>
+
+
+        <div class="contact-lens-prescription-actions">
+
+            <a href="{% url 'contact_lens_assessment_detail' assessment.pk %}"
+               class="btn btn-outline-secondary">
+                Assessment
+            </a>
+
+            {% if can_manage_contact_lenses and prescription.status == "DRAFT" %}
+
+                <a href="{% url 'contact_lens_prescription_update' prescription.pk %}"
+                   class="btn btn-outline-primary">
+                    Edit Draft
+                </a>
+
+                <form method="post"
+                      action="{% url 'contact_lens_prescription_submit' prescription.pk %}"
+                      data-confirm-contact-lens-action="Submit this prescription for clinical approval?">
+
+                    {% csrf_token %}
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Submit for Approval
+                    </button>
+
+                </form>
+
+            {% endif %}
+
+
+            {% if can_approve_contact_lenses and prescription.status == "PENDING_APPROVAL" %}
+
+                <a href="{% url 'contact_lens_prescription_approve' prescription.pk %}"
+                   class="btn btn-success">
+                    Approve
+                </a>
+
+            {% endif %}
+
+
+            {% if can_dispense_contact_lenses and prescription.status == "APPROVED" %}
+
+                <a href="{% url 'contact_lens_prescription_dispense' prescription.pk %}"
+                   class="btn btn-success">
+                    Mark Dispensed
+                </a>
+
+            {% endif %}
+
+
+            {% if can_manage_contact_lenses %}
+
+                <form method="post"
+                      action="{% url 'contact_lens_prescription_new_version' prescription.pk %}"
+                      data-confirm-contact-lens-action="Create a new draft version from this prescription?">
+
+                    {% csrf_token %}
+
+                    <button type="submit"
+                            class="btn btn-outline-warning">
+                        New Version
+                    </button>
+
+                </form>
+
+            {% endif %}
+
+
+            <a href="{% url 'contact_lens_prescription_print' prescription.pk %}"
+               class="btn btn-outline-primary"
+               target="_blank">
+
+                Print Preview
+
+            </a>
+
+
+            {% if prescription.status == "APPROVED" or prescription.status == "DISPENSED" %}
+
+                <a href="{% url 'contact_lens_prescription_pdf' prescription.pk %}"
+                   class="btn btn-outline-danger"
+                   target="_blank">
+
+                    PDF
+
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="contact-lens-patient-banner">
+
+        <div class="contact-lens-patient-avatar">
+            {{ patient.full_name|slice:":1"|upper }}
+        </div>
+
+        <div>
+            <strong>{{ patient.full_name }}</strong>
+
+            <small>
+                {{ patient.file_number }}
+                · {{ visit.visit_number }}
+            </small>
+        </div>
+
+        <div class="contact-lens-visit-badge">
+
+            <span class="contact-lens-status-badge
+                {% if prescription.status == 'APPROVED' %}
+                    approved
+                {% elif prescription.status == 'DISPENSED' %}
+                    dispensed
+                {% elif prescription.status == 'PENDING_APPROVAL' %}
+                    pending
+                {% elif prescription.status == 'CANCELLED' %}
+                    cancelled
+                {% else %}
+                    draft
+                {% endif %}">
+
+                {{ prescription.get_status_display }}
+
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <section class="contact-lens-detail-card">
+
+        <div class="contact-lens-card-header">
+            <div>
+                <h4>Prescription Parameters</h4>
+                <p>Final lens specification for both eyes.</p>
+            </div>
+        </div>
+
+        <div class="contact-lens-card-body contact-lens-table-wrapper">
+
+            <table class="contact-lens-parameter-table">
+
+                <thead>
+                    <tr>
+                        <th>Eye</th>
+                        <th>Design</th>
+                        <th>Manufacturer</th>
+                        <th>Brand</th>
+                        <th>Material</th>
+                        <th>BC</th>
+                        <th>DIA</th>
+                        <th>Sphere</th>
+                        <th>Cylinder</th>
+                        <th>Axis</th>
+                        <th>Add</th>
+                        <th>Colour</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>Right Eye</td>
+                        <td>
+                            {% if prescription.right_lens_design == "OTHER" %}
+                                {{ prescription.right_lens_design_other }}
+                            {% else %}
+                                {{ prescription.get_right_lens_design_display|default:"-" }}
+                            {% endif %}
+                        </td>
+                        <td>{{ prescription.right_manufacturer|default:"-" }}</td>
+                        <td>{{ prescription.right_brand_name|default:"-" }}</td>
+                        <td>{{ prescription.right_material|default:"-" }}</td>
+                        <td>{{ prescription.right_base_curve|default:"-" }}</td>
+                        <td>{{ prescription.right_diameter|default:"-" }}</td>
+                        <td>{{ prescription.right_sphere|default:"-" }}</td>
+                        <td>{{ prescription.right_cylinder|default:"-" }}</td>
+                        <td>{{ prescription.right_axis|default:"-" }}</td>
+                        <td>{{ prescription.right_add_power|default:"-" }}</td>
+                        <td>{{ prescription.right_colour|default:"-" }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Left Eye</td>
+                        <td>
+                            {% if prescription.left_lens_design == "OTHER" %}
+                                {{ prescription.left_lens_design_other }}
+                            {% else %}
+                                {{ prescription.get_left_lens_design_display|default:"-" }}
+                            {% endif %}
+                        </td>
+                        <td>{{ prescription.left_manufacturer|default:"-" }}</td>
+                        <td>{{ prescription.left_brand_name|default:"-" }}</td>
+                        <td>{{ prescription.left_material|default:"-" }}</td>
+                        <td>{{ prescription.left_base_curve|default:"-" }}</td>
+                        <td>{{ prescription.left_diameter|default:"-" }}</td>
+                        <td>{{ prescription.left_sphere|default:"-" }}</td>
+                        <td>{{ prescription.left_cylinder|default:"-" }}</td>
+                        <td>{{ prescription.left_axis|default:"-" }}</td>
+                        <td>{{ prescription.left_add_power|default:"-" }}</td>
+                        <td>{{ prescription.left_colour|default:"-" }}</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <section class="contact-lens-detail-card">
+
+        <div class="contact-lens-card-header">
+            <div>
+                <h4>Wearing and Safety Instructions</h4>
+                <p>Replacement, cleaning, training and dispensing information.</p>
+            </div>
+        </div>
+
+        <div class="contact-lens-card-body">
+
+            <dl class="contact-lens-details-grid">
+
+                <div class="contact-lens-detail-item">
+                    <dt>Prescription Date</dt>
+                    <dd>{{ prescription.prescription_date|date:"d M Y" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Valid Until</dt>
+                    <dd>{{ prescription.valid_until|date:"d M Y"|default:"Not specified" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Replacement</dt>
+                    <dd>
+                        {% if prescription.replacement_schedule == "OTHER" %}
+                            {{ prescription.replacement_schedule_other }}
+                        {% else %}
+                            {{ prescription.get_replacement_schedule_display }}
+                        {% endif %}
+                    </dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Wearing Schedule</dt>
+                    <dd>{{ prescription.get_wearing_schedule_display }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Maximum Daily Wear</dt>
+                    <dd>{{ prescription.maximum_daily_wear_hours|default:"-" }} hours</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Cleaning Solution</dt>
+                    <dd>{{ prescription.cleaning_solution|default:"-" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Insertion/Removal Training</dt>
+                    <dd>{{ prescription.insertion_removal_training_completed|yesno:"Completed,Not completed" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Hygiene Training</dt>
+                    <dd>{{ prescription.hygiene_training_completed|yesno:"Completed,Not completed" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Warning Signs Explained</dt>
+                    <dd>{{ prescription.emergency_warning_signs_explained|yesno:"Completed,Not completed" }}</dd>
+                </div>
+
+            </dl>
+
+            {% if prescription.cleaning_instructions %}
+                <div class="contact-lens-alert mt-3">
+                    <strong>Cleaning Instructions:</strong><br>
+                    {{ prescription.cleaning_instructions|linebreaksbr }}
+                </div>
+            {% endif %}
+
+            {% if prescription.clinical_notes %}
+                <div class="contact-lens-alert mt-3">
+                    <strong>Clinical Notes:</strong><br>
+                    {{ prescription.clinical_notes|linebreaksbr }}
+                </div>
+            {% endif %}
+
+            {% if prescription.dispensing_instructions %}
+                <div class="contact-lens-alert mt-3">
+                    <strong>Dispensing Instructions:</strong><br>
+                    {{ prescription.dispensing_instructions|linebreaksbr }}
+                </div>
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <section class="contact-lens-detail-card">
+
+        <div class="contact-lens-card-header">
+
+            <div>
+                <h4>Approval and Dispensing Audit</h4>
+                <p>Server-controlled clinical authorization records.</p>
+            </div>
+
+        </div>
+
+        <div class="contact-lens-card-body">
+
+            <dl class="contact-lens-details-grid">
+
+                <div class="contact-lens-detail-item">
+                    <dt>Prescribed By</dt>
+                    <dd>
+                        {% if prescription.prescribed_by %}
+                            {{ prescription.prescribed_by.get_full_name|default:prescription.prescribed_by.username }}
+                        {% else %}
+                            Not recorded
+                        {% endif %}
+                    </dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Approved By</dt>
+                    <dd>
+                        {% if prescription.approved_by %}
+                            {{ prescription.approved_by.get_full_name|default:prescription.approved_by.username }}
+                        {% else %}
+                            Pending
+                        {% endif %}
+                    </dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Approved At</dt>
+                    <dd>{{ prescription.approved_at|date:"d M Y, h:i A"|default:"-" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Dispensed By</dt>
+                    <dd>
+                        {% if prescription.dispensed_by %}
+                            {{ prescription.dispensed_by.get_full_name|default:prescription.dispensed_by.username }}
+                        {% else %}
+                            Not dispensed
+                        {% endif %}
+                    </dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Dispensed At</dt>
+                    <dd>{{ prescription.dispensed_at|date:"d M Y, h:i A"|default:"-" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Version</dt>
+                    <dd>Version {{ prescription.version }}</dd>
+                </div>
+
+            </dl>
+
+        </div>
+
+    </section>
+
+
+    <section class="contact-lens-detail-card">
+
+        <div class="contact-lens-card-header">
+
+            <div>
+                <h4>Follow-up Reviews</h4>
+                <p>Scheduled and completed Contact Lens reviews.</p>
+            </div>
+
+            <div class="contact-lens-prescription-actions">
+
+                <a href="{% url 'contact_lens_follow_up_queue' %}"
+                   class="btn btn-sm btn-outline-warning">
+                    Follow-up Queue
+                </a>
+
+                {% if can_manage_contact_lenses %}
+                    {% if prescription.status == "APPROVED" or prescription.status == "DISPENSED" %}
+
+                        <a href="{% url 'contact_lens_follow_up_create' prescription.pk %}"
+                        class="btn btn-sm btn-primary">
+                            + Add Follow-up
+                        </a>
+
+                    {% endif %}
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        {% if follow_ups %}
+
+            <div class="contact-lens-table-wrapper">
+
+                <table class="contact-lens-table">
+
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Wear Time</th>
+                            <th>R Comfort</th>
+                            <th>L Comfort</th>
+                            <th>Lens Condition</th>
+                            <th>Reviewed By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for follow_up in follow_ups %}
+
+                            <tr>
+                                <td>{{ follow_up.follow_up_date|date:"d M Y, h:i A" }}</td>
+                                <td>
+                                    <span class="contact-lens-status-badge
+                                        {% if follow_up.status == 'COMPLETED' %}
+                                            completed
+                                        {% elif follow_up.status == 'MISSED' %}
+                                            missed
+                                        {% elif follow_up.status == 'CANCELLED' %}
+                                            cancelled
+                                        {% else %}
+                                            scheduled
+                                        {% endif %}">
+                                        {{ follow_up.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ follow_up.wearing_time_per_day|default:"-" }}</td>
+                                <td>{{ follow_up.comfort_score_right|default:"-" }}</td>
+                                <td>{{ follow_up.comfort_score_left|default:"-" }}</td>
+                                <td>{{ follow_up.get_lens_condition_display }}</td>
+                                <td>
+                                    {% if follow_up.reviewed_by %}
+                                        {{ follow_up.reviewed_by.get_full_name|default:follow_up.reviewed_by.username }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'contact_lens_follow_up_detail' follow_up.pk %}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Open
+                                    </a>
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="contact-lens-empty-state">
+                <span>📅</span>
+                <h5>No Contact Lens follow-up recorded</h5>
+                <p>
+                    Follow-up reviews can be added after clinical approval.
+                </p>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+<script src="{% static 'js/contact_lens.js' %}?v=20260805-1"></script>
+
+{% endblock %}

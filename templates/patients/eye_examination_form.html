@@ -1,180 +1,3468 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ title }} | Eye Examination{% endblock %}
 
+{% block extra_css %}
+<link href="{% static 'css/eye_examination.css' %}?v=20260802-6"
+      rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 
-<div class="page-header">
+<div class="page-header eye-exam-page-header">
     <div>
+        <span class="eye-exam-page-label">Clinical Eye Examination</span>
         <h2>{{ title }}</h2>
+
         <p>
-            Patient: <strong>{{ visit.patient.full_name }}</strong> |
-            File No: <strong>{{ visit.patient.file_number }}</strong> |
-            Visit: <strong>{{ visit.visit_number }}</strong>
+            Patient:
+            <strong>{{ visit.patient.full_name }}</strong>
+            <span class="mx-1">|</span>
+
+            File No:
+            <strong>{{ visit.patient.file_number }}</strong>
+            <span class="mx-1">|</span>
+
+            Visit:
+            <strong>{{ visit.visit_number }}</strong>
         </p>
     </div>
 
-    <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-secondary">
-        Back to Visit
+    <a href="{% url 'visit_detail' visit.pk %}"
+       class="btn btn-outline-secondary">
+        ← Back to Visit
     </a>
 </div>
 
-<form method="post" novalidate>
+
+<form method="post"
+      id="eyeExaminationForm"
+      class="eye-examination-form"
+      novalidate>
+
     {% csrf_token %}
 
-    <div class="panel-card mb-4">
-        <div class="panel-header">
-            <h5>Visual Acuity</h5>
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            <strong>Please correct the following:</strong>
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+
+    <div class="eye-exam-patient-strip mb-4">
+        <div class="eye-exam-patient-avatar">
+            {{ visit.patient.full_name|slice:":1"|upper }}
         </div>
 
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Right Visual Acuity</label>
-                {{ form.right_visual_acuity }}
-            </div>
+        <div>
+            <strong>{{ visit.patient.full_name }}</strong>
+            <small>
+                {{ visit.patient.file_number }} ·
+                {{ visit.patient.get_gender_display }} ·
+                Age: {{ visit.patient.display_age|default:"-" }}
+            </small>
+        </div>
 
-            <div class="col-md-4">
-                <label class="form-label">Left Visual Acuity</label>
-                {{ form.left_visual_acuity }}
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Right Pinhole</label>
-                {{ form.right_pinhole }}
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Left Pinhole</label>
-                {{ form.left_pinhole }}
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Right Near Vision</label>
-                {{ form.right_near_vision }}
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Left Near Vision</label>
-                {{ form.left_near_vision }}
-            </div>
+        <div class="eye-exam-visit-badge">
+            {{ visit.get_visit_type_display }}
         </div>
     </div>
 
-    <div class="panel-card mb-4">
-        <div class="panel-header">
-            <h5>Refraction</h5>
-        </div>
 
-        <div class="table-responsive">
-            <table class="table table-bordered align-middle">
-                <thead>
-                    <tr>
-                        <th>Eye</th>
-                        <th>Sphere</th>
-                        <th>Cylinder</th>
-                        <th>Axis</th>
-                    </tr>
-                </thead>
+    <!-- TABS -->
+    <div class="clinical-tabs-wrapper">
 
-                <tbody>
-                    <tr>
-                        <td><strong>Right Eye</strong></td>
-                        <td>{{ form.right_sphere }}</td>
-                        <td>{{ form.right_cylinder }}</td>
-                        <td>{{ form.right_axis }}</td>
-                    </tr>
+        <ul class="nav clinical-tabs"
+            id="eyeExamTabs"
+            role="tablist">
 
-                    <tr>
-                        <td><strong>Left Eye</strong></td>
-                        <td>{{ form.left_sphere }}</td>
-                        <td>{{ form.left_cylinder }}</td>
-                        <td>{{ form.left_axis }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active"
+                        id="general-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#general-pane"
+                        type="button"
+                        role="tab"
+                        aria-controls="general-pane"
+                        aria-selected="true">
+                    <span>👁️</span>
+                    General Examination
+                </button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="slit-lamp-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#slit-lamp-pane"
+                        type="button"
+                        role="tab"
+                        aria-controls="slit-lamp-pane"
+                        aria-selected="false">
+                    <span>🔬</span>
+                    Slit Lamp
+                </button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="fundoscopy-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#fundoscopy-pane"
+                        type="button"
+                        role="tab"
+                        aria-controls="fundoscopy-pane"
+                        aria-selected="false">
+                    <span>🟠</span>
+                    Fundoscopy
+                </button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="auto-refraction-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#auto-refraction-pane"
+                        type="button"
+                        role="tab"
+                        aria-controls="auto-refraction-pane"
+                        aria-selected="false">
+                    <span>🔭</span>
+                    Auto Ref
+                </button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="subjective-refraction-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#subjective-refraction-pane"
+                        type="button"
+                        role="tab"
+                        aria-controls="subjective-refraction-pane"
+                        aria-selected="false">
+                    <span>👓</span>
+                    Subj Ref
+                </button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="additional-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#additional-pane"
+                        type="button"
+                        role="tab"
+                        aria-controls="additional-pane"
+                        aria-selected="false">
+                    <span>📝</span>
+                    Additional Findings
+                </button>
+            </li>
+
+        </ul>
+
+
+        <div class="tab-content clinical-tab-content"
+             id="eyeExamTabContent">
+
+            <!-- ======================================================= -->
+            <!-- TAB 1: GENERAL EXAMINATION -->
+            <!-- ======================================================= -->
+
+            <div class="tab-pane fade show active"
+                 id="general-pane"
+                 role="tabpanel"
+                 aria-labelledby="general-tab"
+                 tabindex="0">
+
+                <div class="clinical-section-intro">
+                    <div>
+                        <h4>General Eye Examination</h4>
+                        <p>
+                            Record visual acuity, refraction and intraocular
+                            pressure for the right and left eyes.
+                        </p>
+                    </div>
+
+                    <span class="section-status-badge">
+                        Existing Clinical Fields
+                    </span>
+                </div>
+
+
+                <!-- VISUAL ACUITY -->
+                <div class="clinical-form-card mb-4">
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">👓</span>
+                        </div>
+
+                        <div>
+                            <h5>Visual Acuity</h5>
+                            <p>
+                                Record distance, pinhole and near-vision
+                                measurements.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+
+                        <div class="eye-column-headings">
+                            <div></div>
+                            <div class="right-eye-heading">
+                                RIGHT EYE
+                            </div>
+                            <div class="left-eye-heading">
+                                LEFT EYE
+                            </div>
+                        </div>
+
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Visual Acuity
+                            </div>
+
+                            <div>
+                                <label for="{{ form.right_visual_acuity.id_for_label }}"
+                                       class="visually-hidden">
+                                    Right Visual Acuity
+                                </label>
+
+                                {{ form.right_visual_acuity }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_visual_acuity_other">
+                                    {{ form.right_visual_acuity_other }}
+
+                                    {% if form.right_visual_acuity_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_visual_acuity_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.right_visual_acuity.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_visual_acuity.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <label for="{{ form.left_visual_acuity.id_for_label }}"
+                                       class="visually-hidden">
+                                    Left Visual Acuity
+                                </label>
+
+                                {{ form.left_visual_acuity }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_visual_acuity_other">
+                                    {{ form.left_visual_acuity_other }}
+
+                                    {% if form.left_visual_acuity_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_visual_acuity_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.left_visual_acuity.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_visual_acuity.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Pinhole
+                            </div>
+
+                            <div>
+                                {{ form.right_pinhole }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_pinhole_other">
+                                    {{ form.right_pinhole_other }}
+
+                                    {% if form.right_pinhole_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_pinhole_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.right_pinhole.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_pinhole.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.left_pinhole }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_pinhole_other">
+                                    {{ form.left_pinhole_other }}
+
+                                    {% if form.left_pinhole_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_pinhole_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.left_pinhole.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_pinhole.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Near Vision
+                            </div>
+
+                            <div>
+                                {{ form.right_near_vision }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_near_vision_other">
+                                    {{ form.right_near_vision_other }}
+
+                                    {% if form.right_near_vision_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_near_vision_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.right_near_vision.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_near_vision.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.left_near_vision }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_near_vision_other">
+                                    {{ form.left_near_vision_other }}
+
+                                    {% if form.left_near_vision_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_near_vision_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.left_near_vision.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_near_vision.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- REFRACTION -->
+                <div class="clinical-form-card mb-4">
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">🔎</span>
+                        </div>
+
+                        <div>
+                            <h5>Existing Refraction Record</h5>
+                            <p>
+                                These original fields remain available and are
+                                preserved for all existing records.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+                        <div class="table-responsive">
+                            <table class="table clinical-refraction-table">
+                                <thead>
+                                    <tr>
+                                        <th>Eye</th>
+                                        <th>Sphere</th>
+                                        <th>Cylinder</th>
+                                        <th>Axis</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span class="eye-table-badge right">
+                                                Right Eye
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {{ form.right_sphere }}
+                                            {% if form.right_sphere.errors %}
+                                                <div class="field-error">
+                                                    {{ form.right_sphere.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {{ form.right_cylinder }}
+                                            {% if form.right_cylinder.errors %}
+                                                <div class="field-error">
+                                                    {{ form.right_cylinder.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {{ form.right_axis }}
+                                            {% if form.right_axis.errors %}
+                                                <div class="field-error">
+                                                    {{ form.right_axis.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <span class="eye-table-badge left">
+                                                Left Eye
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {{ form.left_sphere }}
+                                            {% if form.left_sphere.errors %}
+                                                <div class="field-error">
+                                                    {{ form.left_sphere.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {{ form.left_cylinder }}
+                                            {% if form.left_cylinder.errors %}
+                                                <div class="field-error">
+                                                    {{ form.left_cylinder.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {{ form.left_axis }}
+                                            {% if form.left_axis.errors %}
+                                                <div class="field-error">
+                                                    {{ form.left_axis.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- IOP -->
+                <div class="clinical-form-card mb-4">
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">📏</span>
+                        </div>
+
+                        <div>
+                            <h5>Intraocular Pressure</h5>
+                            <p>
+                                Record GAT IOP and corrected GAT IOP in mmHg.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+
+                        <div class="eye-column-headings">
+                            <div></div>
+                            <div class="right-eye-heading">
+                                RIGHT EYE
+                            </div>
+                            <div class="left-eye-heading">
+                                LEFT EYE
+                            </div>
+                        </div>
+
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                GAT IOP
+                                <small>mmHg</small>
+                            </div>
+
+                            <div>
+                                <div class="input-group">
+                                    {{ form.right_iop }}
+                                    <span class="input-group-text">mmHg</span>
+                                </div>
+
+                                {% if form.right_iop.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_iop.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <div class="input-group">
+                                    {{ form.left_iop }}
+                                    <span class="input-group-text">mmHg</span>
+                                </div>
+
+                                {% if form.left_iop.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_iop.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Corrected GAT IOP
+                                <small>mmHg</small>
+                            </div>
+
+                            <div>
+                                <div class="input-group">
+                                    {{ form.right_corrected_iop }}
+                                    <span class="input-group-text">mmHg</span>
+                                </div>
+
+                                {% if form.right_corrected_iop.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_corrected_iop.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <div class="input-group">
+                                    {{ form.left_corrected_iop }}
+                                    <span class="input-group-text">mmHg</span>
+                                </div>
+
+                                {% if form.left_corrected_iop.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_corrected_iop.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ======================================================= -->
+            <!-- TAB 2: SLIT LAMP -->
+            <!-- ======================================================= -->
+
+            <div class="tab-pane fade"
+                 id="slit-lamp-pane"
+                 role="tabpanel"
+                 aria-labelledby="slit-lamp-tab"
+                 tabindex="0">
+
+                <div class="clinical-section-intro">
+                    <div>
+                        <h4>Slit Lamp Examination</h4>
+                        <p>
+                            Select standardized findings for both eyes.
+                            Select “Others (Specify)” to enter an alternative finding.
+                        </p>
+                    </div>
+
+                    <span class="section-status-badge new">
+                        New Structured Fields
+                    </span>
+                </div>
+
+
+                <div class="clinical-form-card">
+                    <div class="clinical-form-card-body">
+
+                        <div class="eye-column-headings">
+                            <div>Structure</div>
+
+                            <div class="right-eye-heading">
+                                RIGHT EYE
+                            </div>
+
+                            <div class="left-eye-heading">
+                                LEFT EYE
+                            </div>
+                        </div>
+
+
+                        <!-- LIDS / ADNEXA -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Lids / Adnexa
+                            </div>
+
+                            <div>
+                                {{ form.right_lids_adnexa }}
+
+                                {% if form.right_lids_adnexa.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_lids_adnexa.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.left_lids_adnexa }}
+
+                                {% if form.left_lids_adnexa.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_lids_adnexa.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        <!-- CONJUNCTIVA -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Conjunctiva
+                            </div>
+
+                            <div>
+                                {{ form.right_conjunctiva }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_conjunctiva_other">
+                                    {{ form.right_conjunctiva_other }}
+
+                                    {% if form.right_conjunctiva_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_conjunctiva_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_conjunctiva }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_conjunctiva_other">
+                                    {{ form.left_conjunctiva_other }}
+
+                                    {% if form.left_conjunctiva_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_conjunctiva_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- CORNEA -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Cornea
+                            </div>
+
+                            <div>
+                                {{ form.right_cornea }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_cornea_other">
+                                    {{ form.right_cornea_other }}
+
+                                    {% if form.right_cornea_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_cornea_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_cornea }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_cornea_other">
+                                    {{ form.left_cornea_other }}
+
+                                    {% if form.left_cornea_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_cornea_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- ANTERIOR CHAMBER -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Anterior Chamber
+                            </div>
+
+                            <div>
+                                {{ form.right_anterior_chamber }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_anterior_chamber_other">
+                                    {{ form.right_anterior_chamber_other }}
+
+                                    {% if form.right_anterior_chamber_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_anterior_chamber_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_anterior_chamber }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_anterior_chamber_other">
+                                    {{ form.left_anterior_chamber_other }}
+
+                                    {% if form.left_anterior_chamber_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_anterior_chamber_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- IRIS -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Iris
+                            </div>
+
+                            <div>
+                                {{ form.right_iris }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_iris_other">
+                                    {{ form.right_iris_other }}
+
+                                    {% if form.right_iris_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_iris_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_iris }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_iris_other">
+                                    {{ form.left_iris_other }}
+
+                                    {% if form.left_iris_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_iris_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- PUPIL -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Pupil
+                            </div>
+
+                            <div>
+                                {{ form.right_pupil }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_pupil_other">
+                                    {{ form.right_pupil_other }}
+
+                                    {% if form.right_pupil_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_pupil_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_pupil }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_pupil_other">
+                                    {{ form.left_pupil_other }}
+
+                                    {% if form.left_pupil_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_pupil_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- LENS -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Lens
+                            </div>
+
+                            <div>
+                                {{ form.right_lens }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_lens_other">
+                                    {{ form.right_lens_other }}
+
+                                    {% if form.right_lens_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_lens_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_lens }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_lens_other">
+                                    {{ form.left_lens_other }}
+
+                                    {% if form.left_lens_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_lens_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- GONIOSCOPY -->
+                        <div class="eye-comparison-row align-items-start">
+                            <div class="eye-row-label">
+                                Gonioscopy Findings
+                            </div>
+
+                            <div>
+                                {{ form.right_gonioscopy_findings }}
+
+                                {% if form.right_gonioscopy_findings.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_gonioscopy_findings.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.left_gonioscopy_findings }}
+
+                                {% if form.left_gonioscopy_findings.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_gonioscopy_findings.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ======================================================= -->
+            <!-- TAB 3: FUNDOSCOPY -->
+            <!-- ======================================================= -->
+
+            <div class="tab-pane fade"
+                 id="fundoscopy-pane"
+                 role="tabpanel"
+                 aria-labelledby="fundoscopy-tab"
+                 tabindex="0">
+
+                <div class="clinical-section-intro">
+                    <div>
+                        <h4>Fundoscopy Examination</h4>
+                        <p>
+                            Record standardized vitreous, disc, vessel,
+                            retinal and macular findings.
+                        </p>
+                    </div>
+
+                    <span class="section-status-badge new">
+                        New Structured Fields
+                    </span>
+                </div>
+
+
+                <div class="clinical-form-card">
+                    <div class="clinical-form-card-body">
+
+                        <div class="eye-column-headings">
+                            <div>Structure</div>
+
+                            <div class="right-eye-heading">
+                                RIGHT EYE
+                            </div>
+
+                            <div class="left-eye-heading">
+                                LEFT EYE
+                            </div>
+                        </div>
+
+
+                        <!-- VITREOUS -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Vitreous
+                            </div>
+
+                            <div>
+                                {{ form.right_vitreous }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_vitreous_other">
+                                    {{ form.right_vitreous_other }}
+
+                                    {% if form.right_vitreous_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_vitreous_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_vitreous }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_vitreous_other">
+                                    {{ form.left_vitreous_other }}
+
+                                    {% if form.left_vitreous_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_vitreous_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- DISC COLOUR -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Disc Colour
+                            </div>
+
+                            <div>
+                                {{ form.right_disc_colour }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_disc_colour_other">
+                                    {{ form.right_disc_colour_other }}
+
+                                    {% if form.right_disc_colour_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_disc_colour_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_disc_colour }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_disc_colour_other">
+                                    {{ form.left_disc_colour_other }}
+
+                                    {% if form.left_disc_colour_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_disc_colour_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- VCDR -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Estimated VCDR
+                            </div>
+
+                            <div>
+                                {{ form.right_estimated_vcdr }}
+
+                                {% if form.right_estimated_vcdr.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_estimated_vcdr.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.left_estimated_vcdr }}
+
+                                {% if form.left_estimated_vcdr.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_estimated_vcdr.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        <!-- DISC MARGIN -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Disc Margin
+                            </div>
+
+                            <div>
+                                {{ form.right_disc_margin }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_disc_margin_other">
+                                    {{ form.right_disc_margin_other }}
+
+                                    {% if form.right_disc_margin_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_disc_margin_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_disc_margin }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_disc_margin_other">
+                                    {{ form.left_disc_margin_other }}
+
+                                    {% if form.left_disc_margin_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_disc_margin_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- VESSELS -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Vessels
+                            </div>
+
+                            <div>
+                                {{ form.right_vessels }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_vessels_other">
+                                    {{ form.right_vessels_other }}
+
+                                    {% if form.right_vessels_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_vessels_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_vessels }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_vessels_other">
+                                    {{ form.left_vessels_other }}
+
+                                    {% if form.left_vessels_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_vessels_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- RETINA -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Retina
+                            </div>
+
+                            <div>
+                                {{ form.right_retina }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_retina_other">
+                                    {{ form.right_retina_other }}
+
+                                    {% if form.right_retina_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_retina_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_retina }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_retina_other">
+                                    {{ form.left_retina_other }}
+
+                                    {% if form.left_retina_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_retina_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- MACULA -->
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Macula
+                            </div>
+
+                            <div>
+                                {{ form.right_macula }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_macula_other">
+                                    {{ form.right_macula_other }}
+
+                                    {% if form.right_macula_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_macula_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div>
+                                {{ form.left_macula }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_macula_other">
+                                    {{ form.left_macula_other }}
+
+                                    {% if form.left_macula_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_macula_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- OTHER FUNDUS FINDINGS -->
+                        <div class="eye-comparison-row align-items-start">
+                            <div class="eye-row-label">
+                                Other Fundus Findings
+                            </div>
+
+                            <div>
+                                {{ form.right_other_fundus_findings }}
+
+                                {% if form.right_other_fundus_findings.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_other_fundus_findings.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.left_other_fundus_findings }}
+
+                                {% if form.left_other_fundus_findings.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_other_fundus_findings.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ======================================================= -->
+            <!-- TAB 4: AUTO REFRACTION -->
+            <!-- ======================================================= -->
+
+            <div class="tab-pane fade"
+                 id="auto-refraction-pane"
+                 role="tabpanel"
+                 aria-labelledby="auto-refraction-tab"
+                 tabindex="0">
+
+                <div class="clinical-section-intro">
+                    <div>
+                        <h4>Auto Refraction</h4>
+                        <p>
+                            Record visual acuity, dry refraction, wet refraction,
+                            lensometry and cycloplegic examination findings.
+                        </p>
+                    </div>
+
+                    <span class="section-status-badge new">
+                        Structured Optometry Record
+                    </span>
+                </div>
+
+
+                <!-- =================================================== -->
+                <!-- AUTO REF VISUAL ACUITY -->
+                <!-- =================================================== -->
+
+                <div class="clinical-form-card mb-4">
+
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">👓</span>
+                        </div>
+
+                        <div>
+                            <h5>Visual Acuity</h5>
+                            <p>
+                                Unaided, with-glasses, pinhole and near-vision values
+                                are shared with the main Eye Examination record.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+
+                        <div class="eye-column-headings">
+                            <div>Measurement</div>
+
+                            <div class="right-eye-heading">
+                                RIGHT EYE
+                            </div>
+
+                            <div class="left-eye-heading">
+                                LEFT EYE
+                            </div>
+                        </div>
+
+
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Unaided
+                            </div>
+
+                            <div>
+                                {{ form.right_visual_acuity }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_visual_acuity_other">
+                                    {{ form.right_visual_acuity_other }}
+
+                                    {% if form.right_visual_acuity_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_visual_acuity_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.right_visual_acuity.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_visual_acuity.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.left_visual_acuity }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_visual_acuity_other">
+                                    {{ form.left_visual_acuity_other }}
+
+                                    {% if form.left_visual_acuity_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_visual_acuity_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.left_visual_acuity.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_visual_acuity.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                With Glasses
+                            </div>
+
+                            <div>
+                                {{ form.right_with_glasses }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_with_glasses_other">
+                                    {{ form.right_with_glasses_other }}
+
+                                    {% if form.right_with_glasses_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_with_glasses_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.right_with_glasses.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_with_glasses.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.left_with_glasses }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_with_glasses_other">
+                                    {{ form.left_with_glasses_other }}
+
+                                    {% if form.left_with_glasses_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_with_glasses_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.left_with_glasses.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_with_glasses.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Pinhole
+                            </div>
+
+                            <div>
+                                {{ form.right_pinhole }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_pinhole_other">
+                                    {{ form.right_pinhole_other }}
+
+                                    {% if form.right_pinhole_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_pinhole_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.right_pinhole.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_pinhole.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.left_pinhole }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_pinhole_other">
+                                    {{ form.left_pinhole_other }}
+
+                                    {% if form.left_pinhole_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_pinhole_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.left_pinhole.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_pinhole.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Near Vision
+                            </div>
+
+                            <div>
+                                {{ form.right_near_vision }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_right_near_vision_other">
+                                    {{ form.right_near_vision_other }}
+
+                                    {% if form.right_near_vision_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.right_near_vision_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.right_near_vision.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_near_vision.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.left_near_vision }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_left_near_vision_other">
+                                    {{ form.left_near_vision_other }}
+
+                                    {% if form.left_near_vision_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.left_near_vision_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.left_near_vision.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_near_vision.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- =================================================== -->
+                <!-- DRY AUTO REFRACTION -->
+                <!-- =================================================== -->
+
+                <div class="clinical-form-card mb-4">
+
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">☀️</span>
+                        </div>
+
+                        <div>
+                            <h5>Dry Auto Refraction</h5>
+                            <p>
+                                Record sphere, cylinder and axis without cycloplegia.
+                                S/E is calculated automatically.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+
+                        <div class="auto-ref-eye-grid">
+
+                            <!-- RIGHT EYE -->
+                            <section class="auto-ref-eye-panel right-eye-panel">
+
+                                <div class="auto-ref-eye-panel-header">
+                                    <div>
+                                        <span class="auto-ref-eye-marker">R</span>
+                                    </div>
+
+                                    <div>
+                                        <strong>Right Eye</strong>
+                                        <small>Dry refraction measurements</small>
+                                    </div>
+                                </div>
+
+                                <div class="auto-ref-measurement-grid">
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.right_dry_sphere.id_for_label }}">
+                                            Sphere
+                                        </label>
+
+                                        {{ form.right_dry_sphere }}
+
+                                        {% if form.right_dry_sphere.errors %}
+                                            <div class="field-error">
+                                                {{ form.right_dry_sphere.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.right_dry_cylinder.id_for_label }}">
+                                            Cylinder
+                                        </label>
+
+                                        {{ form.right_dry_cylinder }}
+
+                                        {% if form.right_dry_cylinder.errors %}
+                                            <div class="field-error">
+                                                {{ form.right_dry_cylinder.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.right_dry_axis.id_for_label }}">
+                                            Axis
+                                        </label>
+
+                                        <div class="input-group">
+                                            {{ form.right_dry_axis }}
+                                            <span class="input-group-text">°</span>
+                                        </div>
+
+                                        {% if form.right_dry_axis.errors %}
+                                            <div class="field-error">
+                                                {{ form.right_dry_axis.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.right_dry_se_display.id_for_label }}">
+                                            Spherical Equivalent
+                                        </label>
+
+                                        {{ form.right_dry_se_display }}
+
+                                        {% if form.right_dry_se_display.errors %}
+                                            <div class="field-error">
+                                                {{ form.right_dry_se_display.errors.0 }}
+                                            </div>
+                                        {% endif %}
+
+                                        <small class="clinical-help-text">
+                                            Sphere + Cylinder ÷ 2
+                                        </small>
+                                    </div>
+
+                                </div>
+                            </section>
+
+
+                            <!-- LEFT EYE -->
+                            <section class="auto-ref-eye-panel left-eye-panel">
+
+                                <div class="auto-ref-eye-panel-header">
+                                    <div>
+                                        <span class="auto-ref-eye-marker">L</span>
+                                    </div>
+
+                                    <div>
+                                        <strong>Left Eye</strong>
+                                        <small>Dry refraction measurements</small>
+                                    </div>
+                                </div>
+
+                                <div class="auto-ref-measurement-grid">
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.left_dry_sphere.id_for_label }}">
+                                            Sphere
+                                        </label>
+
+                                        {{ form.left_dry_sphere }}
+
+                                        {% if form.left_dry_sphere.errors %}
+                                            <div class="field-error">
+                                                {{ form.left_dry_sphere.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.left_dry_cylinder.id_for_label }}">
+                                            Cylinder
+                                        </label>
+
+                                        {{ form.left_dry_cylinder }}
+
+                                        {% if form.left_dry_cylinder.errors %}
+                                            <div class="field-error">
+                                                {{ form.left_dry_cylinder.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.left_dry_axis.id_for_label }}">
+                                            Axis
+                                        </label>
+
+                                        <div class="input-group">
+                                            {{ form.left_dry_axis }}
+                                            <span class="input-group-text">°</span>
+                                        </div>
+
+                                        {% if form.left_dry_axis.errors %}
+                                            <div class="field-error">
+                                                {{ form.left_dry_axis.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.left_dry_se_display.id_for_label }}">
+                                            Spherical Equivalent
+                                        </label>
+
+                                        {{ form.left_dry_se_display }}
+
+                                        {% if form.left_dry_se_display.errors %}
+                                            <div class="field-error">
+                                                {{ form.left_dry_se_display.errors.0 }}
+                                            </div>
+                                        {% endif %}
+
+                                        <small class="clinical-help-text">
+                                            Sphere + Cylinder ÷ 2
+                                        </small>
+                                    </div>
+
+                                </div>
+                            </section>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- =================================================== -->
+                <!-- WET AUTO REFRACTION -->
+                <!-- =================================================== -->
+
+                <div class="clinical-form-card mb-4">
+
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">💧</span>
+                        </div>
+
+                        <div>
+                            <h5>Wet Auto Refraction</h5>
+                            <p>
+                                Record sphere, cylinder and axis after cycloplegia.
+                                S/E is calculated automatically.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+
+                        <div class="auto-ref-eye-grid">
+
+                            <!-- RIGHT EYE -->
+                            <section class="auto-ref-eye-panel right-eye-panel">
+
+                                <div class="auto-ref-eye-panel-header">
+                                    <div>
+                                        <span class="auto-ref-eye-marker">R</span>
+                                    </div>
+
+                                    <div>
+                                        <strong>Right Eye</strong>
+                                        <small>Wet refraction measurements</small>
+                                    </div>
+                                </div>
+
+                                <div class="auto-ref-measurement-grid">
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.right_wet_sphere.id_for_label }}">
+                                            Sphere
+                                        </label>
+
+                                        {{ form.right_wet_sphere }}
+
+                                        {% if form.right_wet_sphere.errors %}
+                                            <div class="field-error">
+                                                {{ form.right_wet_sphere.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.right_wet_cylinder.id_for_label }}">
+                                            Cylinder
+                                        </label>
+
+                                        {{ form.right_wet_cylinder }}
+
+                                        {% if form.right_wet_cylinder.errors %}
+                                            <div class="field-error">
+                                                {{ form.right_wet_cylinder.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.right_wet_axis.id_for_label }}">
+                                            Axis
+                                        </label>
+
+                                        <div class="input-group">
+                                            {{ form.right_wet_axis }}
+                                            <span class="input-group-text">°</span>
+                                        </div>
+
+                                        {% if form.right_wet_axis.errors %}
+                                            <div class="field-error">
+                                                {{ form.right_wet_axis.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.right_wet_se_display.id_for_label }}">
+                                            Spherical Equivalent
+                                        </label>
+
+                                        {{ form.right_wet_se_display }}
+
+                                        {% if form.right_wet_se_display.errors %}
+                                            <div class="field-error">
+                                                {{ form.right_wet_se_display.errors.0 }}
+                                            </div>
+                                        {% endif %}
+
+                                        <small class="clinical-help-text">
+                                            Sphere + Cylinder ÷ 2
+                                        </small>
+                                    </div>
+
+                                </div>
+                            </section>
+
+
+                            <!-- LEFT EYE -->
+                            <section class="auto-ref-eye-panel left-eye-panel">
+
+                                <div class="auto-ref-eye-panel-header">
+                                    <div>
+                                        <span class="auto-ref-eye-marker">L</span>
+                                    </div>
+
+                                    <div>
+                                        <strong>Left Eye</strong>
+                                        <small>Wet refraction measurements</small>
+                                    </div>
+                                </div>
+
+                                <div class="auto-ref-measurement-grid">
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.left_wet_sphere.id_for_label }}">
+                                            Sphere
+                                        </label>
+
+                                        {{ form.left_wet_sphere }}
+
+                                        {% if form.left_wet_sphere.errors %}
+                                            <div class="field-error">
+                                                {{ form.left_wet_sphere.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.left_wet_cylinder.id_for_label }}">
+                                            Cylinder
+                                        </label>
+
+                                        {{ form.left_wet_cylinder }}
+
+                                        {% if form.left_wet_cylinder.errors %}
+                                            <div class="field-error">
+                                                {{ form.left_wet_cylinder.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.left_wet_axis.id_for_label }}">
+                                            Axis
+                                        </label>
+
+                                        <div class="input-group">
+                                            {{ form.left_wet_axis }}
+                                            <span class="input-group-text">°</span>
+                                        </div>
+
+                                        {% if form.left_wet_axis.errors %}
+                                            <div class="field-error">
+                                                {{ form.left_wet_axis.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="clinical-field">
+                                        <label for="{{ form.left_wet_se_display.id_for_label }}">
+                                            Spherical Equivalent
+                                        </label>
+
+                                        {{ form.left_wet_se_display }}
+
+                                        {% if form.left_wet_se_display.errors %}
+                                            <div class="field-error">
+                                                {{ form.left_wet_se_display.errors.0 }}
+                                            </div>
+                                        {% endif %}
+
+                                        <small class="clinical-help-text">
+                                            Sphere + Cylinder ÷ 2
+                                        </small>
+                                    </div>
+
+                                </div>
+                            </section>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- =================================================== -->
+                <!-- LENSOMETRY AND CYCLOPLEGIA -->
+                <!-- =================================================== -->
+
+                <div class="clinical-form-card mb-4">
+
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">📐</span>
+                        </div>
+
+                        <div>
+                            <h5>Lensometry and Cycloplegia</h5>
+                            <p>
+                                Record existing spectacle measurements and the
+                                cycloplegic agent used.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+
+                        <div class="eye-column-headings">
+                            <div>Measurement</div>
+
+                            <div class="right-eye-heading">
+                                RIGHT EYE
+                            </div>
+
+                            <div class="left-eye-heading">
+                                LEFT EYE
+                            </div>
+                        </div>
+
+                        <div class="eye-comparison-row">
+                            <div class="eye-row-label">
+                                Lensometry
+                            </div>
+
+                            <div>
+                                {{ form.right_lensometry }}
+
+                                {% if form.right_lensometry.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_lensometry.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.left_lensometry }}
+
+                                {% if form.left_lensometry.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_lensometry.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        <div class="row g-4 mt-1">
+
+                            <div class="col-md-6">
+                                <label class="form-label"
+                                       for="{{ form.cycloplegic_agent.id_for_label }}">
+                                    Cycloplegic Agent
+                                </label>
+
+                                {{ form.cycloplegic_agent }}
+
+                                {% if form.cycloplegic_agent.errors %}
+                                    <div class="field-error">
+                                        {{ form.cycloplegic_agent.errors.0 }}
+                                    </div>
+                                {% endif %}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_cycloplegic_agent_other">
+
+                                    {{ form.cycloplegic_agent_other }}
+
+                                    {% if form.cycloplegic_agent_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.cycloplegic_agent_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Recorded By
+                                </label>
+
+                                <div class="clinical-readonly-field">
+                                    <span class="clinical-readonly-icon">👨‍⚕️</span>
+
+                                    <div>
+                                        <strong>
+                                            {{ request.user.get_full_name|default:request.user.username }}
+                                        </strong>
+
+                                        <small>
+                                            {{ request.user.get_role_display|default:"Clinical Staff" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-12">
+                                <label class="form-label"
+                                       for="{{ form.auto_refraction_remarks.id_for_label }}">
+                                    Remarks
+                                </label>
+
+                                {{ form.auto_refraction_remarks }}
+
+                                {% if form.auto_refraction_remarks.errors %}
+                                    <div class="field-error">
+                                        {{ form.auto_refraction_remarks.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ======================================================= -->
+            <!-- TAB 5: SUBJECTIVE REFRACTION -->
+            <!-- ======================================================= -->
+
+            <div class="tab-pane fade"
+                 id="subjective-refraction-pane"
+                 role="tabpanel"
+                 aria-labelledby="subjective-refraction-tab"
+                 tabindex="0">
+
+                <div class="clinical-section-intro">
+                    <div>
+                        <h4>Subjective Refraction and Optical Prescription</h4>
+                        <p>
+                            Record the refined spectacle prescription, aided visual
+                            acuity, near addition, pupillary distance, lens type,
+                            dispensing instructions and clinical approval.
+                        </p>
+                    </div>
+
+                    <span class="section-status-badge new">
+                        Optical Lens Prescription
+                    </span>
+                </div>
+
+
+                <!-- =================================================== -->
+                <!-- HISTORY AND DIAGNOSIS -->
+                <!-- =================================================== -->
+
+                <div class="clinical-form-card mb-4">
+
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">📋</span>
+                        </div>
+
+                        <div>
+                            <h5>Refractive History and Diagnosis</h5>
+                            <p>
+                                Record relevant visual complaints, previous spectacle
+                                use and the optical or refractive diagnosis.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+
+                        <div class="row g-4">
+
+                            <div class="col-lg-6">
+                                <label class="form-label"
+                                       for="{{ form.subjective_refraction_history.id_for_label }}">
+                                    Refractive History
+                                </label>
+
+                                {{ form.subjective_refraction_history }}
+
+                                {% if form.subjective_refraction_history.errors %}
+                                    <div class="field-error">
+                                        {{ form.subjective_refraction_history.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+
+                            <div class="col-lg-6">
+                                <label class="form-label"
+                                       for="{{ form.subjective_refraction_diagnosis.id_for_label }}">
+                                    Refractive Diagnosis
+                                </label>
+
+                                {{ form.subjective_refraction_diagnosis }}
+
+                                {% if form.subjective_refraction_diagnosis.errors %}
+                                    <div class="field-error">
+                                        {{ form.subjective_refraction_diagnosis.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- =================================================== -->
+                <!-- SUBJECTIVE LENS PRESCRIPTION -->
+                <!-- =================================================== -->
+
+                <div class="clinical-form-card mb-4">
+
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">🔎</span>
+                        </div>
+
+                        <div>
+                            <h5>Subjective Lens Prescription</h5>
+                            <p>
+                                Record the final subjective sphere, cylinder, axis,
+                                aided visual acuity, Add power and near vision.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+
+                        <div class="subjective-prescription-layout">
+
+                            <!-- =========================================== -->
+                            <!-- RIGHT EYE -->
+                            <!-- =========================================== -->
+
+                            <section class="subjective-eye-card subjective-right-eye">
+
+                                <div class="subjective-eye-card-header">
+                                    <span class="subjective-eye-badge">R</span>
+
+                                    <div>
+                                        <strong>Right Eye</strong>
+                                        <small>Final subjective prescription</small>
+                                    </div>
+                                </div>
+
+
+                                <div class="subjective-eye-card-body">
+
+                                    <div class="subjective-prescription-grid">
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.right_subjective_sphere.id_for_label }}">
+                                                Sphere
+                                            </label>
+
+                                            {{ form.right_subjective_sphere }}
+
+                                            {% if form.right_subjective_sphere.errors %}
+                                                <div class="field-error">
+                                                    {{ form.right_subjective_sphere.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.right_subjective_cylinder.id_for_label }}">
+                                                Cylinder
+                                            </label>
+
+                                            {{ form.right_subjective_cylinder }}
+
+                                            {% if form.right_subjective_cylinder.errors %}
+                                                <div class="field-error">
+                                                    {{ form.right_subjective_cylinder.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.right_subjective_axis.id_for_label }}">
+                                                Axis
+                                            </label>
+
+                                            <div class="input-group">
+                                                {{ form.right_subjective_axis }}
+                                                <span class="input-group-text">°</span>
+                                            </div>
+
+                                            {% if form.right_subjective_axis.errors %}
+                                                <div class="field-error">
+                                                    {{ form.right_subjective_axis.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.right_subjective_aided_va.id_for_label }}">
+                                                Aided Visual Acuity
+                                            </label>
+
+                                            {{ form.right_subjective_aided_va }}
+
+                                            <div class="other-field-wrapper mt-2"
+                                                 data-other-wrapper="id_right_subjective_aided_va_other">
+
+                                                {{ form.right_subjective_aided_va_other }}
+
+                                                {% if form.right_subjective_aided_va_other.errors %}
+                                                    <div class="field-error">
+                                                        {{ form.right_subjective_aided_va_other.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                            {% if form.right_subjective_aided_va.errors %}
+                                                <div class="field-error">
+                                                    {{ form.right_subjective_aided_va.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.right_subjective_add_power.id_for_label }}">
+                                                Add Power
+                                            </label>
+
+                                            {{ form.right_subjective_add_power }}
+
+                                            {% if form.right_subjective_add_power.errors %}
+                                                <div class="field-error">
+                                                    {{ form.right_subjective_add_power.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.right_subjective_near_vision.id_for_label }}">
+                                                Near Vision
+                                            </label>
+
+                                            {{ form.right_subjective_near_vision }}
+
+                                            <div class="other-field-wrapper mt-2"
+                                                 data-other-wrapper="id_right_subjective_near_vision_other">
+
+                                                {{ form.right_subjective_near_vision_other }}
+
+                                                {% if form.right_subjective_near_vision_other.errors %}
+                                                    <div class="field-error">
+                                                        {{ form.right_subjective_near_vision_other.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                            {% if form.right_subjective_near_vision.errors %}
+                                                <div class="field-error">
+                                                    {{ form.right_subjective_near_vision.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </section>
+
+
+                            <!-- =========================================== -->
+                            <!-- LEFT EYE -->
+                            <!-- =========================================== -->
+
+                            <section class="subjective-eye-card subjective-left-eye">
+
+                                <div class="subjective-eye-card-header">
+                                    <span class="subjective-eye-badge">L</span>
+
+                                    <div>
+                                        <strong>Left Eye</strong>
+                                        <small>Final subjective prescription</small>
+                                    </div>
+                                </div>
+
+
+                                <div class="subjective-eye-card-body">
+
+                                    <div class="subjective-prescription-grid">
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.left_subjective_sphere.id_for_label }}">
+                                                Sphere
+                                            </label>
+
+                                            {{ form.left_subjective_sphere }}
+
+                                            {% if form.left_subjective_sphere.errors %}
+                                                <div class="field-error">
+                                                    {{ form.left_subjective_sphere.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.left_subjective_cylinder.id_for_label }}">
+                                                Cylinder
+                                            </label>
+
+                                            {{ form.left_subjective_cylinder }}
+
+                                            {% if form.left_subjective_cylinder.errors %}
+                                                <div class="field-error">
+                                                    {{ form.left_subjective_cylinder.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.left_subjective_axis.id_for_label }}">
+                                                Axis
+                                            </label>
+
+                                            <div class="input-group">
+                                                {{ form.left_subjective_axis }}
+                                                <span class="input-group-text">°</span>
+                                            </div>
+
+                                            {% if form.left_subjective_axis.errors %}
+                                                <div class="field-error">
+                                                    {{ form.left_subjective_axis.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.left_subjective_aided_va.id_for_label }}">
+                                                Aided Visual Acuity
+                                            </label>
+
+                                            {{ form.left_subjective_aided_va }}
+
+                                            <div class="other-field-wrapper mt-2"
+                                                 data-other-wrapper="id_left_subjective_aided_va_other">
+
+                                                {{ form.left_subjective_aided_va_other }}
+
+                                                {% if form.left_subjective_aided_va_other.errors %}
+                                                    <div class="field-error">
+                                                        {{ form.left_subjective_aided_va_other.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                            {% if form.left_subjective_aided_va.errors %}
+                                                <div class="field-error">
+                                                    {{ form.left_subjective_aided_va.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.left_subjective_add_power.id_for_label }}">
+                                                Add Power
+                                            </label>
+
+                                            {{ form.left_subjective_add_power }}
+
+                                            {% if form.left_subjective_add_power.errors %}
+                                                <div class="field-error">
+                                                    {{ form.left_subjective_add_power.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div class="clinical-field">
+                                            <label for="{{ form.left_subjective_near_vision.id_for_label }}">
+                                                Near Vision
+                                            </label>
+
+                                            {{ form.left_subjective_near_vision }}
+
+                                            <div class="other-field-wrapper mt-2"
+                                                 data-other-wrapper="id_left_subjective_near_vision_other">
+
+                                                {{ form.left_subjective_near_vision_other }}
+
+                                                {% if form.left_subjective_near_vision_other.errors %}
+                                                    <div class="field-error">
+                                                        {{ form.left_subjective_near_vision_other.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                            {% if form.left_subjective_near_vision.errors %}
+                                                <div class="field-error">
+                                                    {{ form.left_subjective_near_vision.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </section>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- =================================================== -->
+                <!-- PUPILLARY DISTANCE -->
+                <!-- =================================================== -->
+
+                <div class="clinical-form-card mb-4">
+
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">📏</span>
+                        </div>
+
+                        <div>
+                            <h5>Pupillary Distance</h5>
+                            <p>
+                                Record the binocular distance and near pupillary
+                                distance measurements in millimetres.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+
+                        <div class="subjective-pd-grid">
+
+                            <div class="subjective-pd-field">
+                                <div class="subjective-pd-icon">
+                                    ↔
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <label class="form-label"
+                                           for="{{ form.subjective_distance_pd.id_for_label }}">
+                                        Distance PD
+                                    </label>
+
+                                    <div class="input-group">
+                                        {{ form.subjective_distance_pd }}
+                                        <span class="input-group-text">mm</span>
+                                    </div>
+
+                                    {% if form.subjective_distance_pd.errors %}
+                                        <div class="field-error">
+                                            {{ form.subjective_distance_pd.errors.0 }}
+                                        </div>
+                                    {% endif %}
+
+                                    <small class="clinical-help-text">
+                                        Accepted range: 30–90 mm
+                                    </small>
+                                </div>
+                            </div>
+
+
+                            <div class="subjective-pd-field">
+                                <div class="subjective-pd-icon">
+                                    ⇥
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <label class="form-label"
+                                           for="{{ form.subjective_near_pd.id_for_label }}">
+                                        Near PD
+                                    </label>
+
+                                    <div class="input-group">
+                                        {{ form.subjective_near_pd }}
+                                        <span class="input-group-text">mm</span>
+                                    </div>
+
+                                    {% if form.subjective_near_pd.errors %}
+                                        <div class="field-error">
+                                            {{ form.subjective_near_pd.errors.0 }}
+                                        </div>
+                                    {% endif %}
+
+                                    <small class="clinical-help-text">
+                                        Accepted range: 25–85 mm
+                                    </small>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- =================================================== -->
+                <!-- LENS SPECIFICATION -->
+                <!-- =================================================== -->
+
+                <div class="clinical-form-card mb-4">
+
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">🕶️</span>
+                        </div>
+
+                        <div>
+                            <h5>Lens and Dispensing Specification</h5>
+                            <p>
+                                Select the lens material, bifocal type, wearing
+                                instruction and dispensary instruction.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+
+                        <div class="row g-4">
+
+                            <!-- LENS TYPE -->
+
+                            <div class="col-lg-6">
+                                <label class="form-label"
+                                       for="{{ form.subjective_lens_type.id_for_label }}">
+                                    Lens Type
+                                </label>
+
+                                {{ form.subjective_lens_type }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_subjective_lens_type_other">
+
+                                    {{ form.subjective_lens_type_other }}
+
+                                    {% if form.subjective_lens_type_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.subjective_lens_type_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.subjective_lens_type.errors %}
+                                    <div class="field-error">
+                                        {{ form.subjective_lens_type.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+
+                            <!-- BIFOCAL TYPE -->
+
+                            <div class="col-lg-6">
+                                <label class="form-label"
+                                       for="{{ form.subjective_bifocal_type.id_for_label }}">
+                                    Bifocal Type
+                                </label>
+
+                                {{ form.subjective_bifocal_type }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_subjective_bifocal_type_other">
+
+                                    {{ form.subjective_bifocal_type_other }}
+
+                                    {% if form.subjective_bifocal_type_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.subjective_bifocal_type_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.subjective_bifocal_type.errors %}
+                                    <div class="field-error">
+                                        {{ form.subjective_bifocal_type.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+
+                            <!-- WEARING INSTRUCTION -->
+
+                            <div class="col-lg-6">
+                                <label class="form-label"
+                                       for="{{ form.subjective_wearing_instruction.id_for_label }}">
+                                    Wearing Instruction
+                                </label>
+
+                                {{ form.subjective_wearing_instruction }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_subjective_wearing_instruction_other">
+
+                                    {{ form.subjective_wearing_instruction_other }}
+
+                                    {% if form.subjective_wearing_instruction_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.subjective_wearing_instruction_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.subjective_wearing_instruction.errors %}
+                                    <div class="field-error">
+                                        {{ form.subjective_wearing_instruction.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+
+                            <!-- DISPENSARY INSTRUCTION -->
+
+                            <div class="col-lg-6">
+                                <label class="form-label"
+                                       for="{{ form.subjective_dispensary_instruction.id_for_label }}">
+                                    Dispensary Instruction
+                                </label>
+
+                                {{ form.subjective_dispensary_instruction }}
+
+                                <div class="other-field-wrapper mt-2"
+                                     data-other-wrapper="id_subjective_dispensary_instruction_other">
+
+                                    {{ form.subjective_dispensary_instruction_other }}
+
+                                    {% if form.subjective_dispensary_instruction_other.errors %}
+                                        <div class="field-error">
+                                            {{ form.subjective_dispensary_instruction_other.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if form.subjective_dispensary_instruction.errors %}
+                                    <div class="field-error">
+                                        {{ form.subjective_dispensary_instruction.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+
+                            <!-- REMARKS -->
+
+                            <div class="col-12">
+                                <label class="form-label"
+                                       for="{{ form.subjective_refraction_remarks.id_for_label }}">
+                                    Optical Prescription Remarks
+                                </label>
+
+                                {{ form.subjective_refraction_remarks }}
+
+                                {% if form.subjective_refraction_remarks.errors %}
+                                    <div class="field-error">
+                                        {{ form.subjective_refraction_remarks.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- =================================================== -->
+                <!-- APPROVAL -->
+                <!-- =================================================== -->
+
+                <div class="clinical-form-card mb-4 subjective-approval-card">
+
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">✅</span>
+                        </div>
+
+                        <div>
+                            <h5>Clinical Approval</h5>
+                            <p>
+                                Approval confirms that the final optical prescription
+                                has been reviewed by an authorized clinician.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+
+                        <div class="subjective-approval-layout">
+
+                            <div class="subjective-approval-switch">
+
+                                <div class="form-check form-switch">
+                                    {{ form.subjective_refraction_approved }}
+
+                                    <label class="form-check-label"
+                                           for="{{ form.subjective_refraction_approved.id_for_label }}">
+
+                                        Approve Subjective Refraction
+                                    </label>
+                                </div>
+
+                                {% if form.subjective_refraction_approved.help_text %}
+                                    <small class="subjective-approval-help">
+                                        {{ form.subjective_refraction_approved.help_text }}
+                                    </small>
+                                {% endif %}
+
+                                {% if form.subjective_refraction_approved.errors %}
+                                    <div class="field-error">
+                                        {{ form.subjective_refraction_approved.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+
+                            <div class="subjective-clinician-card">
+
+                                <div class="subjective-clinician-avatar">
+                                    {{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}
+                                </div>
+
+                                <div>
+                                    <span>Current Authorized User</span>
+
+                                    <strong>
+                                        {{ request.user.get_full_name|default:request.user.username }}
+                                    </strong>
+
+                                    <small>
+                                        {{ request.user.get_role_display|default:"Clinical Staff" }}
+                                    </small>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {% if exam and exam.subjective_refraction_approved %}
+
+                            <div class="subjective-approved-record mt-4">
+
+                                <div class="subjective-approved-icon">
+                                    ✓
+                                </div>
+
+                                <div>
+                                    <strong>Approved Optical Prescription</strong>
+
+                                    <p>
+                                        Approved by
+                                        <b>
+                                            {% if exam.subjective_refraction_approved_by %}
+                                                {{ exam.subjective_refraction_approved_by.get_full_name|default:exam.subjective_refraction_approved_by.username }}
+                                            {% else %}
+                                                Authorized clinician
+                                            {% endif %}
+                                        </b>
+
+                                        {% if exam.subjective_refraction_approved_at %}
+                                            on
+                                            {{ exam.subjective_refraction_approved_at|date:"d M Y, h:i A" }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ======================================================= -->
+            <!-- TAB 6: ADDITIONAL FINDINGS -->
+            <!-- ======================================================= -->
+
+            <div class="tab-pane fade"
+                 id="additional-pane"
+                 role="tabpanel"
+                 aria-labelledby="additional-tab"
+                 tabindex="0">
+
+                <div class="clinical-section-intro">
+                    <div>
+                        <h4>Additional and Legacy Findings</h4>
+                        <p>
+                            These original free-text fields are preserved for
+                            existing records, detailed comments and findings
+                            that do not fit the structured dropdowns.
+                        </p>
+                    </div>
+
+                    <span class="section-status-badge">
+                        Existing Fields Preserved
+                    </span>
+                </div>
+
+
+                <div class="clinical-form-card mb-4">
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">📋</span>
+                        </div>
+
+                        <div>
+                            <h5>General Examination Findings</h5>
+                            <p>
+                                Record broad examination findings and additional
+                                clinical observations.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+                        <div class="row g-4">
+
+                            <div class="col-md-6">
+                                <label class="form-label"
+                                       for="{{ form.external_exam.id_for_label }}">
+                                    External Examination
+                                </label>
+
+                                {{ form.external_exam }}
+
+                                {% if form.external_exam.errors %}
+                                    <div class="field-error">
+                                        {{ form.external_exam.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label"
+                                       for="{{ form.anterior_segment.id_for_label }}">
+                                    Anterior Segment
+                                </label>
+
+                                {{ form.anterior_segment }}
+
+                                {% if form.anterior_segment.errors %}
+                                    <div class="field-error">
+                                        {{ form.anterior_segment.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label"
+                                       for="{{ form.posterior_segment.id_for_label }}">
+                                    Posterior Segment
+                                </label>
+
+                                {{ form.posterior_segment }}
+
+                                {% if form.posterior_segment.errors %}
+                                    <div class="field-error">
+                                        {{ form.posterior_segment.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label"
+                                       for="{{ form.fundus_exam.id_for_label }}">
+                                    General Fundus Examination
+                                </label>
+
+                                {{ form.fundus_exam }}
+
+                                {% if form.fundus_exam.errors %}
+                                    <div class="field-error">
+                                        {{ form.fundus_exam.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label"
+                                       for="{{ form.slit_lamp_exam.id_for_label }}">
+                                    General Slit Lamp Examination
+                                </label>
+
+                                {{ form.slit_lamp_exam }}
+
+                                {% if form.slit_lamp_exam.errors %}
+                                    <div class="field-error">
+                                        {{ form.slit_lamp_exam.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="clinical-form-card mb-4">
+                    <div class="clinical-form-card-header">
+                        <div>
+                            <span class="clinical-card-icon">🩺</span>
+                        </div>
+
+                        <div>
+                            <h5>Clinical Summary</h5>
+                            <p>
+                                Record eye-specific findings, impression and
+                                recommendations.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clinical-form-card-body">
+                        <div class="row g-4">
+
+                            <div class="col-md-6">
+                                <label class="form-label"
+                                       for="{{ form.right_eye_findings.id_for_label }}">
+                                    Right Eye Findings
+                                </label>
+
+                                {{ form.right_eye_findings }}
+
+                                {% if form.right_eye_findings.errors %}
+                                    <div class="field-error">
+                                        {{ form.right_eye_findings.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label"
+                                       for="{{ form.left_eye_findings.id_for_label }}">
+                                    Left Eye Findings
+                                </label>
+
+                                {{ form.left_eye_findings }}
+
+                                {% if form.left_eye_findings.errors %}
+                                    <div class="field-error">
+                                        {{ form.left_eye_findings.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label"
+                                       for="{{ form.impression.id_for_label }}">
+                                    Clinical Impression
+                                </label>
+
+                                {{ form.impression }}
+
+                                {% if form.impression.errors %}
+                                    <div class="field-error">
+                                        {{ form.impression.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label"
+                                       for="{{ form.recommendation.id_for_label }}">
+                                    Recommendation
+                                </label>
+
+                                {{ form.recommendation }}
+
+                                {% if form.recommendation.errors %}
+                                    <div class="field-error">
+                                        {{ form.recommendation.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </div>
 
-    <div class="panel-card mb-4">
-        <div class="panel-header">
-            <h5>Intraocular Pressure</h5>
-        </div>
 
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Right IOP</label>
-                {{ form.right_iop }}
-            </div>
+    <!-- STICKY ACTIONS -->
+    <div class="eye-exam-form-actions">
 
-            <div class="col-md-6">
-                <label class="form-label">Left IOP</label>
-                {{ form.left_iop }}
+        <div class="eye-exam-save-note">
+            <span>💾</span>
+
+            <div>
+                <strong>Save the complete eye examination</strong>
+                <small>
+                    All tabs belong to the same examination record.
+                </small>
             </div>
         </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'visit_detail' visit.pk %}"
+               class="btn btn-outline-secondary">
+                Cancel
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary px-4"
+                    id="saveEyeExaminationButton">
+                {{ button_text }}
+            </button>
+        </div>
+
     </div>
 
-    <div class="panel-card mb-4">
-        <div class="panel-header">
-            <h5>Eye Examination Findings</h5>
-        </div>
-
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">External Examination</label>
-                {{ form.external_exam }}
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Anterior Segment</label>
-                {{ form.anterior_segment }}
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Posterior Segment</label>
-                {{ form.posterior_segment }}
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Fundus Examination</label>
-                {{ form.fundus_exam }}
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Slit Lamp Examination</label>
-                {{ form.slit_lamp_exam }}
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Right Eye Findings</label>
-                {{ form.right_eye_findings }}
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Left Eye Findings</label>
-                {{ form.left_eye_findings }}
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Impression</label>
-                {{ form.impression }}
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label">Recommendation</label>
-                {{ form.recommendation }}
-            </div>
-        </div>
-    </div>
-
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary btn-lg">
-            {{ button_text }}
-        </button>
-
-        <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-secondary btn-lg">
-            Cancel
-        </a>
-    </div>
 </form>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("eyeExaminationForm");
+
+    /*
+     * Show an associated "Other" input only when its dropdown value is OTHER.
+     */
+    function updateOtherField(selectElement) {
+        const targetId = selectElement.dataset.otherTarget;
+
+        if (!targetId) {
+            return;
+        }
+
+        const targetInput = document.getElementById(targetId);
+        const wrapper = document.querySelector(
+            '[data-other-wrapper="' + targetId + '"]'
+        );
+
+        if (!targetInput || !wrapper) {
+            return;
+        }
+
+        const shouldShow = selectElement.value === "OTHER";
+
+        wrapper.classList.toggle("show", shouldShow);
+        targetInput.disabled = !shouldShow;
+
+        if (!shouldShow) {
+            targetInput.value = "";
+        }
+    }
+
+    document
+        .querySelectorAll("select[data-other-target]")
+        .forEach(function (selectElement) {
+            updateOtherField(selectElement);
+
+            selectElement.addEventListener("change", function () {
+                updateOtherField(selectElement);
+            });
+        });
+
+
+    /*
+     * =========================================================
+     * AUTO REFRACTION — LIVE SPHERICAL EQUIVALENT CALCULATION
+     *
+     * S/E = Sphere + (Cylinder / 2)
+     *
+     * This is only an on-screen preview. The model recalculates
+     * the value again on the server when the record is saved.
+     * =========================================================
+     */
+
+    function parseClinicalNumber(value) {
+        if (value === null || value === undefined) {
+            return null;
+        }
+
+        const normalizedValue = String(value)
+            .trim()
+            .replace(",", ".");
+
+        if (normalizedValue === "") {
+            return null;
+        }
+
+        const numericValue = Number(normalizedValue);
+
+        return Number.isFinite(numericValue)
+            ? numericValue
+            : null;
+    }
+
+
+    function formatSignedClinicalNumber(value) {
+        if (!Number.isFinite(value)) {
+            return "";
+        }
+
+        const roundedValue = Math.round(
+            (value + Number.EPSILON) * 100
+        ) / 100;
+
+        if (roundedValue > 0) {
+            return "+" + roundedValue.toFixed(2);
+        }
+
+        return roundedValue.toFixed(2);
+    }
+
+
+    function calculateSphericalEquivalent(pairName) {
+        const sphereInput = document.querySelector(
+            '[data-se-pair="' +
+            pairName +
+            '"][data-se-component="sphere"]'
+        );
+
+        const cylinderInput = document.querySelector(
+            '[data-se-pair="' +
+            pairName +
+            '"][data-se-component="cylinder"]'
+        );
+
+        if (!sphereInput || !cylinderInput) {
+            return;
+        }
+
+        const targetId =
+            sphereInput.dataset.seTarget ||
+            cylinderInput.dataset.seTarget;
+
+        if (!targetId) {
+            return;
+        }
+
+        const targetInput = document.getElementById(targetId);
+
+        if (!targetInput) {
+            return;
+        }
+
+        const sphereValue = parseClinicalNumber(
+            sphereInput.value
+        );
+
+        const cylinderValue = parseClinicalNumber(
+            cylinderInput.value
+        );
+
+        if (
+            sphereValue === null &&
+            cylinderValue === null
+        ) {
+            targetInput.value = "";
+            return;
+        }
+
+        const safeSphere = sphereValue ?? 0;
+        const safeCylinder = cylinderValue ?? 0;
+
+        const sphericalEquivalent =
+            safeSphere + (safeCylinder / 2);
+
+        targetInput.value = formatSignedClinicalNumber(
+            sphericalEquivalent
+        );
+    }
+
+
+    const sphericalEquivalentPairs = [
+        "right-dry",
+        "left-dry",
+        "right-wet",
+        "left-wet",
+    ];
+
+
+    sphericalEquivalentPairs.forEach(function (pairName) {
+        const sourceInputs = document.querySelectorAll(
+            '[data-se-pair="' + pairName + '"]'
+        );
+
+        sourceInputs.forEach(function (sourceInput) {
+            sourceInput.addEventListener(
+                "input",
+                function () {
+                    calculateSphericalEquivalent(pairName);
+                }
+            );
+
+            sourceInput.addEventListener(
+                "change",
+                function () {
+                    calculateSphericalEquivalent(pairName);
+                }
+            );
+        });
+
+        calculateSphericalEquivalent(pairName);
+    });
+
+
+    /*
+     * Keep axis values inside the accepted clinical range.
+     * Server-side validation remains the final authority.
+     */
+    document
+        .querySelectorAll(".axis-input, .subjective-axis-input")
+        .forEach(function (axisInput) {
+            axisInput.addEventListener("input", function () {
+                const currentValue = parseInt(
+                    axisInput.value,
+                    10
+                );
+
+                axisInput.classList.remove(
+                    "is-valid",
+                    "is-invalid"
+                );
+
+                if (axisInput.value === "") {
+                    return;
+                }
+
+                if (
+                    Number.isNaN(currentValue) ||
+                    currentValue < 0 ||
+                    currentValue > 180
+                ) {
+                    axisInput.classList.add("is-invalid");
+                } else {
+                    axisInput.classList.add("is-valid");
+                }
+            });
+        });
+
+
+    /*
+     * =========================================================
+     * SUBJECTIVE REFRACTION — PD FEEDBACK
+     * =========================================================
+     */
+
+    function validatePdInput(input) {
+        if (!input) {
+            return;
+        }
+
+        const value = Number(input.value);
+        const minimum = Number(input.getAttribute("min"));
+        const maximum = Number(input.getAttribute("max"));
+
+        input.classList.remove("is-valid", "is-invalid");
+
+        if (input.value.trim() === "") {
+            return;
+        }
+
+        if (
+            !Number.isFinite(value) ||
+            value < minimum ||
+            value > maximum
+        ) {
+            input.classList.add("is-invalid");
+        } else {
+            input.classList.add("is-valid");
+        }
+    }
+
+
+    document
+        .querySelectorAll(".pd-input")
+        .forEach(function (pdInput) {
+            pdInput.addEventListener("input", function () {
+                validatePdInput(pdInput);
+            });
+
+            pdInput.addEventListener("change", function () {
+                validatePdInput(pdInput);
+            });
+        });
+
+
+    const distancePdInput = document.getElementById(
+        "id_subjective_distance_pd"
+    );
+
+    const nearPdInput = document.getElementById(
+        "id_subjective_near_pd"
+    );
+
+
+    function validatePdRelationship() {
+        if (!distancePdInput || !nearPdInput) {
+            return;
+        }
+
+        const distanceValue = Number(distancePdInput.value);
+        const nearValue = Number(nearPdInput.value);
+
+        if (
+            distancePdInput.value.trim() === "" ||
+            nearPdInput.value.trim() === ""
+        ) {
+            return;
+        }
+
+        if (
+            Number.isFinite(distanceValue) &&
+            Number.isFinite(nearValue) &&
+            nearValue > distanceValue
+        ) {
+            nearPdInput.classList.remove("is-valid");
+            nearPdInput.classList.add("is-invalid");
+        }
+    }
+
+
+    if (distancePdInput && nearPdInput) {
+        distancePdInput.addEventListener(
+            "input",
+            validatePdRelationship
+        );
+
+        nearPdInput.addEventListener(
+            "input",
+            validatePdRelationship
+        );
+    }
+
+
+    /*
+     * =========================================================
+     * SUBJECTIVE REFRACTION — APPROVAL VISUAL STATE
+     * =========================================================
+     */
+
+    const subjectiveApprovalCheckbox = document.getElementById(
+        "id_subjective_refraction_approved"
+    );
+
+    const subjectiveApprovalCard = document.querySelector(
+        ".subjective-approval-card"
+    );
+
+
+    function updateSubjectiveApprovalCard() {
+        if (
+            !subjectiveApprovalCheckbox ||
+            !subjectiveApprovalCard
+        ) {
+            return;
+        }
+
+        subjectiveApprovalCard.classList.toggle(
+            "is-approved",
+            subjectiveApprovalCheckbox.checked
+        );
+    }
+
+
+    if (subjectiveApprovalCheckbox) {
+        updateSubjectiveApprovalCard();
+
+        subjectiveApprovalCheckbox.addEventListener(
+            "change",
+            updateSubjectiveApprovalCard
+        );
+    }
+
+
+    /*
+     * Remember the user's active tab while filling the form.
+     */
+    const tabStorageKey = "capital-eye-eye-exam-active-tab";
+
+
+    document
+        .querySelectorAll('#eyeExamTabs button[data-bs-toggle="tab"]')
+        .forEach(function (tabButton) {
+            tabButton.addEventListener("shown.bs.tab", function (event) {
+                localStorage.setItem(
+                    tabStorageKey,
+                    event.target.getAttribute("data-bs-target")
+                );
+            });
+        });
+
+    const savedTabTarget = localStorage.getItem(tabStorageKey);
+
+    if (savedTabTarget) {
+        const savedTabButton = document.querySelector(
+            '#eyeExamTabs button[data-bs-target="' +
+            savedTabTarget +
+            '"]'
+        );
+
+        if (savedTabButton && window.bootstrap) {
+            bootstrap.Tab.getOrCreateInstance(savedTabButton).show();
+        }
+    }
+
+
+    /*
+     * If server-side validation finds an error, open the tab that
+     * contains the first error.
+     */
+    const firstError = document.querySelector(
+        ".clinical-tab-content .field-error"
+    );
+
+    if (firstError) {
+        const errorPane = firstError.closest(".tab-pane");
+
+        if (errorPane && window.bootstrap) {
+            const errorTabButton = document.querySelector(
+                '#eyeExamTabs button[data-bs-target="#' +
+                errorPane.id +
+                '"]'
+            );
+
+            if (errorTabButton) {
+                bootstrap.Tab.getOrCreateInstance(errorTabButton).show();
+            }
+        }
+    }
+
+
+    /*
+     * Preserve normal form submission while preventing repeated clicks.
+     */
+    if (form) {
+        form.addEventListener("submit", function () {
+            const button = document.getElementById(
+                "saveEyeExaminationButton"
+            );
+
+            if (button) {
+                button.innerHTML = "Saving Eye Examination...";
+            }
+        });
+    }
+});
+</script>
 
 {% endblock %}

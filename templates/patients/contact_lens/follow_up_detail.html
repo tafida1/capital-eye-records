@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contact Lens Follow-up{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/contact_lens.css' %}?v=20260805-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="contact-lens-page">
+
+    <div class="contact-lens-page-header">
+
+        <div>
+            <span class="contact-lens-page-label">Contact Lens Follow-up</span>
+            <h2>{{ follow_up.follow_up_date|date:"d M Y" }}</h2>
+            <p>{{ patient.full_name }} · {{ prescription.prescription_number }}</p>
+        </div>
+
+        <div class="contact-lens-prescription-actions">
+
+            <a href="{% url 'contact_lens_prescription_detail' prescription.pk %}"
+               class="btn btn-outline-secondary">
+                Prescription
+            </a>
+
+            {% if can_manage_contact_lenses %}
+                <a href="{% url 'contact_lens_follow_up_update' follow_up.pk %}"
+                   class="btn btn-primary">
+                    Edit Follow-up
+                </a>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <section class="contact-lens-detail-card">
+
+        <div class="contact-lens-card-header">
+
+            <div>
+                <h4>Follow-up Summary</h4>
+                <p>Vision, comfort, fit and clinical status.</p>
+            </div>
+
+            <span class="contact-lens-status-badge
+                {% if follow_up.status == 'COMPLETED' %}
+                    completed
+                {% elif follow_up.status == 'MISSED' %}
+                    missed
+                {% elif follow_up.status == 'CANCELLED' %}
+                    cancelled
+                {% else %}
+                    scheduled
+                {% endif %}">
+
+                {{ follow_up.get_status_display }}
+
+            </span>
+
+        </div>
+
+        <div class="contact-lens-card-body">
+
+            <dl class="contact-lens-details-grid">
+
+                <div class="contact-lens-detail-item">
+                    <dt>Review Date</dt>
+                    <dd>{{ follow_up.follow_up_date|date:"d M Y, h:i A" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Attended At</dt>
+                    <dd>{{ follow_up.attended_at|date:"d M Y, h:i A"|default:"-" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Reviewed By</dt>
+                    <dd>
+                        {% if follow_up.reviewed_by %}
+                            {{ follow_up.reviewed_by.get_full_name|default:follow_up.reviewed_by.username }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Daily Wearing Time</dt>
+                    <dd>{{ follow_up.wearing_time_per_day|default:"-" }} hours</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Right Comfort</dt>
+                    <dd>{{ follow_up.comfort_score_right|default:"-" }}/10</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Left Comfort</dt>
+                    <dd>{{ follow_up.comfort_score_left|default:"-" }}/10</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Right Vision</dt>
+                    <dd>{{ follow_up.right_visual_acuity|default:"-" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Left Vision</dt>
+                    <dd>{{ follow_up.left_visual_acuity|default:"-" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Lens Condition</dt>
+                    <dd>{{ follow_up.get_lens_condition_display }}</dd>
+                </div>
+
+            </dl>
+
+        </div>
+
+    </section>
+
+
+    <section class="contact-lens-detail-card">
+
+        <div class="contact-lens-card-header">
+            <div>
+                <h4>Clinical Findings and Management</h4>
+            </div>
+        </div>
+
+        <div class="contact-lens-card-body">
+
+            <dl class="contact-lens-details-grid">
+
+                <div class="contact-lens-detail-item">
+                    <dt>Right Fit</dt>
+                    <dd>{{ follow_up.right_fit_assessment|default:"-" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Left Fit</dt>
+                    <dd>{{ follow_up.left_fit_assessment|default:"-" }}</dd>
+                </div>
+
+                <div class="contact-lens-detail-item">
+                    <dt>Next Review</dt>
+                    <dd>{{ follow_up.next_follow_up_date|date:"d M Y, h:i A"|default:"-" }}</dd>
+                </div>
+
+            </dl>
+
+            {% if follow_up.complications %}
+                <div class="contact-lens-alert danger mt-3">
+                    <strong>Complications:</strong><br>
+                    {{ follow_up.complications|linebreaksbr }}
+                </div>
+            {% endif %}
+
+            {% if follow_up.management_plan %}
+                <div class="contact-lens-alert mt-3">
+                    <strong>Management Plan:</strong><br>
+                    {{ follow_up.management_plan|linebreaksbr }}
+                </div>
+            {% endif %}
+
+            {% if follow_up.revised_parameters %}
+                <div class="contact-lens-alert warning mt-3">
+                    <strong>Revised Parameters:</strong><br>
+                    {{ follow_up.revised_parameters|linebreaksbr }}
+                </div>
+            {% endif %}
+
+            {% if follow_up.clinical_notes %}
+                <div class="contact-lens-alert mt-3">
+                    <strong>Clinical Notes:</strong><br>
+                    {{ follow_up.clinical_notes|linebreaksbr }}
+                </div>
+            {% endif %}
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

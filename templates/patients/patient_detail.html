@@ -1,6 +1,14 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ patient.full_name }} | Patient Profile{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+
+    <link href="{% static 'css/clinical_attachments.css' %}?v=20260803-1"
+          rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 
@@ -29,6 +37,26 @@
         <a href="{% url 'patient_update' patient.pk %}" class="btn btn-light btn-sm">Edit</a>
         <a href="{% url 'patient_card_pdf' patient.pk %}" class="btn btn-outline-light btn-sm no-loader">Card PDF</a>
         <a href="{% url 'patient_report_pdf' patient.pk %}" class="btn btn-outline-light btn-sm no-loader">Full Report</a>
+
+        <a href="{% url 'patient_ophthalmology_timeline' patient.pk %}"
+           class="btn btn-outline-primary">
+
+            🕘 Ophthalmology Timeline
+
+        </a>
+
+        <a href="{% url 'patient_clinical_attachment_list' patient.pk %}"
+           class="btn btn-outline-primary">
+
+            📂 Investigation Files
+
+            {% if attachment_total_count %}
+                <span class="badge bg-primary ms-1">
+                    {{ attachment_total_count }}
+                </span>
+            {% endif %}
+        </a>
+
         <button onclick="window.print()" class="btn btn-warning btn-sm no-print">Print</button>
     </div>
 </div>
@@ -79,7 +107,356 @@
     <a href="{% url 'patient_appointment_history' patient.pk %}" class="btn btn-outline-info">Appointment History</a>
     <a href="{% url 'patient_surgery_history' patient.pk %}" class="btn btn-outline-warning">Surgery History</a>
     <a href="{% url 'patient_bill_history' patient.pk %}" class="btn btn-outline-dark">Billing History</a>
+    <a href="{% url 'patient_contact_lens_history' patient.pk %}" class="btn btn-outline-primary">👁️ Contact Lens History</a>
 </div>
+
+<!-- ====================================================== -->
+<!-- CLINICAL INVESTIGATION SUMMARY -->
+<!-- ====================================================== -->
+
+<section class="patient-investigation-summary mb-4">
+
+    <div class="patient-investigation-summary-header">
+
+        <div>
+            <span class="attachment-page-label">
+                Investigation Records
+            </span>
+
+            <h4>Clinical Files Summary</h4>
+
+            <p>
+                Current investigation images, reports and clinical
+                documents associated with this patient.
+            </p>
+        </div>
+
+        <a href="{% url 'patient_clinical_attachment_list' patient.pk %}"
+           class="btn btn-sm btn-outline-primary">
+            View Complete History
+        </a>
+
+    </div>
+
+
+    <div class="patient-attachment-kpi-grid">
+
+        <a href="{% url 'patient_clinical_attachment_list' patient.pk %}"
+           class="patient-attachment-kpi-card total">
+
+            <span class="patient-attachment-kpi-icon">
+                📎
+            </span>
+
+            <div>
+                <strong>
+                    {{ attachment_total_count }}
+                </strong>
+
+                <small>
+                    Active Files
+                </small>
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'patient_clinical_attachment_list' patient.pk %}?review_status=PENDING"
+           class="patient-attachment-kpi-card pending">
+
+            <span class="patient-attachment-kpi-icon">
+                ⏳
+            </span>
+
+            <div>
+                <strong>
+                    {{ attachment_pending_count }}
+                </strong>
+
+                <small>
+                    Pending Review
+                </small>
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'patient_clinical_attachment_list' patient.pk %}?review_status=REVIEWED"
+           class="patient-attachment-kpi-card reviewed">
+
+            <span class="patient-attachment-kpi-icon">
+                ✓
+            </span>
+
+            <div>
+                <strong>
+                    {{ attachment_reviewed_count }}
+                </strong>
+
+                <small>
+                    Reviewed Files
+                </small>
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'patient_clinical_attachment_list' patient.pk %}?review_status=NEEDS_ATTENTION"
+           class="patient-attachment-kpi-card attention">
+
+            <span class="patient-attachment-kpi-icon">
+                ⚠
+            </span>
+
+            <div>
+                <strong>
+                    {{ attachment_attention_count }}
+                </strong>
+
+                <small>
+                    Needs Attention
+                </small>
+            </div>
+
+        </a>
+
+    </div>
+
+</section>
+
+<!-- ====================================================== -->
+<!-- LATEST INVESTIGATION RESULTS -->
+<!-- ====================================================== -->
+
+<section class="patient-latest-attachments-card mb-4">
+
+    <div class="patient-latest-attachments-header">
+
+        <div>
+            <h4>Latest Investigation Results</h4>
+
+            <p>
+                Recent active clinical files uploaded across the
+                patient’s visits.
+            </p>
+        </div>
+
+        <a href="{% url 'patient_clinical_attachment_list' patient.pk %}"
+           class="btn btn-sm btn-outline-primary">
+            View All Files
+        </a>
+
+    </div>
+
+
+    {% if latest_clinical_attachments %}
+
+        <div class="patient-latest-attachments-grid">
+
+            {% for attachment in latest_clinical_attachments %}
+
+                <article class="patient-latest-attachment-item">
+
+                    <div class="patient-attachment-file-icon
+                        {% if attachment.is_image %}
+                            image
+                        {% elif attachment.is_pdf %}
+                            pdf
+                        {% else %}
+                            document
+                        {% endif %}">
+
+                        {% if attachment.is_image %}
+                            🖼️
+                        {% elif attachment.is_pdf %}
+                            PDF
+                        {% else %}
+                            DOC
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="patient-latest-attachment-body">
+
+                        <div class="patient-attachment-title-line">
+
+                            <div>
+                                <span class="patient-attachment-category">
+                                    {% if attachment.category == "OTHER" %}
+                                        {{ attachment.category_other }}
+                                    {% else %}
+                                        {{ attachment.get_category_display }}
+                                    {% endif %}
+                                </span>
+
+                                <h5>
+                                    {{ attachment.title }}
+                                </h5>
+                            </div>
+
+
+                            <span class="review-status-badge
+                                {% if attachment.review_status == 'REVIEWED' %}
+                                    reviewed
+                                {% elif attachment.review_status == 'NEEDS_ATTENTION' %}
+                                    attention
+                                {% else %}
+                                    pending
+                                {% endif %}">
+
+                                {{ attachment.get_review_status_display }}
+
+                            </span>
+
+                        </div>
+
+
+                        {% if attachment.description %}
+                            <p class="patient-attachment-description">
+                                {{ attachment.description|truncatechars:110 }}
+                            </p>
+                        {% endif %}
+
+
+                        <div class="patient-attachment-meta">
+
+                            <span>
+                                👁
+                                {{ attachment.get_eye_side_display }}
+                            </span>
+
+                            <span>
+                                📅
+                                {{ attachment.investigation_date|date:"d M Y"|default:"Date not specified" }}
+                            </span>
+
+                            <span>
+                                🩺
+                                <a href="{% url 'visit_detail' attachment.visit.pk %}">
+                                    {{ attachment.visit.visit_number }}
+                                </a>
+                            </span>
+
+                            <span>
+                                📄
+                                {{ attachment.file_size_display }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="patient-attachment-actions">
+
+                            <a href="{% url 'clinical_attachment_detail' attachment.pk %}"
+                               class="btn btn-sm btn-primary">
+                                View Details
+                            </a>
+
+                            {% if attachment.is_image or attachment.is_pdf %}
+                                <a href="{% url 'clinical_attachment_viewer' attachment.pk %}?scope=patient"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Open Viewer
+                                </a>
+                            {% endif %}
+
+                            <a href="{% url 'clinical_attachment_download' attachment.pk %}"
+                               class="btn btn-sm btn-outline-secondary">
+                                Download
+                            </a>
+
+                            {% if can_review_clinical_attachments and attachment.review_status != "REVIEWED" %}
+
+                                <a href="{% url 'clinical_attachment_review' attachment.pk %}"
+                                   class="btn btn-sm btn-outline-success">
+                                    Review
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% if attachment_total_count > 6 %}
+
+            <div class="patient-attachments-view-all">
+
+                <a href="{% url 'patient_clinical_attachment_list' patient.pk %}"
+                   class="btn btn-outline-primary">
+
+                    View all {{ attachment_total_count }}
+                    investigation files
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+
+    {% else %}
+
+        <div class="patient-attachment-empty-state">
+
+            <div class="patient-attachment-empty-icon">
+                📂
+            </div>
+
+            <h5>
+                No clinical investigation files
+            </h5>
+
+            <p>
+                Investigation files are uploaded from a patient visit
+                so they can be connected to the correct clinical
+                encounter.
+            </p>
+
+            {% if visits %}
+
+                <div class="patient-upload-guidance">
+
+                    <strong>
+                        To upload a test result:
+                    </strong>
+
+                    <span>
+                        Open one of the patient’s visits below, then
+                        select <b>Upload Test Result</b>.
+                    </span>
+
+                </div>
+
+            {% else %}
+
+                <div class="patient-upload-guidance">
+
+                    <strong>
+                        No visit is available yet.
+                    </strong>
+
+                    <span>
+                        Create a patient visit before uploading an
+                        investigation result.
+                    </span>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</section>
 
 <div class="row g-4 mt-2">
 
@@ -144,9 +521,28 @@
                             <h6>{{ visit.visit_number }} - {{ visit.get_visit_type_display }}</h6>
                             <small>{{ visit.visit_date|date:"d M Y, h:i A" }} | {{ visit.get_status_display }}</small>
                             <p>{{ visit.chief_complaint|truncatechars:120|default:"No complaint recorded." }}</p>
-                            <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-sm btn-outline-primary">
-                                Open Visit
-                            </a>
+
+                            <div class="d-flex gap-2 flex-wrap">
+
+                                <a href="{% url 'visit_detail' visit.pk %}" class="btn btn-sm btn-outline-primary">
+                                    Open Visit
+                                </a>
+
+                                <a href="{% url 'visit_clinical_attachment_list' visit.pk %}"
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="View investigation files for this visit">
+                                    📂 Files
+                                </a>
+
+                                {% if can_manage_clinical_attachments %}
+                                    <a href="{% url 'clinical_attachment_create' visit.pk %}"
+                                       class="btn btn-sm btn-outline-success"
+                                       title="Upload an investigation result for this visit">
+                                        📎 Upload Result
+                                    </a>
+                                {% endif %}
+
+                            </div>
                         </div>
                     </div>
                 {% empty %}

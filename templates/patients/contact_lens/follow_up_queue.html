@@ -1,0 +1,660 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Contact Lens Follow-up Queue
+{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/contact_lens.css' %}?v=20260806-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="contact-lens-page">
+
+    <div class="contact-lens-page-header">
+
+        <div>
+            <span class="contact-lens-page-label">
+                Contact Lens Service Monitoring
+            </span>
+
+            <h2>Follow-up and Safety Queue</h2>
+
+            <p>
+                Overdue reviews, upcoming appointments, clinical
+                complications and expiring prescriptions.
+            </p>
+        </div>
+
+        <a href="{% url 'ophthalmology_dashboard' %}"
+           class="btn btn-outline-secondary">
+            ← Ophthalmology Dashboard
+        </a>
+
+    </div>
+
+
+    <div class="contact-lens-follow-up-kpi-grid">
+
+        <a href="?queue=overdue"
+           class="contact-lens-follow-up-kpi overdue">
+
+            <span>!</span>
+
+            <div>
+                <strong>{{ queue_counts.overdue }}</strong>
+                <small>Overdue Reviews</small>
+            </div>
+
+        </a>
+
+
+        <a href="?queue=today"
+           class="contact-lens-follow-up-kpi today">
+
+            <span>📅</span>
+
+            <div>
+                <strong>{{ queue_counts.today }}</strong>
+                <small>Due Today</small>
+            </div>
+
+        </a>
+
+
+        <a href="?queue=due_soon"
+           class="contact-lens-follow-up-kpi soon">
+
+            <span>⏳</span>
+
+            <div>
+                <strong>{{ queue_counts.due_soon }}</strong>
+                <small>Due Within 7 Days</small>
+            </div>
+
+        </a>
+
+
+        <a href="?queue=upcoming"
+           class="contact-lens-follow-up-kpi upcoming">
+
+            <span>🗓</span>
+
+            <div>
+                <strong>{{ queue_counts.upcoming }}</strong>
+                <small>Future Reviews</small>
+            </div>
+
+        </a>
+
+
+        <a href="?queue=missed"
+           class="contact-lens-follow-up-kpi missed">
+
+            <span>×</span>
+
+            <div>
+                <strong>{{ queue_counts.missed }}</strong>
+                <small>Missed Reviews</small>
+            </div>
+
+        </a>
+
+
+        <a href="?queue=complications"
+           class="contact-lens-follow-up-kpi complication">
+
+            <span>⚠</span>
+
+            <div>
+                <strong>{{ queue_counts.complications }}</strong>
+                <small>Complication Records</small>
+            </div>
+
+        </a>
+
+    </div>
+
+
+    {% if expired_prescription_count %}
+
+        <div class="contact-lens-alert danger mb-4">
+
+            <strong>
+                {{ expired_prescription_count }}
+                active Contact Lens prescription{{ expired_prescription_count|pluralize }}
+                expired.
+            </strong>
+
+            Historical prescriptions remain preserved, but the
+            patient may require clinical reassessment before another
+            supply is issued.
+
+        </div>
+
+    {% endif %}
+
+
+    <section class="contact-lens-form-card">
+
+        <div class="contact-lens-card-body">
+
+            <form method="get"
+                  class="row g-3 align-items-end">
+
+                <input type="hidden"
+                       name="queue"
+                       value="{{ selected_queue }}">
+
+                <div class="col-lg-6">
+
+                    <label class="form-label">
+                        Search Follow-ups
+                    </label>
+
+                    <input type="search"
+                           name="q"
+                           value="{{ query }}"
+                           class="form-control"
+                           placeholder="Patient, hospital number, prescription or visit">
+
+                </div>
+
+
+                <div class="col-lg-4">
+
+                    <label class="form-label">
+                        Follow-up Status
+                    </label>
+
+                    <select name="status"
+                            class="form-select">
+
+                        <option value="">
+                            All Statuses
+                        </option>
+
+                        {% for value, label in status_choices %}
+
+                            <option value="{{ value }}"
+                                    {% if selected_status == value %}selected{% endif %}>
+
+                                {{ label }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-lg-2">
+
+                    <div class="d-grid gap-2">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Filter
+                        </button>
+
+                        <a href="{% url 'contact_lens_follow_up_queue' %}"
+                           class="btn btn-outline-secondary">
+                            Reset
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <nav class="contact-lens-queue-tabs mb-4">
+
+        <a href="?queue=active"
+           class="{% if selected_queue == 'active' %}active{% endif %}">
+            Active Due Queue
+        </a>
+
+        <a href="?queue=overdue"
+           class="{% if selected_queue == 'overdue' %}active{% endif %}">
+            Overdue
+        </a>
+
+        <a href="?queue=today"
+           class="{% if selected_queue == 'today' %}active{% endif %}">
+            Due Today
+        </a>
+
+        <a href="?queue=due_soon"
+           class="{% if selected_queue == 'due_soon' %}active{% endif %}">
+            Due Soon
+        </a>
+
+        <a href="?queue=upcoming"
+           class="{% if selected_queue == 'upcoming' %}active{% endif %}">
+            Upcoming
+        </a>
+
+        <a href="?queue=completed"
+           class="{% if selected_queue == 'completed' %}active{% endif %}">
+            Completed
+        </a>
+
+        <a href="?queue=missed"
+           class="{% if selected_queue == 'missed' %}active{% endif %}">
+            Missed
+        </a>
+
+        <a href="?queue=complications"
+           class="{% if selected_queue == 'complications' %}active{% endif %}">
+            Complications
+        </a>
+
+        <a href="?queue=all"
+           class="{% if selected_queue == 'all' %}active{% endif %}">
+            All
+        </a>
+
+    </nav>
+
+
+    <section class="contact-lens-detail-card">
+
+        <div class="contact-lens-card-header">
+
+            <div>
+                <h4>Contact Lens Follow-up Records</h4>
+
+                <p>
+                    {{ page_obj.paginator.count }}
+                    record{{ page_obj.paginator.count|pluralize }}
+                    in the selected queue.
+                </p>
+            </div>
+
+        </div>
+
+
+        {% if follow_up_rows %}
+
+            <div class="contact-lens-follow-up-list">
+
+                {% for row in follow_up_rows %}
+
+                    {% with follow_up=row.record %}
+
+                        <article class="contact-lens-follow-up-row
+                            {% if row.due_category == 'OVERDUE' %}
+                                overdue
+                            {% elif row.due_category == 'DUE_TODAY' %}
+                                due-today
+                            {% elif row.has_safety_flags %}
+                                has-alert
+                            {% endif %}">
+
+                            <div class="contact-lens-follow-up-date">
+
+                                <strong>
+                                    {{ follow_up.follow_up_date|date:"d" }}
+                                </strong>
+
+                                <span>
+                                    {{ follow_up.follow_up_date|date:"M Y" }}
+                                </span>
+
+                                <small>
+                                    {{ follow_up.follow_up_date|date:"h:i A" }}
+                                </small>
+
+                            </div>
+
+
+                            <div class="contact-lens-follow-up-main">
+
+                                <div class="contact-lens-follow-up-heading">
+
+                                    <div>
+
+                                        <span>
+                                            {{ follow_up.prescription.prescription_number }}
+                                        </span>
+
+                                        <h5>
+                                            {{ follow_up.patient.full_name }}
+                                        </h5>
+
+                                        <p>
+                                            {{ follow_up.patient.file_number }}
+                                            ·
+                                            {{ follow_up.prescription.visit.visit_number }}
+                                        </p>
+
+                                    </div>
+
+
+                                    <div class="contact-lens-follow-up-badges">
+
+                                        <span class="contact-lens-status-badge
+                                            {% if follow_up.status == 'COMPLETED' %}
+                                                completed
+                                            {% elif follow_up.status == 'MISSED' %}
+                                                missed
+                                            {% elif follow_up.status == 'CANCELLED' %}
+                                                cancelled
+                                            {% else %}
+                                                scheduled
+                                            {% endif %}">
+
+                                            {{ follow_up.get_status_display }}
+
+                                        </span>
+
+
+                                        {% if row.due_category == "OVERDUE" %}
+
+                                            <span class="contact-lens-due-badge overdue">
+                                                Overdue
+                                            </span>
+
+                                        {% elif row.due_category == "DUE_TODAY" %}
+
+                                            <span class="contact-lens-due-badge today">
+                                                Due Today
+                                            </span>
+
+                                        {% elif row.due_category == "DUE_SOON" %}
+
+                                            <span class="contact-lens-due-badge soon">
+                                                Due Soon
+                                            </span>
+
+                                        {% elif row.due_category == "UPCOMING" %}
+
+                                            <span class="contact-lens-due-badge upcoming">
+                                                Upcoming
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+
+                                {% if row.safety_flags %}
+
+                                    <div class="contact-lens-safety-flags">
+
+                                        {% for flag in row.safety_flags %}
+
+                                            <span class="{{ flag.severity }}">
+                                                {{ flag.label }}
+                                            </span>
+
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                <div class="contact-lens-follow-up-summary">
+
+                                    <span>
+                                        Daily wear:
+                                        <strong>
+                                            {{ follow_up.wearing_time_per_day|default:"-" }}
+                                            hours
+                                        </strong>
+                                    </span>
+
+                                    <span>
+                                        R comfort:
+                                        <strong>
+                                            {{ follow_up.comfort_score_right|default:"-" }}/10
+                                        </strong>
+                                    </span>
+
+                                    <span>
+                                        L comfort:
+                                        <strong>
+                                            {{ follow_up.comfort_score_left|default:"-" }}/10
+                                        </strong>
+                                    </span>
+
+                                    <span>
+                                        Lens condition:
+                                        <strong>
+                                            {{ follow_up.get_lens_condition_display }}
+                                        </strong>
+                                    </span>
+
+                                </div>
+
+
+                                {% if follow_up.complications %}
+
+                                    <div class="contact-lens-follow-up-complication">
+
+                                        <strong>
+                                            Recorded complication:
+                                        </strong>
+
+                                        {{ follow_up.complications|truncatechars:180 }}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="contact-lens-follow-up-actions">
+
+                                <a href="{% url 'contact_lens_follow_up_detail' follow_up.pk %}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Open
+                                </a>
+
+                                <a href="{% url 'contact_lens_prescription_detail' follow_up.prescription.pk %}"
+                                   class="btn btn-sm btn-outline-secondary">
+                                    Prescription
+                                </a>
+
+                                {% if can_manage_contact_lenses %}
+
+                                    <a href="{% url 'contact_lens_follow_up_update' follow_up.pk %}"
+                                       class="btn btn-sm btn-primary">
+                                        Update
+                                    </a>
+
+                                {% endif %}
+
+                            </div>
+
+                        </article>
+
+                    {% endwith %}
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="contact-lens-empty-state">
+
+                <span>✓</span>
+
+                <h5>No records in this queue</h5>
+
+                <p>
+                    There are no Contact Lens follow-ups matching the
+                    selected queue, status and search filters.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    {% if expiring_prescriptions %}
+
+        <section class="contact-lens-detail-card">
+
+            <div class="contact-lens-card-header">
+
+                <div>
+                    <h4>Prescriptions Expiring Within 30 Days</h4>
+
+                    <p>
+                        Active approved or dispensed prescriptions
+                        approaching their expiry dates.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="contact-lens-table-wrapper">
+
+                <table class="contact-lens-table">
+
+                    <thead>
+                        <tr>
+                            <th>Prescription</th>
+                            <th>Patient</th>
+                            <th>Hospital Number</th>
+                            <th>Valid Until</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for prescription in expiring_prescriptions %}
+
+                            <tr>
+
+                                <td>
+                                    {{ prescription.prescription_number }}
+                                </td>
+
+                                <td>
+                                    {{ prescription.patient.full_name }}
+                                </td>
+
+                                <td>
+                                    {{ prescription.patient.file_number }}
+                                </td>
+
+                                <td>
+                                    {{ prescription.valid_until|date:"d M Y" }}
+                                </td>
+
+                                <td>
+                                    <span class="contact-lens-status-badge
+                                        {% if prescription.status == 'DISPENSED' %}
+                                            dispensed
+                                        {% else %}
+                                            approved
+                                        {% endif %}">
+
+                                        {{ prescription.get_status_display }}
+
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <a href="{% url 'contact_lens_prescription_detail' prescription.pk %}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Open
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+    {% if page_obj.paginator.num_pages > 1 %}
+
+        <nav class="mt-4">
+
+            <ul class="pagination justify-content-center">
+
+                {% if page_obj.has_previous %}
+
+                    <li class="page-item">
+
+                        <a class="page-link"
+                           href="?page={{ page_obj.previous_page_number }}&queue={{ selected_queue }}&status={{ selected_status }}&q={{ query|urlencode }}">
+
+                            Previous
+
+                        </a>
+
+                    </li>
+
+                {% endif %}
+
+
+                <li class="page-item active">
+
+                    <span class="page-link">
+
+                        Page {{ page_obj.number }}
+                        of {{ page_obj.paginator.num_pages }}
+
+                    </span>
+
+                </li>
+
+
+                {% if page_obj.has_next %}
+
+                    <li class="page-item">
+
+                        <a class="page-link"
+                           href="?page={{ page_obj.next_page_number }}&queue={{ selected_queue }}&status={{ selected_status }}&q={{ query|urlencode }}">
+
+                            Next
+
+                        </a>
+
+                    </li>
+
+                {% endif %}
+
+            </ul>
+
+        </nav>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

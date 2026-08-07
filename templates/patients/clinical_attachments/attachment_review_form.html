@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/clinical_attachments.css' %}?v=20260802-1"
+      rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header attachment-page-header">
+
+    <div>
+        <span class="attachment-page-label">
+            Clinical Result Review
+        </span>
+
+        <h2>{{ title }}</h2>
+
+        <p>
+            {{ attachment.title }} ·
+            {{ patient.full_name }} ·
+            {{ visit.visit_number }}
+        </p>
+    </div>
+
+    <a href="{% url 'clinical_attachment_detail' attachment.pk %}"
+       class="btn btn-outline-secondary">
+        ← Back to Attachment
+    </a>
+
+</div>
+
+
+<div class="row g-4">
+
+    <div class="col-xl-8">
+
+        <div class="attachment-preview-card mb-4">
+
+            <div class="attachment-preview-toolbar">
+                <div>
+                    <strong>{{ attachment.title }}</strong>
+                    <small>{{ attachment.original_filename }}</small>
+                </div>
+
+                {% if attachment.is_image or attachment.is_pdf %}
+                    <a href="{% url 'clinical_attachment_preview' attachment.pk %}"
+                       target="_blank"
+                       rel="noopener"
+                       class="btn btn-sm btn-outline-primary">
+                        Open Full Preview
+                    </a>
+                {% else %}
+                    <a href="{% url 'clinical_attachment_download' attachment.pk %}"
+                       class="btn btn-sm btn-outline-primary">
+                        Download File
+                    </a>
+                {% endif %}
+            </div>
+
+
+            <div class="attachment-review-preview">
+
+                {% if attachment.is_image %}
+                    <img src="{% url 'clinical_attachment_preview' attachment.pk %}"
+                         alt="{{ attachment.title }}">
+                {% elif attachment.is_pdf %}
+                    <iframe src="{% url 'clinical_attachment_preview' attachment.pk %}"
+                            title="{{ attachment.title }}">
+                    </iframe>
+                {% else %}
+                    <div class="attachment-document-preview">
+                        <span>📄</span>
+                        <h4>Download required</h4>
+                        <p>
+                            Open this document using a compatible application
+                            before completing the clinical review.
+                        </p>
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-xl-4">
+
+        <form method="post"
+              id="clinicalAttachmentReviewForm"
+              class="attachment-review-form"
+              novalidate>
+
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+
+            <div class="attachment-detail-card">
+
+                <div class="attachment-detail-card-header">
+                    Clinical Review
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label"
+                           for="{{ form.review_status.id_for_label }}">
+                        {{ form.review_status.label }}
+                    </label>
+
+                    {{ form.review_status }}
+
+                    {% if form.review_status.errors %}
+                        <div class="field-error">
+                            {{ form.review_status.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+
+                <div class="mb-4">
+                    <label class="form-label"
+                           for="{{ form.review_notes.id_for_label }}">
+                        {{ form.review_notes.label }}
+                    </label>
+
+                    {{ form.review_notes }}
+
+                    <div class="attachment-character-counter">
+                        <span id="reviewNotesCharacterCount">0</span>
+                        / 2000
+                    </div>
+
+                    {% if form.review_notes.errors %}
+                        <div class="field-error">
+                            {{ form.review_notes.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+
+                <div class="reviewing-user-card mb-4">
+
+                    <div class="reviewing-user-avatar">
+                        {{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}
+                    </div>
+
+                    <div>
+                        <span>Reviewing Clinician</span>
+
+                        <strong>
+                            {{ request.user.get_full_name|default:request.user.username }}
+                        </strong>
+
+                        <small>
+                            {{ request.user.get_role_display|default:"Clinical Staff" }}
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="d-grid gap-2">
+
+                    <button type="submit"
+                            class="btn btn-primary"
+                            id="saveClinicalReviewButton">
+                        {{ button_text }}
+                    </button>
+
+                    <a href="{% url 'clinical_attachment_detail' attachment.pk %}"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const notes = document.getElementById("id_review_notes");
+    const counter = document.getElementById(
+        "reviewNotesCharacterCount"
+    );
+
+    function updateCounter() {
+        if (!notes || !counter) {
+            return;
+        }
+
+        counter.textContent = notes.value.length;
+    }
+
+    if (notes) {
+        updateCounter();
+        notes.addEventListener("input", updateCounter);
+    }
+
+    const form = document.getElementById(
+        "clinicalAttachmentReviewForm"
+    );
+
+    if (form) {
+        form.addEventListener("submit", function () {
+            const button = document.getElementById(
+                "saveClinicalReviewButton"
+            );
+
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = "Saving Clinical Review...";
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

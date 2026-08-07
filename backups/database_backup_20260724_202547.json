@@ -1,0 +1,1557 @@
+[
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "admin",
+    "model": "logentry"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "permission"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "group"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "contenttypes",
+    "model": "contenttype"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "sessions",
+    "model": "session"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "accounts",
+    "model": "user"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "patients",
+    "model": "patient"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "patients",
+    "model": "familygroup"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "patients",
+    "model": "patientvisit"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "patients",
+    "model": "consultation"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "patients",
+    "model": "eyeexamination"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "patients",
+    "model": "diagnosistreatment"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "patients",
+    "model": "prescription"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "patients",
+    "model": "surgeryprocedure"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "patients",
+    "model": "appointment"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "patients",
+    "model": "bill"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "patients",
+    "model": "payment"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "audit_logs",
+    "model": "auditlog"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "settings_app",
+    "model": "systemsetting"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "notifications",
+    "model": "notification"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "2fj1brqwxhhct68ea0l8qre1bkd2zzai",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyEuUOh69O43kIUFqRpISnsy_rtt0oPeJvPezFt4Wpfi155mP7G4CBCn3y5QfKa6A35QvTcZW13mKchdkQft8tY4va6H-3dQqJdt7fLoNGKOiMijQjeAyqAcm0jWaB1DtGy2YBKAZWfpnJkBNQ15sJDF5wvIvjdg:1wkRiA:OCU3QsDC1CytIF1alW1_U6nsQCbxvsHWi-40_s-bqhw",
+    "expire_date": "2026-07-17T03:25:34.166Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "7wndf8u54kz2ke1ej9bmfdlt7fby6jfa",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyEuUOh69O43kIUFqRpISnsy_rtt0oPeJvPezFt4Wpfi155mP7G4CBCn3y5QfKa6A35QvTcZW13mKchdkQft8tY4va6H-3dQqJdt7fLoNGKOiMijQjeAyqAcm0jWaB1DtGy2YBKAZWfpnJkBNQ15sJDF5wvIvjdg:1wkHGu:33nyNQhQJpXWVMAvlzbt76EzmfcfBS0C6SWYVajT4YM",
+    "expire_date": "2026-07-16T16:16:44.144Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "9oqo06ghqiy9rt2fqsh023cf4oq601yb",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyEuUOh69O43kIUFqRpISnsy_rtt0oPeJvPezFt4Wpfi155mP7G4CBCn3y5QfKa6A35QvTcZW13mKchdkQft8tY4va6H-3dQqJdt7fLoNGKOiMijQjeAyqAcm0jWaB1DtGy2YBKAZWfpnJkBNQ15sJDF5wvIvjdg:1wk5QD:EVmAGIAF0DjOkWd1VVrJkm0kEOyLcXT37quUPg1ioHY",
+    "expire_date": "2026-07-16T03:37:33.487Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "buganx26mpmt5zaf6gx2ib2czayx6iq6",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyEuUOh69O43kIUFqRpISnsy_rtt0oPeJvPezFt4Wpfi155mP7G4CBCn3y5QfKa6A35QvTcZW13mKchdkQft8tY4va6H-3dQqJdt7fLoNGKOiMijQjeAyqAcm0jWaB1DtGy2YBKAZWfpnJkBNQ15sJDF5wvIvjdg:1wmHEu:LsTBBr7dA9z6jUeCIj6BpI8HPAobPXfA2a8GAGSIg3Q",
+    "expire_date": "2026-07-22T04:38:56.583Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "ius0mv2t1w405k8cozbaahgxnr8in2tb",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyEuUOh69O43kIUFqRpISnsy_rtt0oPeJvPezFt4Wpfi155mP7G4CBCn3y5QfKa6A35QvTcZW13mKchdkQft8tY4va6H-3dQqJdt7fLoNGKOiMijQjeAyqAcm0jWaB1DtGy2YBKAZWfpnJkBNQ15sJDF5wvIvjdg:1wiYzp:kgrJqVxyb1kv-lUI6BMU_ZMILKf2PheHmzTHh5Xpcwc",
+    "expire_date": "2026-07-11T22:48:01.024Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "sm8e67lxqfg64aif3vk3lbkpdqe2k953",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyEuUOh69O43kIUFqRpISnsy_rtt0oPeJvPezFt4Wpfi155mP7G4CBCn3y5QfKa6A35QvTcZW13mKchdkQft8tY4va6H-3dQqJdt7fLoNGKOiMijQjeAyqAcm0jWaB1DtGy2YBKAZWfpnJkBNQ15sJDF5wvIvjdg:1wmHBZ:FcS1-Id55XB-w2D9bEUxzZiz7uPGqUviSL6thHi_2Qg",
+    "expire_date": "2026-07-22T04:35:29.769Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "v8vxm7o4xr5i2i8xja05irxfphppu5sx",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyEuUOh69O43kIUFqRpISnsy_rtt0oPeJvPezFt4Wpfi155mP7G4CBCn3y5QfKa6A35QvTcZW13mKchdkQft8tY4va6H-3dQqJdt7fLoNGKOiMijQjeAyqAcm0jWaB1DtGy2YBKAZWfpnJkBNQ15sJDF5wvIvjdg:1wf2A4:WdCUuG0oDCyrluk3WwXnq2It72n_N52I3mQCW3qsoyQ",
+    "expire_date": "2026-07-02T05:08:00.361Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "yjs0la4ikln2ur4s5fxh6wuyoib89hnq",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyEuUOh69O43kIUFqRpISnsy_rtt0oPeJvPezFt4Wpfi155mP7G4CBCn3y5QfKa6A35QvTcZW13mKchdkQft8tY4va6H-3dQqJdt7fLoNGKOiMijQjeAyqAcm0jWaB1DtGy2YBKAZWfpnJkBNQ15sJDF5wvIvjdg:1wnLWg:ex3yI8FYt0j2QEt5xTV-6HHWy9vluBZEttLVDggMEww",
+    "expire_date": "2026-07-25T03:25:42.283Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "zlvaamq1kh4630btlvlgyhct21560g2e",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyEuUOh69O43kIUFqRpISnsy_rtt0oPeJvPezFt4Wpfi155mP7G4CBCn3y5QfKa6A35QvTcZW13mKchdkQft8tY4va6H-3dQqJdt7fLoNGKOiMijQjeAyqAcm0jWaB1DtGy2YBKAZWfpnJkBNQ15sJDF5wvIvjdg:1wf2HT:6ElOJNY6D2-ZiEdCTCYRB-hI2sio9bWHVASQbMl_szE",
+    "expire_date": "2026-07-02T05:15:39.019Z"
+  }
+},
+{
+  "model": "settings_app.systemsetting",
+  "pk": 1,
+  "fields": {
+    "hospital_name": "CAPITAL EYE HOSPITAL",
+    "system_name": "CAPITAL EYE HOSPITAL RECORDS SYSTEM",
+    "hospital_address": "",
+    "hospital_phone": "",
+    "hospital_email": "",
+    "receipt_footer": "Thank you for choosing Capital Eye Hospital.",
+    "report_footer": "Generated from CAPITAL EYE HOSPITAL RECORDS SYSTEM.",
+    "backup_reminder_text": "Remember to backup clinic records regularly.",
+    "default_currency": "₦",
+    "allow_duplicate_warning": true,
+    "enable_audit_logs": true,
+    "updated_at": "2026-06-30T14:04:04.564Z"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "add_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "change_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "delete_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "view_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "add_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "change_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "delete_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "view_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "add_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "change_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "delete_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "view_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "add_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "change_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "delete_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "view_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "add_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "change_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "delete_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "view_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add user",
+    "content_type": [
+      "accounts",
+      "user"
+    ],
+    "codename": "add_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change user",
+    "content_type": [
+      "accounts",
+      "user"
+    ],
+    "codename": "change_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete user",
+    "content_type": [
+      "accounts",
+      "user"
+    ],
+    "codename": "delete_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view user",
+    "content_type": [
+      "accounts",
+      "user"
+    ],
+    "codename": "view_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add patient",
+    "content_type": [
+      "patients",
+      "patient"
+    ],
+    "codename": "add_patient"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change patient",
+    "content_type": [
+      "patients",
+      "patient"
+    ],
+    "codename": "change_patient"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete patient",
+    "content_type": [
+      "patients",
+      "patient"
+    ],
+    "codename": "delete_patient"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view patient",
+    "content_type": [
+      "patients",
+      "patient"
+    ],
+    "codename": "view_patient"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add family group",
+    "content_type": [
+      "patients",
+      "familygroup"
+    ],
+    "codename": "add_familygroup"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change family group",
+    "content_type": [
+      "patients",
+      "familygroup"
+    ],
+    "codename": "change_familygroup"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete family group",
+    "content_type": [
+      "patients",
+      "familygroup"
+    ],
+    "codename": "delete_familygroup"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view family group",
+    "content_type": [
+      "patients",
+      "familygroup"
+    ],
+    "codename": "view_familygroup"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add patient visit",
+    "content_type": [
+      "patients",
+      "patientvisit"
+    ],
+    "codename": "add_patientvisit"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change patient visit",
+    "content_type": [
+      "patients",
+      "patientvisit"
+    ],
+    "codename": "change_patientvisit"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete patient visit",
+    "content_type": [
+      "patients",
+      "patientvisit"
+    ],
+    "codename": "delete_patientvisit"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view patient visit",
+    "content_type": [
+      "patients",
+      "patientvisit"
+    ],
+    "codename": "view_patientvisit"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add consultation",
+    "content_type": [
+      "patients",
+      "consultation"
+    ],
+    "codename": "add_consultation"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change consultation",
+    "content_type": [
+      "patients",
+      "consultation"
+    ],
+    "codename": "change_consultation"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete consultation",
+    "content_type": [
+      "patients",
+      "consultation"
+    ],
+    "codename": "delete_consultation"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view consultation",
+    "content_type": [
+      "patients",
+      "consultation"
+    ],
+    "codename": "view_consultation"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add eye examination",
+    "content_type": [
+      "patients",
+      "eyeexamination"
+    ],
+    "codename": "add_eyeexamination"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change eye examination",
+    "content_type": [
+      "patients",
+      "eyeexamination"
+    ],
+    "codename": "change_eyeexamination"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete eye examination",
+    "content_type": [
+      "patients",
+      "eyeexamination"
+    ],
+    "codename": "delete_eyeexamination"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view eye examination",
+    "content_type": [
+      "patients",
+      "eyeexamination"
+    ],
+    "codename": "view_eyeexamination"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add diagnosis treatment",
+    "content_type": [
+      "patients",
+      "diagnosistreatment"
+    ],
+    "codename": "add_diagnosistreatment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change diagnosis treatment",
+    "content_type": [
+      "patients",
+      "diagnosistreatment"
+    ],
+    "codename": "change_diagnosistreatment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete diagnosis treatment",
+    "content_type": [
+      "patients",
+      "diagnosistreatment"
+    ],
+    "codename": "delete_diagnosistreatment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view diagnosis treatment",
+    "content_type": [
+      "patients",
+      "diagnosistreatment"
+    ],
+    "codename": "view_diagnosistreatment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add prescription",
+    "content_type": [
+      "patients",
+      "prescription"
+    ],
+    "codename": "add_prescription"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change prescription",
+    "content_type": [
+      "patients",
+      "prescription"
+    ],
+    "codename": "change_prescription"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete prescription",
+    "content_type": [
+      "patients",
+      "prescription"
+    ],
+    "codename": "delete_prescription"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view prescription",
+    "content_type": [
+      "patients",
+      "prescription"
+    ],
+    "codename": "view_prescription"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add surgery procedure",
+    "content_type": [
+      "patients",
+      "surgeryprocedure"
+    ],
+    "codename": "add_surgeryprocedure"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change surgery procedure",
+    "content_type": [
+      "patients",
+      "surgeryprocedure"
+    ],
+    "codename": "change_surgeryprocedure"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete surgery procedure",
+    "content_type": [
+      "patients",
+      "surgeryprocedure"
+    ],
+    "codename": "delete_surgeryprocedure"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view surgery procedure",
+    "content_type": [
+      "patients",
+      "surgeryprocedure"
+    ],
+    "codename": "view_surgeryprocedure"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add appointment",
+    "content_type": [
+      "patients",
+      "appointment"
+    ],
+    "codename": "add_appointment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change appointment",
+    "content_type": [
+      "patients",
+      "appointment"
+    ],
+    "codename": "change_appointment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete appointment",
+    "content_type": [
+      "patients",
+      "appointment"
+    ],
+    "codename": "delete_appointment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view appointment",
+    "content_type": [
+      "patients",
+      "appointment"
+    ],
+    "codename": "view_appointment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add bill",
+    "content_type": [
+      "patients",
+      "bill"
+    ],
+    "codename": "add_bill"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change bill",
+    "content_type": [
+      "patients",
+      "bill"
+    ],
+    "codename": "change_bill"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete bill",
+    "content_type": [
+      "patients",
+      "bill"
+    ],
+    "codename": "delete_bill"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view bill",
+    "content_type": [
+      "patients",
+      "bill"
+    ],
+    "codename": "view_bill"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add payment",
+    "content_type": [
+      "patients",
+      "payment"
+    ],
+    "codename": "add_payment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change payment",
+    "content_type": [
+      "patients",
+      "payment"
+    ],
+    "codename": "change_payment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete payment",
+    "content_type": [
+      "patients",
+      "payment"
+    ],
+    "codename": "delete_payment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view payment",
+    "content_type": [
+      "patients",
+      "payment"
+    ],
+    "codename": "view_payment"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add audit log",
+    "content_type": [
+      "audit_logs",
+      "auditlog"
+    ],
+    "codename": "add_auditlog"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change audit log",
+    "content_type": [
+      "audit_logs",
+      "auditlog"
+    ],
+    "codename": "change_auditlog"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete audit log",
+    "content_type": [
+      "audit_logs",
+      "auditlog"
+    ],
+    "codename": "delete_auditlog"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view audit log",
+    "content_type": [
+      "audit_logs",
+      "auditlog"
+    ],
+    "codename": "view_auditlog"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add System Setting",
+    "content_type": [
+      "settings_app",
+      "systemsetting"
+    ],
+    "codename": "add_systemsetting"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change System Setting",
+    "content_type": [
+      "settings_app",
+      "systemsetting"
+    ],
+    "codename": "change_systemsetting"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete System Setting",
+    "content_type": [
+      "settings_app",
+      "systemsetting"
+    ],
+    "codename": "delete_systemsetting"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view System Setting",
+    "content_type": [
+      "settings_app",
+      "systemsetting"
+    ],
+    "codename": "view_systemsetting"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add notification",
+    "content_type": [
+      "notifications",
+      "notification"
+    ],
+    "codename": "add_notification"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change notification",
+    "content_type": [
+      "notifications",
+      "notification"
+    ],
+    "codename": "change_notification"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete notification",
+    "content_type": [
+      "notifications",
+      "notification"
+    ],
+    "codename": "delete_notification"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view notification",
+    "content_type": [
+      "notifications",
+      "notification"
+    ],
+    "codename": "view_notification"
+  }
+},
+{
+  "model": "accounts.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$7HINl869gZtVnUKh5ZkMmB$Z02/BFarKA/AERhfzAaROACDYhrUNDNrH54vVGaFS+Y=",
+    "last_login": "2026-07-24T19:05:50.765Z",
+    "is_superuser": true,
+    "username": "tafida",
+    "first_name": "Tafida",
+    "last_name": "Muhammad Umar",
+    "email": "umarmuhammadtafeeda@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-07-01T20:53:06.798Z",
+    "role": "SUPER_ADMIN",
+    "phone_number": "08031146140",
+    "staff_id": "CEH/Staff/2026/001",
+    "department": "IT",
+    "must_change_password": false,
+    "is_active_staff": true,
+    "created_at": "2026-07-01T20:53:09.035Z",
+    "updated_at": "2026-07-01T21:15:15.482Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "LOGIN",
+    "module": "Authentication",
+    "description": "tafida logged in.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+    "created_at": "2026-07-01T20:53:28.276Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "LOGIN",
+    "module": "Authentication",
+    "description": "tafida logged in.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "10.33.21.169",
+    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Mobile Safari/537.36",
+    "created_at": "2026-07-01T21:05:40.990Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "UPDATE",
+    "module": "Staff Management",
+    "description": "Updated staff account: tafida.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+    "created_at": "2026-07-01T21:14:33.507Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "UPDATE",
+    "module": "Staff Management",
+    "description": "Updated staff account: tafida.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+    "created_at": "2026-07-01T21:15:15.735Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "EXPORT",
+    "module": "Patients",
+    "description": "Exported patient records to Excel.",
+    "object_id": "",
+    "object_repr": "",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+    "created_at": "2026-07-01T21:15:38.847Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "LOGIN",
+    "module": "Authentication",
+    "description": "tafida logged in.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "10.170.148.152",
+    "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+    "created_at": "2026-07-11T14:44:16.363Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "LOGOUT",
+    "module": "Authentication",
+    "description": "tafida logged out.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "10.170.148.152",
+    "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+    "created_at": "2026-07-11T14:47:45.946Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 8,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "LOGIN",
+    "module": "Authentication",
+    "description": "tafida logged in.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "10.170.148.178",
+    "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+    "created_at": "2026-07-11T14:48:00.705Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 9,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "LOGIN",
+    "module": "Authentication",
+    "description": "tafida logged in.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "created_at": "2026-07-15T19:37:32.922Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 10,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "LOGIN",
+    "module": "Authentication",
+    "description": "tafida logged in.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "10.167.73.90",
+    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Mobile Safari/537.36",
+    "created_at": "2026-07-16T08:16:20.824Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 11,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "LOGIN",
+    "module": "Authentication",
+    "description": "tafida logged in.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "created_at": "2026-07-16T19:19:02.811Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 12,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "LOGIN",
+    "module": "Authentication",
+    "description": "tafida logged in.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "10.167.73.90",
+    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Mobile Safari/537.36",
+    "created_at": "2026-07-21T20:34:45.771Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 13,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "LOGIN",
+    "module": "Authentication",
+    "description": "tafida logged in.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "10.167.73.201",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Mobile/15E148 Safari/604.1",
+    "created_at": "2026-07-21T20:38:56.264Z"
+  }
+},
+{
+  "model": "audit_logs.auditlog",
+  "pk": 14,
+  "fields": {
+    "user": [
+      "tafida"
+    ],
+    "action": "LOGIN",
+    "module": "Authentication",
+    "description": "tafida logged in.",
+    "object_id": "1",
+    "object_repr": "tafida",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "created_at": "2026-07-24T19:05:50.955Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 1,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-06-30T14:00:42.347Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 2,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-07-01T21:04:53.097Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 3,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-07-11T14:38:05.710Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 4,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-07-11T14:40:58.168Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 5,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-07-15T19:32:08.346Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 6,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-07-15T19:49:54.630Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 7,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-07-15T19:51:37.863Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 8,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-07-16T08:14:29.670Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 9,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-07-21T20:32:07.750Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 10,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-07-21T20:33:46.766Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 11,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-07-24T19:02:45.153Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 12,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": false,
+    "is_global": true,
+    "created_at": "2026-07-24T19:12:02.546Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 13,
+  "fields": {
+    "recipient": null,
+    "title": "Daily Backup Reminder",
+    "message": "Please create and copy today’s clinic backup to an external drive before closing.",
+    "notification_type": "BACKUP",
+    "link": "/backups/",
+    "is_read": true,
+    "is_global": true,
+    "created_at": "2026-07-24T19:21:28.511Z"
+  }
+}
+]

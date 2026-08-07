@@ -1,0 +1,434 @@
+/* =========================================================
+   CORRECTION PHASE 7E
+   CONTACT LENS PRESCRIPTION PRINT / PDF
+   ========================================================= */
+
+@page {
+    size: A4;
+    margin: 12mm;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: #1e293b;
+    background: #eef2f5;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.cl-print-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 13px;
+    background: #17212b;
+}
+
+.cl-print-toolbar a,
+.cl-print-toolbar button {
+    min-height: 36px;
+    padding: 8px 14px;
+    color: #ffffff;
+    background: #0b4f8a;
+    border: 1px solid #2f79b7;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.cl-print-toolbar .secondary {
+    color: #e2e8f0;
+    background: transparent;
+    border-color: #61707c;
+}
+
+.cl-prescription-sheet {
+    position: relative;
+    width: 210mm;
+    min-height: 275mm;
+    margin: 18px auto;
+    padding: 12mm;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #d5dde3;
+    box-shadow: 0 15px 42px rgba(15, 23, 42, 0.15);
+}
+
+.cl-draft-watermark {
+    position: absolute;
+    top: 44%;
+    left: 8%;
+    z-index: 0;
+    color: rgba(185, 28, 28, 0.09);
+    font-size: 58px;
+    font-weight: 900;
+    letter-spacing: 7px;
+    transform: rotate(-34deg);
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.cl-document-content {
+    position: relative;
+    z-index: 1;
+}
+
+.cl-letterhead {
+    display: grid;
+    grid-template-columns: 74px minmax(0, 1fr) 120px;
+    gap: 14px;
+    align-items: center;
+    padding-bottom: 11px;
+    border-bottom: 3px solid #0b4f8a;
+}
+
+.cl-logo-area {
+    width: 68px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid #d7e0e6;
+    border-radius: 50%;
+}
+
+.cl-logo-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.cl-logo-fallback {
+    color: #0b4f8a;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.cl-hospital-details {
+    text-align: center;
+}
+
+.cl-hospital-details h1 {
+    margin: 0;
+    color: #0b4f8a;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+}
+
+.cl-hospital-details p {
+    margin: 3px 0 0;
+    color: #52677a;
+    font-size: 9px;
+}
+
+.cl-document-code {
+    text-align: right;
+}
+
+.cl-document-code strong,
+.cl-document-code span {
+    display: block;
+}
+
+.cl-document-code strong {
+    color: #0b4f8a;
+    font-size: 11px;
+}
+
+.cl-document-code span {
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 8px;
+}
+
+.cl-document-title {
+    margin: 12px 0;
+    text-align: center;
+}
+
+.cl-document-title h2 {
+    margin: 0;
+    color: #0b4f8a;
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.cl-document-title p {
+    margin: 3px 0 0;
+    color: #64748b;
+    font-size: 9px;
+}
+
+.cl-status-line {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.cl-status-badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 8px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.cl-status-badge.final {
+    color: #17633a;
+    background: #dff6e8;
+    border: 1px solid #aadfbd;
+}
+
+.cl-status-badge.draft {
+    color: #8a1c25;
+    background: #fde2e5;
+    border: 1px solid #efbfc4;
+}
+
+.cl-patient-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-bottom: 12px;
+    border: 1px solid #cfd9e0;
+}
+
+.cl-patient-item {
+    min-height: 49px;
+    padding: 7px 9px;
+    border-right: 1px solid #d8e1e7;
+    border-bottom: 1px solid #d8e1e7;
+}
+
+.cl-patient-item:nth-child(4n) {
+    border-right: 0;
+}
+
+.cl-patient-item label {
+    display: block;
+    color: #6b7f90;
+    font-size: 7px;
+    font-weight: 900;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.cl-patient-item strong {
+    display: block;
+    margin-top: 4px;
+    color: #1f3549;
+    font-size: 10px;
+}
+
+.cl-section {
+    margin-top: 12px;
+}
+
+.cl-section-title {
+    padding: 7px 10px;
+    color: #ffffff;
+    background: #0b4f8a;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.cl-prescription-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cl-prescription-table th,
+.cl-prescription-table td {
+    padding: 8px 6px;
+    border: 1px solid #cfd9e0;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.cl-prescription-table th {
+    color: #334b60;
+    background: #edf3f7;
+    font-size: 8px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.cl-prescription-table td {
+    font-size: 9px;
+}
+
+.cl-prescription-table td:first-child {
+    color: #0b4f8a;
+    font-weight: 900;
+}
+
+.cl-instruction-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border: 1px solid #cfd9e0;
+}
+
+.cl-instruction-item {
+    min-height: 55px;
+    padding: 8px;
+    border-right: 1px solid #d8e1e7;
+    border-bottom: 1px solid #d8e1e7;
+}
+
+.cl-instruction-item:nth-child(3n) {
+    border-right: 0;
+}
+
+.cl-instruction-item label {
+    display: block;
+    color: #6b7f90;
+    font-size: 7px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.cl-instruction-item strong,
+.cl-instruction-item p {
+    display: block;
+    margin: 4px 0 0;
+    color: #263b50;
+    font-size: 9px;
+}
+
+.cl-wide-note {
+    padding: 9px 10px;
+    border: 1px solid #cfd9e0;
+    border-top: 0;
+}
+
+.cl-wide-note label {
+    display: block;
+    color: #6b7f90;
+    font-size: 7px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.cl-wide-note p {
+    margin: 5px 0 0;
+    white-space: pre-line;
+}
+
+.cl-safety-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border: 1px solid #cfd9e0;
+}
+
+.cl-safety-item {
+    padding: 8px;
+    text-align: center;
+    border-right: 1px solid #d8e1e7;
+}
+
+.cl-safety-item:last-child {
+    border-right: 0;
+}
+
+.cl-safety-item span {
+    display: block;
+    font-size: 16px;
+}
+
+.cl-safety-item strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 8px;
+}
+
+.cl-approval-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-top: 18px;
+}
+
+.cl-signature-box {
+    min-height: 83px;
+    padding-top: 38px;
+    border-bottom: 1px solid #263b50;
+}
+
+.cl-signature-box strong,
+.cl-signature-box small {
+    display: block;
+    text-align: center;
+}
+
+.cl-signature-box strong {
+    font-size: 9px;
+}
+
+.cl-signature-box small {
+    margin-top: 3px;
+    color: #64748b;
+    font-size: 7px;
+}
+
+.cl-emergency-notice {
+    margin-top: 15px;
+    padding: 8px 10px;
+    color: #842029;
+    background: #fff0f1;
+    border: 1px solid #efc8cc;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.cl-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 15px;
+    padding-top: 7px;
+    color: #718096;
+    border-top: 1px solid #cfd9e0;
+    font-size: 7px;
+}
+
+@media print {
+    body {
+        background: #ffffff;
+    }
+
+    .cl-print-toolbar {
+        display: none !important;
+    }
+
+    .cl-prescription-sheet {
+        width: auto;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+}
