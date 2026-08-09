@@ -148,6 +148,82 @@ Capital Eye Hospital Records System includes backup-oriented functionality to su
 
 ---
 
+## 🖥️ System Screenshots
+
+The following screenshots demonstrate selected modules and workflows of the **Capital Eye Hospital Records System (CEHRS)**.
+
+### 🔐 Secure Authentication
+
+The system provides controlled access for authorized hospital personnel through a secure authentication interface.
+
+![Capital Eye Login](Documentation/screenshots/01-login-page.png)
+
+---
+
+### 📊 Hospital Operations Dashboard
+
+The central dashboard provides authorized users with an overview of patient activity, visits, appointments, payments, backups, notifications, and operational shortcuts.
+
+![Capital Eye Dashboard](Documentation/screenshots/02-main-dashboard.png)
+
+---
+
+### 👥 Patient Records Management
+
+Authorized staff can register, search, review, import, export, and manage patient records from a centralized interface.
+
+![Patient Records](Documentation/screenshots/03-patient-records.png)
+
+---
+
+### 🩺 Patient Profile & Clinical Information
+
+Each patient has a centralized profile providing access to visits, appointments, procedures, billing history, investigation files, ophthalmology information, and other clinical records.
+
+![Patient Profile](Documentation/screenshots/04-patient-profile.png)
+
+---
+
+### 🏥 Patient Visits & Encounters
+
+The encounter-management module tracks patient visits, complaints, encounter status, visit numbers, dates, and related clinical workflow information.
+
+![Patient Visits](Documentation/screenshots/05-patient-visits.png)
+
+---
+
+### 📈 Clinical Reporting
+
+Clinical reporting provides date-based summaries of visits, consultations, prescriptions, diagnoses, and related clinical activity.
+
+![Clinical Report](Documentation/screenshots/06-clinical-report.png)
+
+---
+
+### 💰 Financial Reporting
+
+The financial reporting module summarizes billing, discounts, payments, outstanding balances, payment methods, and transaction records.
+
+![Financial Report](Documentation/screenshots/07-financial-report.png)
+
+---
+
+### 📅 Appointment Reporting
+
+Hospital administrators and authorized staff can review appointment activity by date and status, including scheduled, confirmed, completed, cancelled, and missed appointments.
+
+![Appointment Report](Documentation/screenshots/08-appointment-report.png)
+
+---
+
+### 🏥 Surgery & Procedure Reporting
+
+The surgery and procedure reporting module provides structured tracking of planned and completed procedures, patient information, procedure status, affected eye, and assigned surgeon.
+
+![Surgery and Procedure Report](Documentation/screenshots/09-surgery-report.png)
+
+---
+
 # 🌐 Local Network / Offline Deployment
 
 One of the key architectural goals of CEHRS is the ability to operate within a hospital without requiring continuous internet access.
@@ -177,3 +253,4 @@ The application can be deployed on a designated clinic server computer and acces
           └────────────────────┼────────────────────┘
                                │
                        Tablets / Laptops
+```
